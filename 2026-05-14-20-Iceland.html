@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Iceland Road Trip May 14-20</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1923; color: #e8edf2; }
+.header { text-align: center; padding: 24px 20px 12px; }
+h1 { font-size: 1.55rem; color: #fff; margin-bottom: 4px; }
+.subtitle { font-size: 0.83rem; color: #7a9bb5; margin-bottom: 14px; }
+.flight-banner { background: #0d2535; border: 1px solid #1a6b8a; border-radius: 8px; padding: 9px 14px; margin: 0 20px 14px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.flight-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.flight-label { color: #5a8aaa; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.4px; }
+.flight-val { color: #c8e6f5; font-weight: 700; font-size: 0.86rem; }
+.tabs { display: flex; margin: 0 20px 14px; border-radius: 8px; overflow: hidden; border: 1px solid #1e3347; }
+.tab { flex: 1; padding: 9px 4px; text-align: center; font-size: 0.78rem; font-weight: 600; cursor: pointer; background: #0d1f2e; color: #5a8aaa; border-right: 1px solid #1e3347; }
+.tab:last-child { border-right: none; }
+.tab.active { background: #1a6b8a; color: #fff; }
+.section { padding: 0 20px 20px; display: none; }
+.section.active { display: block; }
+#map { width: 100%; height: 460px; border-radius: 10px; border: 1px solid #1e3347; background: #0d2535; }
+.map-legend { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+.map-legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.72rem; color: #7a9bb5; }
+.ldot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; border: 1.5px solid rgba(255,255,255,0.25); }
+.legend { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 14px; }
+.tag { display: inline-block; font-size: 0.63rem; padding: 2px 6px; border-radius: 8px; margin-right: 3px; font-weight: 600; }
+.tag-geo { background: #1a3d4a; color: #4ac8e8; }
+.tag-water { background: #1a2a4a; color: #6aa8f0; }
+.tag-glacier { background: #152535; color: #90c8f0; }
+.tag-wildlife { background: #1a3a1a; color: #6de86d; }
+.tag-culture { background: #3a2a1a; color: #e8a860; }
+.tag-book { background: #3a1a1a; color: #f08080; }
+.expand-btn { display: block; margin: 0 auto 14px; background: #1a4a6a; color: #90d0f0; border: none; padding: 6px 20px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; font-weight: 600; }
+.day { background: #162433; border-radius: 10px; margin-bottom: 12px; border: 1px solid #1e3347; overflow: hidden; }
+.day-header { display: flex; align-items: center; padding: 11px 14px; cursor: pointer; gap: 10px; }
+.day-num { background: #1a6b8a; color: #fff; font-weight: 700; font-size: 0.76rem; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.day-title { flex: 1; }
+.day-title h2 { font-size: 0.95rem; font-weight: 700; color: #c8e6f5; }
+.day-title p { font-size: 0.72rem; color: #5a8aaa; margin-top: 1px; }
+.day-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.day-km { font-size: 0.68rem; color: #4a9abb; background: #0d2535; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+.day-sleep { font-size: 0.66rem; color: #5a9a5a; background: #0d1a0d; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+.chevron { color: #4a7a9b; font-size: 0.9rem; transition: transform 0.2s; margin-left: 4px; }
+.chevron.open { transform: rotate(180deg); }
+.day-body { display: none; padding: 0 14px 14px; }
+.day-body.open { display: block; }
+.timeline { position: relative; padding-left: 20px; }
+.timeline::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: #1e3a52; }
+.stop { position: relative; margin-bottom: 4px; }
+.stop::before { content: ''; position: absolute; left: -17px; top: 11px; width: 8px; height: 8px; border-radius: 50%; background: #1a8ab0; border: 2px solid #0f1923; }
+.stop-card { background: #0d1f2e; border-radius: 7px; padding: 8px 11px; border-left: 3px solid #1a6b8a; }
+.stop-top { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.stop-time { font-size: 0.7rem; font-weight: 700; color: #4ab8e0; white-space: nowrap; min-width: 55px; }
+.stop-name { font-size: 0.85rem; font-weight: 600; color: #ddeeff; flex: 1; }
+.stop-dur { font-size: 0.68rem; color: #5a8aaa; background: #162433; padding: 2px 7px; border-radius: 9px; white-space: nowrap; }
+.stop-note { font-size: 0.72rem; color: #7aaabb; margin-top: 3px; line-height: 1.4; }
+.tags { margin-top: 3px; }
+.drive { display: flex; align-items: center; gap: 8px; padding: 5px 0; position: relative; }
+.drive::before { content: ''; position: absolute; left: -17px; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; border-radius: 50%; background: #1e3347; border: 2px solid #0f1923; }
+.drive-label { font-size: 0.72rem; color: #4a7080; font-style: italic; flex: 1; }
+.drive-badge { font-size: 0.68rem; color: #e8a840; background: #2a1f08; padding: 2px 7px; border-radius: 9px; white-space: nowrap; }
+/* Google Maps popup override */
+.gm-style .gm-style-iw-c { background: #162433 !important; border: 1px solid #1e3347 !important; border-radius: 8px !important; padding: 0 !important; }
+.gm-style .gm-style-iw-d { overflow: hidden !important; }
+.gm-style .gm-style-iw-t::after { background: #162433 !important; }
+.gm-style button.gm-ui-hover-effect { top: 2px !important; right: 2px !important; }
+.popup-inner { padding: 10px 14px; min-width: 160px; }
+.popup-day { font-size: 0.66rem; font-weight: 700; margin-bottom: 2px; }
+.popup-name { font-size: 0.9rem; font-weight: 600; color: #ddeeff; }
+.popup-note { font-size: 0.72rem; color: #7aaabb; margin-top: 3px; line-height: 1.35; max-width: 200px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>&#127470;&#127480; Iceland 7-Day Road Trip</h1>
+  <p class="subtitle">May 14&ndash;20 &middot; optimized loop &middot; 2 nights Reykjavik &middot; minimal backtracking</p>
+</div>
+
+<div class="flight-banner">
+  <div class="flight-item"><span class="flight-label">&#9992; Arrive KEF</span><span class="flight-val">Thu May 14 &middot; 8:55 AM</span></div>
+  <div class="flight-item"><span class="flight-label">&#x1F697; Car ready ~</span><span class="flight-val">10:15 AM</span></div>
+  <div class="flight-item"><span class="flight-label">&#9992; Depart KEF</span><span class="flight-val">Tue May 20 &middot; 7:50 PM</span></div>
+  <div class="flight-item"><span class="flight-label">&#x23F0; Car return by</span><span class="flight-val">Tue May 20 &middot; 5:00 PM</span></div>
+  <div class="flight-item"><span class="flight-label">&#x1F3E8; Reykjavik nights</span><span class="flight-val">May 14&ndash;15 + May 19</span></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" id="tab-map" onclick="showTab('map')">&#x1F5FA; Map</div>
+  <div class="tab" id="tab-schedule" onclick="showTab('schedule')">&#x1F4C5; Schedule</div>
+</div>
+
+<div id="map-section" class="section active">
+  <div id="map"></div>
+  <div class="map-legend">
+    <div class="map-legend-item"><div class="ldot" style="background:#e74c3c"></div>Day 1 &ndash; Arrive</div>
+    <div class="map-legend-item"><div class="ldot" style="background:#e67e22"></div>Day 2 &ndash; Golden Circle</div>
+    <div class="map-legend-item"><div class="ldot" style="background:#f1c40f"></div>Day 3 &ndash; South Coast</div>
+    <div class="map-legend-item"><div class="ldot" style="background:#2ecc71"></div>Day 4 &ndash; Glaciers</div>
+    <div class="map-legend-item"><div class="ldot" style="background:#1abc9c"></div>Day 5 &ndash; To Snaefellsnes</div>
+    <div class="map-legend-item"><div class="ldot" style="background:#3498db"></div>Day 6 &ndash; Snaefellsnes</div>
+    <div class="map-legend-item"><div class="ldot" style="background:#9b59b6"></div>Day 7 &ndash; Departure</div>
+  </div>
+</div>
+
+<div id="schedule-section" class="section">
+  <div class="legend">
+    <span class="tag tag-geo">&#x1F30B; Geothermal</span>
+    <span class="tag tag-water">&#x1F4A7; Waterfall</span>
+    <span class="tag tag-glacier">&#x1F9CA; Glacier</span>
+    <span class="tag tag-wildlife">&#x1F426; Wildlife</span>
+    <span class="tag tag-culture">&#x1F3DB; Culture</span>
+    <span class="tag tag-book">&#x1F4CC; Book ahead</span>
+  </div>
+  <button class="expand-btn" onclick="toggleAll()">Expand All Days</button>
+  <div id="days"></div>
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById(name+'-section').classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+var dayColors = {1:'#e74c3c',2:'#e67e22',3:'#f1c40f',4:'#2ecc71',5:'#1abc9c',6:'#3498db',7:'#9b59b6'};
+var dayNames = {1:'Day 1',2:'Day 2',3:'Day 3',4:'Day 4',5:'Day 5',6:'Day 6',7:'Day 7'};
+
+var stops = [
+  {lat:63.8807,lng:-22.4473,label:'Blue Lagoon',day:1,note:'Geothermal spa - jet-lag reset'},
+  {lat:64.1466,lng:-21.9426,label:'Reykjavik',day:1,note:'Capital city - 2 nights'},
+  {lat:64.2553,lng:-21.1299,label:'Thingvellir NP',day:2,note:'Walk between tectonic plates - UNESCO'},
+  {lat:64.3104,lng:-20.3021,label:'Geysir',day:2,note:'Strokkur erupts every 5-10 min'},
+  {lat:64.3275,lng:-20.1216,label:'Gullfoss',day:2,note:"Iceland's most famous waterfall"},
+  {lat:64.1296,lng:-20.3001,label:'Secret Lagoon',day:2,note:"Iceland's oldest geothermal pool"},
+  {lat:63.6156,lng:-19.9886,label:'Seljalandsfoss',day:3,note:'Walk behind the waterfall'},
+  {lat:63.5320,lng:-19.5113,label:'Skogafoss',day:3,note:'60m drop - 527 stairs up the side'},
+  {lat:63.4033,lng:-19.1280,label:'Dyrholaey Cliffs',day:3,note:'Puffins nest here in May'},
+  {lat:63.4054,lng:-18.9921,label:'Reynisfjara Beach',day:3,note:'Black sand - basalt columns'},
+  {lat:63.4187,lng:-19.0049,label:'Vik',day:3,note:'Sleep here tonight'},
+  {lat:64.0161,lng:-16.9756,label:'Skaftafell',day:4,note:'Svartifoss basalt column hike'},
+  {lat:64.0490,lng:-16.3800,label:'Glacier Hike',day:4,note:'Book in advance - Glacier Adventure'},
+  {lat:64.0784,lng:-16.2306,label:'Jokulsarlon Lagoon',day:4,note:'Icebergs calving - seals lounging'},
+  {lat:64.0671,lng:-16.1799,label:'Diamond Beach',day:4,note:'Ice chunks on black sand'},
+  {lat:63.7507,lng:-18.0648,label:'Fjadrarglj­ufur Canyon',day:5,note:'Optional - Game of Thrones canyon'},
+  {lat:64.0412,lng:-20.8836,label:'Kerid Crater',day:5,note:'Optional - turquoise volcanic lake'},
+  {lat:64.9243,lng:-23.2681,label:'Grundarfjordur',day:5,note:'Sleep here - Kirkjufell outside your window'},
+  {lat:64.9408,lng:-23.3083,label:'Kirkjufell',day:6,note:'Most photographed mountain in Iceland'},
+  {lat:64.7499,lng:-23.9021,label:'Djupalonssandur',day:6,note:'Black pebble beach + shipwreck'},
+  {lat:64.8161,lng:-23.9258,label:'Snaefellsjokull',day:6,note:'Jules Verne gateway to center of earth'},
+  {lat:64.8675,lng:-23.4845,label:'Ytri Tunga',day:6,note:'Harbor seal colony'},
+  {lat:63.8876,lng:-22.0613,label:'Krysuvík',day:7,note:'Sulfur mud pools + steaming vents'},
+  {lat:63.9349,lng:-22.0520,label:'Kleifarvatn Lake',day:7,note:'Eerie black lava lake'},
+  {lat:63.9850,lng:-22.6056,label:'KEF Airport',day:7,note:'Return car by 5 PM - depart 7:50 PM'}
+];
+
+var map, infoWindow;
+
+function initMap() {
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: {lat:64.5, lng:-19.5},
+    zoom: 6,
+    mapTypeId: 'terrain',
+    styles: [
+      {elementType:'geometry', stylers:[{color:'#1a2535'}]},
+      {elementType:'labels.text.fill', stylers:[{color:'#8ec3d4'}]},
+      {elementType:'labels.text.stroke', stylers:[{color:'#0f1923'}]},
+      {featureType:'water', elementType:'geometry', stylers:[{color:'#0d2535'}]},
+      {featureType:'road', elementType:'geometry', stylers:[{color:'#2a3d55'}]},
+      {featureType:'road', elementType:'geometry.stroke', stylers:[{color:'#1a2a40'}]},
+      {featureType:'landscape', elementType:'geometry', stylers:[{color:'#1a2535'}]},
+      {featureType:'poi', elementType:'geometry', stylers:[{color:'#162433'}]},
+      {featureType:'administrative', elementType:'geometry.stroke', stylers:[{color:'#2a4a6a'}]}
+    ]
+  });
+
+  infoWindow = new google.maps.InfoWindow({maxWidth: 240});
+
+  // Draw polylines per day
+  var byDay = {};
+  stops.forEach(function(s){ if(!byDay[s.day]) byDay[s.day]=[]; byDay[s.day].push({lat:s.lat,lng:s.lng}); });
+  Object.keys(byDay).forEach(function(day){
+    new google.maps.Polyline({
+      path: byDay[day],
+      geodesic: true,
+      strokeColor: dayColors[day],
+      strokeOpacity: 0.7,
+      strokeWeight: 2.5,
+      map: map
+    });
+  });
+
+  // Draw markers
+  stops.forEach(function(s){
+    var marker = new google.maps.Marker({
+      position: {lat:s.lat, lng:s.lng},
+      map: map,
+      title: s.label,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: dayColors[s.day],
+        fillOpacity: 1,
+        strokeColor: '#ffffff',
+        strokeWeight: 2,
+        scale: 9
+      },
+      label: {
+        text: String(s.day),
+        color: '#ffffff',
+        fontSize: '10px',
+        fontWeight: 'bold'
+      }
+    });
+
+    marker.addListener('click', function(){
+      infoWindow.setContent(
+        '<div class="popup-inner">' +
+        '<div class="popup-day" style="color:'+dayColors[s.day]+'">Day '+s.day+'</div>' +
+        '<div class="popup-name">'+s.label+'</div>' +
+        '<div class="popup-note">'+s.note+'</div>' +
+        '</div>'
+      );
+      infoWindow.open(map, marker);
+    });
+  });
+}
+
+// Schedule data
+var days = [
+  {n:1, date:'Thu May 14', title:'Arrive + Reykjavik', km:'~75 km', sleep:'Reykjavik',
+   stops:[
+    {time:'8:55 AM', name:'Land at KEF - customs, bags, car pickup', note:'Allow ~80 min for immigration, baggage claim, and rental car collection.'},
+    {drive:'20 min to Blue Lagoon'},
+    {time:'10:15 AM', name:'Blue Lagoon', dur:'2.5 hrs', tags:['tag-geo','tag-book'], note:'Perfect jet-lag reset right off the airport road. Book Comfort ticket in advance - silica mask + one drink included.'},
+    {drive:'50 min to Reykjavik'},
+    {time:'1:30 PM', name:'Check in to hotel + freshen up', dur:'45 min', note:'Drop bags and get oriented.'},
+    {time:'2:15 PM', name:'Hallgrimskirkja Tower', dur:'1 hr', tags:['tag-culture'], note:'Panoramic city views from the tower (~$7). Open until 5 PM.'},
+    {time:'3:30 PM', name:'Explore Reykjavik - harbor and dinner', dur:'Evening', tags:['tag-culture'], note:'Sun Voyager sculpture, Laugavegur for shopping. Dinner: Cafe Loki or Reykjavik Fish.'}
+   ]},
+  {n:2, date:'Fri May 15', title:'Golden Circle', km:'~230 km', sleep:'Reykjavik',
+   stops:[
+    {time:'8:30 AM', name:'Depart Reykjavik', note:'Last morning based in the city.'},
+    {drive:'45 min to Thingvellir'},
+    {time:'9:15 AM', name:'Thingvellir National Park', dur:'2 hrs', tags:['tag-culture'], note:'Walk the rift between the North American and Eurasian tectonic plates. UNESCO site. World oldest parliament (930 AD).'},
+    {drive:'45 min to Geysir'},
+    {time:'12:00 PM', name:'Geysir Geothermal Area', dur:'1.5 hrs', tags:['tag-geo'], note:'Strokkur erupts every 5-10 min. Lunch at on-site restaurant - Icelandic lamb soup is a must.'},
+    {drive:'15 min to Gullfoss'},
+    {time:'2:00 PM', name:'Gullfoss Waterfall', dur:'45 min', tags:['tag-water'], note:'Massive two-tiered cascade. Spray can be intense up close.'},
+    {drive:'30 min to Secret Lagoon'},
+    {time:'3:30 PM', name:'Secret Lagoon (Fludir)', dur:'2 hrs', tags:['tag-geo','tag-book'], note:"Iceland's oldest geothermal pool. Far less crowded than Blue Lagoon. Book in advance."},
+    {drive:'1 hr 15 min to Reykjavik'},
+    {time:'7:00 PM', name:'Arrive Reykjavik - final city dinner', note:'Last night in the capital. Try Fiskfelagid or Geiri Smart.'}
+   ]},
+  {n:3, date:'Sat May 16', title:'South Coast - Waterfalls and Black Sand', km:'~310 km', sleep:'Vik',
+   stops:[
+    {time:'8:00 AM', name:'Depart Reykjavik - check out', note:"East on Ring Road (Route 1). You won't be back until May 19."},
+    {drive:'1 hr 45 min to Seljalandsfoss'},
+    {time:'9:45 AM', name:'Seljalandsfoss', dur:'1 hr', tags:['tag-water'], note:'Walk completely behind the waterfall. Waterproofs essential. Bonus: Gljufrabui cave waterfall is 5 min north.'},
+    {drive:'30 min to Skogafoss'},
+    {time:'11:15 AM', name:'Skogafoss', dur:'1.5 hrs', tags:['tag-water'], note:'60-meter drop. Climb 527 stairs for aerial views and rainbows.'},
+    {drive:'30 min to Dyrholaey'},
+    {time:'1:15 PM', name:'Dyrholaey Cliffs', dur:'1.5 hrs', tags:['tag-wildlife'], note:'Puffins nest here in May. Iconic basalt sea arch and lighthouse panorama.'},
+    {drive:'15 min to Reynisfjara'},
+    {time:'3:00 PM', name:'Reynisfjara Black Sand Beach', dur:'1 hr', note:'Basalt columns, sea stacks, jet-black sand. Stay 30+ meters from water - sneaker waves are dangerous.'},
+    {drive:'10 min into Vik'},
+    {time:'4:30 PM', name:'Check in - Vik', note:'Dinner at Halldorskaffi. Early night - 7:30 AM start tomorrow.'}
+   ]},
+  {n:4, date:'Sun May 17', title:'Glacier Country', km:'~280 km', sleep:'Jokulsarlon area',
+   stops:[
+    {time:'7:30 AM', name:'Depart Vik', note:'Early start - 2 hrs to Skaftafell.'},
+    {drive:'2 hrs to Skaftafell / Vatnajokull NP'},
+    {time:'9:30 AM', name:'Skaftafell - Svartifoss Hike', dur:'2 hrs', tags:['tag-glacier','tag-water'], note:'1.5-hr loop to Svartifoss waterfall framed by hexagonal basalt columns. Europe largest glacier above.'},
+    {drive:'45 min to Glacier Adventure basecamp'},
+    {time:'12:15 PM', name:'Guided Glacier Hike', dur:'4-5 hrs', tags:['tag-glacier','tag-book'], note:'Book weeks in advance. Crampons and guide provided. Glacier Adventure rated 4.9 stars.'},
+    {drive:'5 min to Jokulsarlon'},
+    {time:'5:30 PM', name:'Jokulsarlon Glacier Lagoon', dur:'1.5 hrs', tags:['tag-glacier','tag-wildlife'], note:'Icebergs calving off Breidamerkurjokull. Seals often spotted. Zodiac tours available.'},
+    {drive:'5 min across road'},
+    {time:'7:00 PM', name:'Diamond Beach', dur:'45 min', tags:['tag-glacier'], note:'Glacial ice on black sand. Sun stays up until ~11 PM in May.'},
+    {time:'8:00 PM', name:'Sleep near Jokulsarlon', note:'Fosshotel Glacier Lagoon or Hotel Jokulsarlon. Very limited - book months ahead.'}
+   ]},
+  {n:5, date:'Mon May 18', title:'Jokulsarlon to Snaefellsnes direct', km:'~390 km', sleep:'Grundarfjordur',
+   stops:[
+    {time:'9:00 AM', name:'Depart Jokulsarlon northwest', note:'Drive directly to Snaefellsnes - skips Reykjavik return, saves ~200 km.'},
+    {drive:'~45 min west on Ring Road'},
+    {time:'10:00 AM', name:'Optional: Fjadrargl­ufur Canyon', dur:'1 hr', note:'Winding river canyon just off Route 1. Game of Thrones filming location.'},
+    {drive:'~2 hrs west on Ring Road'},
+    {time:'1:00 PM', name:'Optional: Kerid Volcanic Crater', dur:'45 min', tags:['tag-geo'], note:'Vivid turquoise crater lake against red lava walls. Small entry fee.'},
+    {drive:'1 hr 30 min northwest to Snaefellsnes via Route 54'},
+    {time:'3:30 PM', name:'Arrive Grundarfjordur - check in', note:'Kirkjufell mountain is right outside your window. Dinner at Bjargarsteinn Mathus.'},
+    {time:'Evening', name:'Kirkjufell at golden hour', note:'Evening light on the most photographed mountain in Iceland.'}
+   ]},
+  {n:6, date:'Tue May 19', title:'Snaefellsnes Peninsula to Reykjavik', km:'~230 km', sleep:'Reykjavik',
+   stops:[
+    {time:'9:00 AM', name:'Kirkjufell + Kirkjufellsfoss', dur:'1 hr', tags:['tag-water'], note:"You're already here. Morning light is perfect."},
+    {drive:'45 min to western tip'},
+    {time:'10:30 AM', name:'Djupalonssandur Beach', dur:'45 min', note:'Black pebble beach with rusted shipwreck remains and lava trails.'},
+    {drive:'20 min'},
+    {time:'11:30 AM', name:'Snaefellsjokull Glacier', dur:'1 hr', tags:['tag-glacier'], note:'Jules Verne set Journey to the Center of the Earth here. Walk the lava fields.'},
+    {drive:'30 min east along south shore'},
+    {time:'1:00 PM', name:'Ytri Tunga Beach - Seal Colony', dur:'45 min', tags:['tag-wildlife'], note:'Harbor seals lounge on the rocks throughout May.'},
+    {drive:'1 hr to Borgarnes'},
+    {time:'2:30 PM', name:'Optional: Borgarnes Settlement Center', dur:'45 min', tags:['tag-culture'], note:"Iceland's Viking history museum. Good leg-stretch."},
+    {drive:'1 hr to Reykjavik'},
+    {time:'5:00 PM', name:'Arrive Reykjavik - final night', note:'Last dinner. Splurge: Fiskfelagid, Apotek, or Snaps.'}
+   ]},
+  {n:7, date:'Wed May 20', title:'Krysuvík + Kleifarvatn to KEF', km:'~95 km', sleep:'Flight home',
+   stops:[
+    {time:'9:00 AM', name:'Breakfast and check out', note:'Grab coffee at Braud and Co on Frakkastigur - one of Reykjavik best bakeries.'},
+    {drive:'40 min to Krysuvík (Route 42 south)'},
+    {time:'9:45 AM', name:'Krysuvík Geothermal Fields', dur:'1.5 hrs', tags:['tag-geo'], note:'Bubbling sulfur mud pools, steaming vents, vivid rust-orange earth. Free entry, easy boardwalk.'},
+    {drive:'10 min to Kleifarvatn'},
+    {time:'11:30 AM', name:'Kleifarvatn Lake', dur:'1.5 hrs', note:'Iceland largest lake on Reykjanes peninsula. Ringed by black lava and dramatic cliffs. Eerily quiet.'},
+    {drive:'35 min to KEF Airport (Route 43 then Route 41)'},
+    {time:'1:45 PM', name:'Arrive KEF - return rental car', note:'Duty-free: skyr, chocolate, Brennivin, lopapeysa wool sweaters. Plenty of time before flight.'},
+    {time:'5:00 PM', name:'Car returned - check in', note:'Rental car returned by deadline. Check in for flight.'},
+    {time:'7:50 PM', name:'Depart KEF', note:'Go home happy.'}
+   ]}
+];
+
+var tagLabels = {'tag-geo':'Geothermal','tag-water':'Waterfall','tag-glacier':'Glacier','tag-wildlife':'Wildlife','tag-culture':'Culture','tag-book':'Book ahead'};
+
+function renderDays(){
+  var c = document.getElementById('days');
+  days.forEach(function(d,i){
+    var h = '<div class="day"><div class="day-header" onclick="toggle('+i+')"><div class="day-num">'+d.n+'</div><div class="day-title"><h2>'+d.title+'</h2><p>'+d.date+'</p></div><div class="day-meta"><div class="day-km">'+d.km+'</div><div class="day-sleep">'+d.sleep+'</div></div><div class="chevron" id="c'+i+'">&#9660;</div></div><div class="day-body" id="b'+i+'"><div class="timeline">';
+    d.stops.forEach(function(s){
+      if(s.drive){
+        var m = s.drive.match(/(\d[\d.]* ?(hr[s]?( \d+ ?min)?|min))/);
+        h += '<div class="drive"><span>&#x1F697;</span><span class="drive-label">'+s.drive+'</span>'+(m?'<span class="drive-badge">'+m[0]+'</span>':'')+'</div>';
+      } else {
+        var tags = (s.tags||[]).map(function(t){return '<span class="tag '+t+'">'+tagLabels[t]+'</span>';}).join('');
+        h += '<div class="stop"><div class="stop-card"><div class="stop-top"><span class="stop-time">'+s.time+'</span><span class="stop-name">'+s.name+'</span>'+(s.dur?'<span class="stop-dur">'+s.dur+'</span>':'')+'</div>'+(tags?'<div class="tags">'+tags+'</div>':'')+(s.note?'<div class="stop-note">'+s.note+'</div>':'')+'</div></div>';
+      }
+    });
+    h += '</div></div></div>';
+    c.innerHTML += h;
+  });
+}
+
+var allOpen = false;
+function toggleAll(){
+  allOpen = !allOpen;
+  days.forEach(function(_,i){
+    document.getElementById('b'+i).classList.toggle('open',allOpen);
+    document.getElementById('c'+i).classList.toggle('open',allOpen);
+  });
+  document.querySelector('.expand-btn').textContent = allOpen ? 'Collapse All Days' : 'Expand All Days';
+}
+function toggle(i){
+  document.getElementById('b'+i).classList.toggle('open');
+  document.getElementById('c'+i).classList.toggle('open');
+}
+
+renderDays();
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJEs-ueLaREIRJVaa2hmCb5qHHzBnWYUY&callback=initMap" async defer></script>
+</body>
+</html>

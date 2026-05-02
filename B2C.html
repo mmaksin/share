@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="en" dir="ltr" id="root">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WellHealth · B2C MVP Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green:        #0F4A3F;
+    --green-deep:   #0A3329;
+    --green-soft:   #1E5E50;
+    --gold:         #C9A55C;
+    --gold-soft:    #E0C893;
+    --cream:        #F8F4ED;
+    --cream-warm:   #F2EBDB;
+    --surface:      #FFFFFF;
+    --ink:          #1F2A24;
+    --ink-soft:     #6B7669;
+    --line:         #E8E1D2;
+    --danger:       #8B3A2F;
+    --shadow:       0 8px 30px rgba(15, 74, 63, 0.10);
+    --radius-card:  18px;
+    --radius-pill:  999px;
+  }
+
+  *,*::before,*::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #fdf9f0 0%, transparent 60%),
+      radial-gradient(900px 500px at 110% 110%, #eef2ee 0%, transparent 60%),
+      var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- Page chrome ---------- */
+  .page { max-width: 1480px; margin: 0 auto; padding: 28px 24px 80px; }
+  .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 28px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-mark {
+    width: 42px; height: 42px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-deep) 100%);
+    display: grid; place-items: center; color: var(--gold);
+    font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600;
+    box-shadow: var(--shadow);
+  }
+  .brand-name { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; letter-spacing: 0.5px; }
+  .brand-sub { font-size: 12px; color: var(--ink-soft); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+
+  .page-meta { font-size: 12px; color: var(--ink-soft); }
+  .page-meta b { color: var(--ink); font-weight: 600; }
+
+  .lang-toggle {
+    display: inline-flex; background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius-pill); padding: 4px; box-shadow: var(--shadow);
+  }
+  .lang-toggle button {
+    border: 0; background: transparent; padding: 8px 18px; font: inherit;
+    border-radius: var(--radius-pill); cursor: pointer; color: var(--ink-soft); font-weight: 500;
+  }
+  .lang-toggle button.is-active { background: var(--green); color: var(--gold); }
+
+  .legend {
+    margin-top: 18px; padding: 14px 18px; border-radius: 14px;
+    background: var(--surface); border: 1px solid var(--line); color: var(--ink-soft);
+    font-size: 13px; line-height: 1.6;
+  }
+  .legend b { color: var(--ink); }
+
+  /* ---------- Phone deck ---------- */
+  .deck {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+    gap: 28px;
+    margin-top: 32px;
+  }
+
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .phone {
+    width: 330px; height: 700px;
+    border-radius: 44px;
+    background: #111; padding: 12px;
+    box-shadow: 0 30px 60px rgba(15,74,63,0.18), 0 0 0 1px rgba(0,0,0,0.4) inset;
+    position: relative;
+  }
+  .phone::after {
+    content: '';
+    position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
+    width: 110px; height: 28px; background: #000; border-radius: 16px;
+    z-index: 5;
+  }
+  .screen {
+    width: 100%; height: 100%;
+    background: var(--cream);
+    border-radius: 34px; overflow: hidden;
+    position: relative;
+    display: flex; flex-direction: column;
+  }
+  .screen-label { font-size: 12px; color: var(--ink-soft); letter-spacing: 1px; text-transform: uppercase; }
+
+  .status-bar {
+    height: 44px; flex: 0 0 44px;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    padding: 0 24px 6px; font-size: 12px; color: var(--ink); font-weight: 600;
+  }
+  .status-bar .right { display: flex; gap: 6px; align-items: center; }
+  .dot { width: 6px; height: 6px; background: var(--ink); border-radius: 50%; }
+
+  .nav-top {
+    height: 56px; flex: 0 0 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px;
+  }
+  .nav-top .icon-btn {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--surface);
+    display: grid; place-items: center; color: var(--ink); border: 1px solid var(--line);
+    font-size: 16px;
+  }
+  .nav-top .title { font-family: 'Cormorant Garamond', serif; font-size: 18px; }
+
+  .scroll {
+    flex: 1; overflow-y: auto; padding: 0 20px 24px;
+  }
+
+  .nav-bottom {
+    height: 78px; flex: 0 0 78px;
+    background: var(--surface); border-top: 1px solid var(--line);
+    display: flex; justify-content: space-around; align-items: flex-start; padding-top: 12px;
+  }
+  .nav-bottom .nb-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: var(--ink-soft); }
+  .nav-bottom .nb-item.is-active { color: var(--green); }
+  .nav-bottom .nb-glyph {
+    width: 28px; height: 28px; border-radius: 8px; background: var(--cream-warm);
+    display: grid; place-items: center; font-size: 13px;
+  }
+  .nav-bottom .is-active .nb-glyph { background: var(--green); color: var(--gold); }
+
+  /* ---------- Reusable components ---------- */
+  .h-eyebrow { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  .h-title { font-family: 'Cormorant Garamond', serif; font-weight: 500; line-height: 1.1; }
+  .h1 { font-size: 28px; }
+  .h2 { font-size: 22px; }
+  .h3 { font-size: 18px; }
+  .body { font-size: 14px; line-height: 1.55; color: var(--ink); }
+  .body-soft { color: var(--ink-soft); font-size: 13px; line-height: 1.55; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: var(--radius-pill);
+    background: var(--cream-warm); color: var(--ink); font-size: 11px; font-weight: 500;
+    border: 1px solid var(--line);
+  }
+  .chip.gold { background: rgba(201,165,92,0.15); color: #6f5523; border-color: rgba(201,165,92,0.4); }
+  .chip.green { background: rgba(15,74,63,0.08); color: var(--green-deep); border-color: rgba(15,74,63,0.2); }
+  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 18px; border-radius: 14px; border: 0; cursor: pointer;
+    font: inherit; font-weight: 600; font-size: 14px;
+    background: var(--green); color: var(--gold);
+    width: 100%;
+  }
+  .btn.ghost { background: transparent; border: 1px solid var(--green); color: var(--green); }
+  .btn.gold-line { background: transparent; border: 1px solid var(--gold); color: #6f5523; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius-card); overflow: hidden;
+  }
+
+  .divider { height: 1px; background: var(--line); margin: 14px 0; }
+
+  /* ---------- SCREEN 1 — HOME ---------- */
+  .home-greet { padding-top: 4px; }
+  .home-greet .salam { font-family: 'Cormorant Garamond', serif; font-size: 24px; }
+  .home-greet .name { color: var(--green); }
+  .home-greet .sub { color: var(--ink-soft); font-size: 13px; margin-top: 4px; }
+
+  .hero {
+    margin-top: 18px;
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-deep) 100%);
+    color: var(--cream);
+    border-radius: var(--radius-card);
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: ''; position: absolute; right: -40px; top: -40px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,165,92,0.25) 0%, transparent 70%);
+  }
+  .hero .h-eyebrow { color: var(--gold-soft); }
+  .hero .h-title { color: var(--cream); margin: 8px 0 10px; }
+  .hero .reason { color: rgba(248,244,237,0.75); font-size: 13px; line-height: 1.55; }
+  .hero .row { display: flex; gap: 8px; margin-top: 16px; }
+  .hero .row .btn { width: auto; padding: 10px 14px; font-size: 12px; }
+  .hero .row .btn.gold { background: var(--gold); color: var(--green-deep); }
+  .hero .row .btn.line { background: transparent; border: 1px solid rgba(248,244,237,0.4); color: var(--cream); }
+
+  .section-label {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 22px 0 10px;
+  }
+  .section-label .lbl { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
+  .section-label a { font-size: 12px; color: var(--green); text-decoration: none; font-weight: 500; }
+
+  .trip-card {
+    display: flex; gap: 12px; padding: 12px;
+    background: var(--surface); border-radius: 14px; border: 1px solid var(--line);
+    margin-bottom: 8px;
+  }
+  .trip-thumb {
+    width: 56px; height: 56px; flex: 0 0 56px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #c9a55c 0%, #6b4f1f 100%);
+    display: grid; place-items: center; color: var(--cream);
+    font-family: 'Cormorant Garamond', serif; font-size: 22px;
+  }
+  .trip-thumb.alt { background: linear-gradient(135deg, #1e5e50 0%, #0a3329 100%); }
+  .trip-meta { flex: 1; min-width: 0; }
+  .trip-meta .t { font-weight: 600; font-size: 14px; }
+  .trip-meta .d { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .trip-meta .badges { display: flex; gap: 6px; margin-top: 8px; }
+  .trip-meta .badges .chip { padding: 3px 8px; font-size: 10px; }
+
+  .concierge-fab {
+    position: absolute; bottom: 92px; inset-inline-end: 16px;
+    background: var(--green); color: var(--gold);
+    border-radius: var(--radius-pill);
+    padding: 10px 14px; font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 10px 24px rgba(15,74,63,0.35);
+    z-index: 4;
+  }
+  .concierge-fab .pulse {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
+    box-shadow: 0 0 0 0 rgba(201,165,92,0.6);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(201,165,92,0.5); }
+    70%  { box-shadow: 0 0 0 10px rgba(201,165,92,0); }
+    100% { box-shadow: 0 0 0 0 rgba(201,165,92,0); }
+  }
+
+  /* ---------- SCREEN 2 — RECOMMENDATIONS ---------- */
+  .summary {
+    background: var(--surface); border: 1px solid var(--line);
+    padding: 14px; border-radius: 14px; margin-bottom: 14px;
+  }
+  .summary .who { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 1px; }
+  .summary .what { font-size: 13px; line-height: 1.55; margin-top: 4px; }
+  .summary .edit { color: var(--green); font-size: 12px; font-weight: 600; margin-top: 8px; display: inline-block; }
+
+  .venue {
+    margin-bottom: 14px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: var(--radius-card); overflow: hidden;
+  }
+  .venue-img {
+    height: 130px; background: linear-gradient(135deg,#1e5e50 0%,#0a3329 100%);
+    position: relative;
+  }
+  .venue-img.lans { background: linear-gradient(135deg,#bda378 0%,#5b462a 100%); }
+  .venue-img.kamalaya { background: linear-gradient(135deg,#7a8e6f 0%,#2d3a26 100%); }
+  .venue-img.sha { background: linear-gradient(135deg,#c5b8a3 0%,#7a6d56 100%); }
+  .venue-img .badge {
+    position: absolute; top: 12px; inset-inline-start: 12px;
+    padding: 5px 10px; border-radius: var(--radius-pill);
+    background: rgba(248,244,237,0.95); color: var(--green-deep);
+    font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .venue-img .badge.warn { background: rgba(255,255,255,0.95); color: var(--danger); }
+  .venue-body { padding: 14px 16px 16px; }
+  .venue-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500; }
+  .venue-loc { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+  .venue-rationale { font-size: 13px; color: var(--ink); line-height: 1.55; margin: 10px 0; }
+  .venue-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+
+  /* ---------- SCREEN 3 — DETAIL ---------- */
+  .detail-hero {
+    height: 200px;
+    background: linear-gradient(135deg,#bda378 0%,#5b462a 100%);
+    position: relative; flex: 0 0 200px;
+  }
+  .detail-hero .back {
+    position: absolute; top: 16px; inset-inline-start: 16px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(248,244,237,0.95);
+    display: grid; place-items: center; color: var(--ink);
+  }
+  .detail-hero .save {
+    position: absolute; top: 16px; inset-inline-end: 16px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(248,244,237,0.95);
+    display: grid; place-items: center; color: var(--ink);
+  }
+  .detail-title-block {
+    background: var(--surface); padding: 18px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .detail-title-block .h-title { font-size: 24px; }
+  .detail-title-block .loc { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+  .detail-row { display: flex; gap: 14px; margin-top: 12px; }
+  .detail-stat { flex: 1; }
+  .detail-stat .k { font-size: 10px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 1px; }
+  .detail-stat .v { font-family: 'Cormorant Garamond', serif; font-size: 18px; }
+
+  .why-panel {
+    margin-top: 14px;
+    border: 1px solid var(--gold); background: rgba(201,165,92,0.08);
+    border-radius: var(--radius-card); padding: 16px;
+  }
+  .why-panel .h-eyebrow { color: #6f5523; }
+  .why-panel h4 { margin: 6px 0 10px; font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 18px; color: var(--green-deep); }
+  .why-list { margin: 0; padding-inline-start: 18px; font-size: 13px; line-height: 1.6; color: var(--ink); }
+  .why-list li { margin-bottom: 6px; }
+  .why-cons { font-size: 12px; color: var(--danger); margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(139,58,47,0.2); }
+
+  .cta-stack { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+
+  /* ---------- SCREEN 4 — CHAT ---------- */
+  .chat-scroll { display: flex; flex-direction: column; gap: 10px; padding-top: 12px; }
+  .bubble {
+    max-width: 80%; padding: 12px 14px; border-radius: 16px;
+    font-size: 13px; line-height: 1.55;
+  }
+  .bubble.ai { background: var(--surface); border: 1px solid var(--line); color: var(--ink); align-self: flex-start; border-start-start-radius: 4px; }
+  .bubble.me { background: var(--green); color: var(--cream); align-self: flex-end; border-start-end-radius: 4px; }
+  .ai-meta { display: flex; align-items: center; gap: 8px; align-self: flex-start; margin-bottom: -4px; }
+  .ai-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: linear-gradient(135deg,var(--gold) 0%,#8a6e2d 100%);
+    color: var(--green-deep); display: grid; place-items: center;
+    font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 600;
+  }
+  .ai-name { font-size: 11px; color: var(--ink-soft); font-weight: 600; letter-spacing: 0.5px; }
+
+  .quick-replies { display: flex; gap: 6px; flex-wrap: wrap; align-self: flex-start; margin-top: 4px; }
+  .quick-replies .qr {
+    padding: 8px 12px; border-radius: var(--radius-pill);
+    background: var(--surface); border: 1px solid var(--green);
+    color: var(--green); font-size: 11px; font-weight: 500;
+  }
+
+  .chat-input-row {
+    display: flex; gap: 8px; align-items: center; padding: 12px 16px;
+    background: var(--surface); border-top: 1px solid var(--line);
+    flex: 0 0 auto;
+  }
+  .chat-input {
+    flex: 1; height: 40px; border-radius: 20px; border: 1px solid var(--line);
+    padding: 0 14px; font: inherit; font-size: 13px; background: var(--cream);
+  }
+  .chat-mic {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--green);
+    display: grid; place-items: center; color: var(--gold);
+  }
+
+  /* ---------- SCREEN 5 — CONCIERGE HANDOFF ---------- */
+  .concierge-card {
+    margin-top: 12px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: var(--radius-card); padding: 18px;
+  }
+  .concierge-card .av {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg,#1e5e50 0%,#0a3329 100%);
+    color: var(--gold); display: grid; place-items: center;
+    font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600;
+  }
+  .concierge-head { display: flex; gap: 12px; align-items: center; }
+  .concierge-head .meta .nm { font-weight: 600; }
+  .concierge-head .meta .ro { font-size: 12px; color: var(--ink-soft); }
+  .concierge-head .meta .av-mark { color: var(--green); font-size: 12px; font-weight: 600; margin-top: 4px; }
+
+  .channel-list { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .channel {
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px;
+    border: 1px solid var(--line); border-radius: 12px;
+    background: var(--cream-warm);
+  }
+  .channel.active { border-color: var(--green); background: rgba(15,74,63,0.05); }
+  .channel .icon {
+    width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center;
+    background: var(--surface); color: var(--green); font-size: 14px; font-weight: 600;
+  }
+  .channel .nm { font-weight: 600; font-size: 13px; }
+  .channel .sub { font-size: 11px; color: var(--ink-soft); }
+  .channel .check { margin-inline-start: auto; color: var(--green); }
+
+  .summary-pack {
+    margin-top: 14px; background: var(--cream-warm); border: 1px dashed var(--gold);
+    border-radius: 12px; padding: 12px 14px; font-size: 12px; color: var(--ink-soft);
+  }
+  .summary-pack .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #6f5523; font-weight: 600; }
+  .summary-pack ul { margin: 6px 0 0; padding-inline-start: 16px; }
+  .summary-pack li { margin-bottom: 2px; color: var(--ink); }
+
+  /* ---------- SCREEN 6 — HEALTH PASSPORT ---------- */
+  .principal-switch {
+    display: flex; gap: 8px; padding: 12px 0; overflow-x: auto;
+  }
+  .principal-chip {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    border-radius: var(--radius-pill); background: var(--surface);
+    border: 1px solid var(--line); flex: 0 0 auto;
+  }
+  .principal-chip.is-active { background: var(--green); color: var(--gold); border-color: var(--green); }
+  .principal-chip .dot { width: 24px; height: 24px; border-radius: 50%; background: var(--cream-warm); display: grid; place-items: center; font-size: 11px; color: var(--ink); font-weight: 700; }
+  .principal-chip.is-active .dot { background: var(--gold); color: var(--green-deep); }
+  .principal-chip .nm { font-size: 12px; font-weight: 500; }
+
+  .pp-section { margin-top: 14px; }
+  .pp-row {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+    padding: 12px 14px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; margin-bottom: 8px;
+  }
+  .pp-row .k { font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 1px; }
+  .pp-row .v { font-size: 14px; font-weight: 500; margin-top: 4px; }
+  .pp-row .v.soft { color: var(--ink-soft); font-weight: 400; font-size: 13px; }
+  .pp-row .edit { font-size: 12px; color: var(--green); font-weight: 600; }
+
+  .pp-doc {
+    display: flex; gap: 10px; padding: 10px 12px; background: var(--cream-warm);
+    border-radius: 10px; margin-bottom: 6px; align-items: center;
+  }
+  .pp-doc .ic { width: 32px; height: 32px; border-radius: 8px; background: var(--surface); display: grid; place-items: center; color: var(--green); font-weight: 700; font-size: 11px; }
+  .pp-doc .meta .n { font-size: 13px; font-weight: 500; }
+  .pp-doc .meta .d { font-size: 11px; color: var(--ink-soft); }
+  .pp-doc .lock { margin-inline-start: auto; color: var(--ink-soft); font-size: 14px; }
+
+  /* ---------- Notes under each phone ---------- */
+  .note { max-width: 330px; text-align: center; }
+  .note .label { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--green); margin-bottom: 4px; }
+  .note .desc { font-size: 12px; color: var(--ink-soft); line-height: 1.55; }
+
+  /* ---------- RTL nudges ---------- */
+  html[dir="rtl"] body { font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; }
+  html[dir="rtl"] .why-list { padding-inline-start: 0; padding-inline-end: 18px; }
+  html[dir="rtl"] .summary-pack ul { padding-inline-start: 0; padding-inline-end: 16px; }
+
+  /* ---------- Annotation panel ---------- */
+  .annotations {
+    margin-top: 56px; padding: 24px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 18px;
+  }
+  .annotations h2 {
+    font-family: 'Cormorant Garamond', serif; font-weight: 500; margin: 0 0 12px;
+    font-size: 22px; color: var(--green-deep);
+  }
+  .annotations .grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px;
+  }
+  .annotations .grid > div { padding: 12px 14px; background: var(--cream-warm); border-radius: 12px; border: 1px solid var(--line); }
+  .annotations h3 { font-size: 13px; margin: 0 0 6px; color: var(--green-deep); letter-spacing: 0.3px; }
+  .annotations p { font-size: 12px; color: var(--ink-soft); line-height: 1.55; margin: 0; }
+
+  @media print {
+    body { background: white; }
+    .lang-toggle { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="page-head">
+    <div>
+      <div class="brand">
+        <div class="brand-mark">W</div>
+        <div>
+          <div class="brand-name">WellHealth</div>
+          <div class="brand-sub">B2C MVP · Wireframe v0.1</div>
+        </div>
+      </div>
+      <div class="page-meta" style="margin-top: 14px;">
+        Six representative screens for <b>Hybrid AI + Concierge</b> flow. Mobile-first, bilingual, RTL-aware.
+        Toggle the language to see the entire deck flip between English (LTR) and Arabic (RTL).
+      </div>
+    </div>
+    <div class="lang-toggle" role="tablist">
+      <button id="btn-en" class="is-active" type="button">EN</button>
+      <button id="btn-ar" type="button">العربية</button>
+    </div>
+  </header>
+
+  <div class="legend">
+    <b>Palette:</b> deep emerald + warm gold over cream. <b>Type:</b> IBM Plex Sans Arabic + Cormorant Garamond serif accent.
+    <b>Privacy:</b> no social, no public profile, no like-counts. <b>Concierge:</b> always one tap away — see the gold pill on the home screen.
+  </div>
+
+  <div class="deck" id="deck">
+
+    <!-- ============ PHONE 1 — HOME / DASHBOARD ============ -->
+    <div class="phone-wrap">
+      <div class="phone"><div class="screen">
+        <div class="status-bar">
+          <span data-i18n="time">9:41</span>
+          <span class="right"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+        </div>
+        <div class="nav-top">
+          <div class="icon-btn">≡</div>
+          <div class="title" data-i18n="home_title">WellHealth</div>
+          <div class="icon-btn">⌕</div>
+        </div>
+        <div class="scroll">
+          <div class="home-greet">
+            <div class="salam"><span data-i18n="greet">Good morning,</span> <span class="name" data-i18n="user_first">Khalid</span></div>
+            <div class="sub" data-i18n="greet_sub">A quiet moment to think about your next stay.</div>
+          </div>
+
+          <div class="hero">
+            <div class="h-eyebrow" data-i18n="hero_eyebrow">Suggestion for you</div>
+            <div class="h-title h2" data-i18n="hero_title">Time for your next trip?</div>
+            <div class="reason" data-i18n="hero_reason">It's been seven months since Lanserhof. You mentioned wanting to focus on sleep this year — three quiet places come to mind.</div>
+            <div class="row">
+              <button class="btn gold" data-i18n="hero_cta1">See three suggestions</button>
+              <button class="btn line" data-i18n="hero_cta2">Not now</button>
+            </div>
+          </div>
+
+          <div class="section-label">
+            <span class="lbl" data-i18n="upcoming">Upcoming</span>
+          </div>
+          <div class="trip-card">
+            <div class="trip-thumb">L</div>
+            <div class="trip-meta">
+              <div class="t" data-i18n="trip1_title">Lanserhof Sylt</div>
+              <div class="d" data-i18n="trip1_dates">Mar 12 — Mar 26 · Booked</div>
+              <div class="badges">
+                <span class="chip green" data-i18n="trip1_badge1">Sleep & longevity</span>
+                <span class="chip" data-i18n="trip1_badge2">Concierge briefed</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-label">
+            <span class="lbl" data-i18n="past">Past trips</span>
+            <a href="#" data-i18n="all">All</a>
+          </div>
+          <div class="trip-card">
+            <div class="trip-thumb alt">S</div>
+            <div class="trip-meta">
+              <div class="t" data-i18n="trip2_title">SHA Wellness, Spain</div>
+              <div class="d" data-i18n="trip2_dates">Sep 2025 · 10 nights</div>
+              <div class="badges">
+                <span class="chip" data-i18n="trip2_badge1">Detox</span>
+                <span class="chip" data-i18n="trip2_badge2">Notes saved</span>
+              </div>
+            </div>
+          </div>
+          <div class="trip-card">
+            <div class="trip-thumb">P</div>
+            <div class="trip-meta">
+              <div class="t" data-i18n="trip3_title">Palace Merano</div>
+              <div class="d" data-i18n="trip3_dates">May 2025 · 14 nights</div>
+              <div class="badges">
+                <span class="chip" data-i18n="trip3_badge1">Mayr method</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="concierge-fab">
+          <span class="pulse"></span>
+          <span data-i18n="concierge_fab">Concierge</span>
+        </div>
+
+        <div class="nav-bottom">
+          <div class="nb-item is-active"><div class="nb-glyph">⌂</div><span data-i18n="nav_home">Home</span></div>
+          <div class="nb-item"><div class="nb-glyph">✎</div><span data-i18n="nav_plan">Plan</span></div>
+          <div class="nb-item"><div class="nb-glyph">♡</div><span data-i18n="nav_health">Health</span></div>
+          <div class="nb-item"><div class="nb-glyph">⚐</div><span data-i18n="nav_trips">Trips</span></div>
+        </div>
+      </div></div>
+      <div class="note">
+        <div class="label" data-i18n="note1_t">1 · Home</div>
+        <div class="desc" data-i18n="note1_d">Single hero card invites the next trip with a personalised one-line rationale. Past trips are the asset that makes repeat use lightweight.</div>
+      </div>
+    </div>
+
+    <!-- ============ PHONE 2 — AI CHAT ============ -->
+    <div class="phone-wrap">
+      <div class="phone"><div class="screen">
+        <div class="status-bar">
+          <span data-i18n="time">9:41</span>
+          <span class="right"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+        </div>
+        <div class="nav-top">
+          <div class="icon-btn">←</div>
+          <div class="title"><span data-i18n="chat_title">Assistant</span></div>
+          <div class="icon-btn">⋯</div>
+        </div>
+        <div class="scroll chat-scroll">
+          <div class="ai-meta"><div class="ai-avatar">D</div><span class="ai-name" data-i18n="ai_name">Dr. Healthman · WellHealth</span></div>
+          <div class="bubble ai" data-i18n="msg1">Welcome back, Khalid. I noticed you mentioned sleep when we spoke in February. Shall we plan around that, or is something else on your mind?</div>
+
+          <div class="bubble me" data-i18n="msg2">Sleep, yes. And my back has been tight after the long flights last month.</div>
+
+          <div class="bubble ai" data-i18n="msg3">Understood. I'll factor in spinal recovery alongside sleep. A few quick choices — when, and how far?</div>
+
+          <div class="quick-replies">
+            <span class="qr" data-i18n="qr1">In June</span>
+            <span class="qr" data-i18n="qr2">Within 4 hours</span>
+            <span class="qr" data-i18n="qr3">Female-only spa</span>
+          </div>
+
+          <div class="bubble me" data-i18n="msg4">June, within four hours. Halal kitchen.</div>
+
+          <div class="ai-meta"><div class="ai-avatar">D</div><span class="ai-name" data-i18n="ai_name">Dr. Healthman · WellHealth</span></div>
+          <div class="bubble ai" data-i18n="msg5">Three places fit. Two have a Halal-certified kitchen on-site, one prepares it on request. Shall I show them?</div>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" placeholder="Message" data-i18n-ph="chat_ph">
+          <div class="chat-mic">🎙</div>
+        </div>
+      </div></div>
+      <div class="note">
+        <div class="label" data-i18n="note2_t">2 · Conversational onboarding</div>
+        <div class="desc" data-i18n="note2_d">AI accepts code-switching, mirrors language, never overrides clinical filters. Quick replies reduce typing for older principals.</div>
+      </div>
+    </div>
+
+    <!-- ============ PHONE 3 — RECOMMENDATIONS (3 cards) ============ -->
+    <div class="phone-wrap">
+      <div class="phone"><div class="screen">
+        <div class="status-bar">
+          <span data-i18n="time">9:41</span>
+          <span class="right"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+        </div>
+        <div class="nav-top">
+          <div class="icon-btn">←</div>
+          <div class="title" data-i18n="rec_title">Suggestions</div>
+          <div class="icon-btn">⤴</div>
+        </div>
+        <div class="scroll">
+          <div class="summary">
+            <div class="who" data-i18n="rec_for">For Khalid · June, 10 nights</div>
+            <div class="what" data-i18n="rec_what">Focus: <b>sleep recovery</b> and gentle <b>spinal rehabilitation</b>. Within 4 flight hours of Dubai. Halal kitchen.</div>
+            <a href="#" class="edit" data-i18n="rec_edit">Edit ↗</a>
+          </div>
+
+          <div class="venue">
+            <div class="venue-img lans">
+              <div class="badge" data-i18n="rec_badge1">Best fit</div>
+            </div>
+            <div class="venue-body">
+              <div class="venue-name" data-i18n="rec_v1_name">Lanserhof Tegernsee</div>
+              <div class="venue-loc" data-i18n="rec_v1_loc">Bavaria, Germany · 6h</div>
+              <div class="venue-rationale" data-i18n="rec_v1_rat">Mayr-based programme with a sleep-physician in residence. You've responded well to similar programmes before.</div>
+              <div class="venue-row">
+                <span class="chip green" data-i18n="rec_v1_chip1">Sleep</span>
+                <span class="chip green" data-i18n="rec_v1_chip2">Spinal</span>
+                <span class="chip" data-i18n="rec_v1_chip3">Halal on request</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="venue">
+            <div class="venue-img sha">
+              <div class="badge" data-i18n="rec_badge2">Good fit</div>
+            </div>
+            <div class="venue-body">
+              <div class="venue-name" data-i18n="rec_v2_name">Chenot Palace Weggis</div>
+              <div class="venue-loc" data-i18n="rec_v2_loc">Lake Lucerne, Switzerland · 6h</div>
+              <div class="venue-rationale" data-i18n="rec_v2_rat">Strong for biological-age recovery; spa is gender-segregated by hour. Female-only practitioners available.</div>
+              <div class="venue-row">
+                <span class="chip green" data-i18n="rec_v2_chip1">Longevity</span>
+                <span class="chip gold" data-i18n="rec_v2_chip2">Female-only spa</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="venue">
+            <div class="venue-img kamalaya">
+              <div class="badge warn" data-i18n="rec_badge3">Closest available — not perfect</div>
+            </div>
+            <div class="venue-body">
+              <div class="venue-name" data-i18n="rec_v3_name">Kamalaya Koh Samui</div>
+              <div class="venue-loc" data-i18n="rec_v3_loc">Thailand · 8h (over 4h limit)</div>
+              <div class="venue-rationale" data-i18n="rec_v3_rat">Excellent on sleep but exceeds your 4-hour flight cap. Showing because of strong outcomes from similar profiles.</div>
+              <div class="venue-row">
+                <span class="chip" data-i18n="rec_v3_chip1">Outside flight cap</span>
+                <span class="chip" data-i18n="rec_v3_chip2">Halal on request</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+      <div class="note">
+        <div class="label" data-i18n="note3_t">3 · Recommendations</div>
+        <div class="desc" data-i18n="note3_d">Always three. Imperfect matches are explicitly labelled — never bait-and-switch. The summary up top is editable in place.</div>
+      </div>
+    </div>
+
+    <!-- ============ PHONE 4 — DETAIL + WHY ============ -->
+    <div class="phone-wrap">
+      <div class="phone"><div class="screen">
+        <div class="detail-hero">
+          <div class="back">←</div>
+          <div class="save">♡</div>
+        </div>
+        <div class="detail-title-block">
+          <div class="h-title h2" data-i18n="det_name">Lanserhof Tegernsee</div>
+          <div class="loc" data-i18n="det_loc">Bavaria, Germany · est. 1984</div>
+          <div class="detail-row">
+            <div class="detail-stat"><div class="k" data-i18n="det_stay">Suggested stay</div><div class="v" data-i18n="det_stay_v">10–14 nights</div></div>
+            <div class="detail-stat"><div class="k" data-i18n="det_band">Indicative</div><div class="v" data-i18n="det_band_v">€€€€</div></div>
+            <div class="detail-stat"><div class="k" data-i18n="det_doc">Doctor-in-residence</div><div class="v" data-i18n="det_doc_v">Yes</div></div>
+          </div>
+        </div>
+        <div class="scroll" style="padding-top: 14px;">
+          <div class="why-panel">
+            <div class="h-eyebrow" data-i18n="why_eyebrow">Why this venue, for you</div>
+            <h4 data-i18n="why_h">A clear match on three counts</h4>
+            <ul class="why-list">
+              <li data-i18n="why_li1">Their Modified Mayr Cure pairs well with your flagged <b>sleep</b> goal — they have a sleep-physician in residence (Dr. M. Lechleitner).</li>
+              <li data-i18n="why_li2">For your <b>spinal recovery</b>: hydrotherapy + Schroth-method therapists on-site.</li>
+              <li data-i18n="why_li3">Past visits at Lanserhof Sylt suggest you tolerate this protocol well; transferable plan.</li>
+            </ul>
+            <div class="why-cons" data-i18n="why_cons"><b>Worth knowing:</b> on-site kitchen is not Halal-certified — they will cater to request, but it is not their default. The concierge can confirm before you book.</div>
+          </div>
+          <div class="cta-stack">
+            <button class="btn" data-i18n="det_cta1">Continue with concierge</button>
+            <button class="btn ghost" data-i18n="det_cta2">Send this to my doctor</button>
+            <button class="btn gold-line" data-i18n="det_cta3">Save · share as PDF</button>
+          </div>
+        </div>
+      </div></div>
+      <div class="note">
+        <div class="label" data-i18n="note4_t">4 · Why this venue</div>
+        <div class="desc" data-i18n="note4_d">The explainability panel is the trust device. Pros and explicit caveats in the same view. PDF export is for sharing with the principal's doctor.</div>
+      </div>
+    </div>
+
+    <!-- ============ PHONE 5 — CONCIERGE HANDOFF ============ -->
+    <div class="phone-wrap">
+      <div class="phone"><div class="screen">
+        <div class="status-bar">
+          <span data-i18n="time">9:41</span>
+          <span class="right"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+        </div>
+        <div class="nav-top">
+          <div class="icon-btn">←</div>
+          <div class="title" data-i18n="con_title">Concierge</div>
+          <div class="icon-btn">⌕</div>
+        </div>
+        <div class="scroll">
+          <div class="h-eyebrow" data-i18n="con_eyebrow" style="margin-top: 10px; display:block;">Handing you over</div>
+          <div class="h-title h1" data-i18n="con_h" style="margin-top: 6px;">Maryam will take it from here.</div>
+          <div class="body-soft" data-i18n="con_p" style="margin-top: 8px;">She has your conversation, your three suggestions, and the venue you tapped into. You won't need to repeat anything.</div>
+
+          <div class="concierge-card">
+            <div class="concierge-head">
+              <div class="av">M</div>
+              <div class="meta">
+                <div class="nm" data-i18n="con_name">Maryam Al-Hashimi</div>
+                <div class="ro" data-i18n="con_role">Senior Wellness Concierge · Dubai</div>
+                <div class="av-mark" data-i18n="con_avail">● Available now · usually replies in 4 min</div>
+              </div>
+            </div>
+
+            <div class="channel-list">
+              <div class="channel active">
+                <div class="icon">W</div>
+                <div><div class="nm" data-i18n="ch1">WhatsApp</div><div class="sub" data-i18n="ch1s">+971 · your usual number</div></div>
+                <div class="check">✓</div>
+              </div>
+              <div class="channel">
+                <div class="icon">⌕</div>
+                <div><div class="nm" data-i18n="ch2">In-app chat</div><div class="sub" data-i18n="ch2s">Stays inside WellHealth</div></div>
+              </div>
+              <div class="channel">
+                <div class="icon">☏</div>
+                <div><div class="nm" data-i18n="ch3">Phone call</div><div class="sub" data-i18n="ch3s">Arabic preferred</div></div>
+              </div>
+            </div>
+
+            <div class="summary-pack">
+              <div class="lbl" data-i18n="pack_lbl">What Maryam will see</div>
+              <ul>
+                <li data-i18n="pack1">Goal: sleep + spinal recovery, June, 10 nights</li>
+                <li data-i18n="pack2">Top pick: Lanserhof Tegernsee · Halal caveat noted</li>
+                <li data-i18n="pack3">Past trips: Lanserhof Sylt, SHA, Palace Merano</li>
+                <li data-i18n="pack4">Constraints: 4h flight cap, female-only spa preferred</li>
+              </ul>
+            </div>
+
+            <div style="margin-top: 14px;">
+              <button class="btn" data-i18n="con_go">Open WhatsApp →</button>
+            </div>
+          </div>
+
+        </div>
+        <div class="nav-bottom">
+          <div class="nb-item"><div class="nb-glyph">⌂</div><span data-i18n="nav_home">Home</span></div>
+          <div class="nb-item is-active"><div class="nb-glyph">✎</div><span data-i18n="nav_plan">Plan</span></div>
+          <div class="nb-item"><div class="nb-glyph">♡</div><span data-i18n="nav_health">Health</span></div>
+          <div class="nb-item"><div class="nb-glyph">⚐</div><span data-i18n="nav_trips">Trips</span></div>
+        </div>
+      </div></div>
+      <div class="note">
+        <div class="label" data-i18n="note5_t">5 · Concierge handoff</div>
+        <div class="desc" data-i18n="note5_d">WhatsApp is the dominant 1:1 channel in this segment. The handoff packet means the principal never repeats themselves.</div>
+      </div>
+    </div>
+
+    <!-- ============ PHONE 6 — HEALTH PASSPORT ============ -->
+    <div class="phone-wrap">
+      <div class="phone"><div class="screen">
+        <div class="status-bar">
+          <span data-i18n="time">9:41</span>
+          <span class="right"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+        </div>
+        <div class="nav-top">
+          <div class="icon-btn">←</div>
+          <div class="title" data-i18n="hp_title">Health passport</div>
+          <div class="icon-btn">+</div>
+        </div>
+        <div class="scroll">
+          <div class="h-eyebrow" data-i18n="hp_eye" style="margin-top: 8px; display: block;">Active profile</div>
+
+          <div class="principal-switch">
+            <div class="principal-chip is-active"><div class="dot">K</div><span class="nm" data-i18n="who1">Khalid (you)</span></div>
+            <div class="principal-chip"><div class="dot">N</div><span class="nm" data-i18n="who2">Noura</span></div>
+            <div class="principal-chip"><div class="dot">F</div><span class="nm" data-i18n="who3">Father</span></div>
+            <div class="principal-chip"><div class="dot">+</div><span class="nm" data-i18n="who_add">Add</span></div>
+          </div>
+
+          <div class="pp-section">
+            <div class="pp-row">
+              <div><div class="k" data-i18n="hp_goal">Current goal</div><div class="v" data-i18n="hp_goal_v">Sleep · spinal recovery</div></div>
+              <a class="edit" data-i18n="edit">Edit</a>
+            </div>
+            <div class="pp-row">
+              <div><div class="k" data-i18n="hp_diag">Diagnoses</div><div class="v soft" data-i18n="hp_diag_v">Mild lumbar disc protrusion · sleep apnoea (mild)</div></div>
+              <a class="edit" data-i18n="edit">Edit</a>
+            </div>
+            <div class="pp-row">
+              <div><div class="k" data-i18n="hp_ci">Contraindications</div><div class="v soft" data-i18n="hp_ci_v">No magnetotherapy (titanium implant, 2023)</div></div>
+              <a class="edit" data-i18n="edit">Edit</a>
+            </div>
+            <div class="pp-row">
+              <div><div class="k" data-i18n="hp_pref">Preferences</div><div class="v soft" data-i18n="hp_pref_v">Halal kitchen · female-only spa · ≤4h flight</div></div>
+              <a class="edit" data-i18n="edit">Edit</a>
+            </div>
+
+            <div class="section-label">
+              <span class="lbl" data-i18n="hp_docs">Documents</span>
+              <a href="#" data-i18n="all">All</a>
+            </div>
+            <div class="pp-doc">
+              <div class="ic">PDF</div>
+              <div class="meta"><div class="n" data-i18n="doc1">MRI report — lumbar spine</div><div class="d" data-i18n="doc1d">Cleveland Clinic AD · Feb 2026</div></div>
+              <div class="lock">🔒</div>
+            </div>
+            <div class="pp-doc">
+              <div class="ic">PDF</div>
+              <div class="meta"><div class="n" data-i18n="doc2">Lab panel — full</div><div class="d" data-i18n="doc2d">Mediclinic · Jan 2026</div></div>
+              <div class="lock">🔒</div>
+            </div>
+          </div>
+        </div>
+        <div class="nav-bottom">
+          <div class="nb-item"><div class="nb-glyph">⌂</div><span data-i18n="nav_home">Home</span></div>
+          <div class="nb-item"><div class="nb-glyph">✎</div><span data-i18n="nav_plan">Plan</span></div>
+          <div class="nb-item is-active"><div class="nb-glyph">♡</div><span data-i18n="nav_health">Health</span></div>
+          <div class="nb-item"><div class="nb-glyph">⚐</div><span data-i18n="nav_trips">Trips</span></div>
+        </div>
+      </div></div>
+      <div class="note">
+        <div class="label" data-i18n="note6_t">6 · Health passport</div>
+        <div class="desc" data-i18n="note6_d">One account, multiple principals — the gatekeeper persona switches between them. Active principal is always visible to avoid mis-attribution.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ANNOTATIONS -->
+  <div class="annotations">
+    <h2 data-i18n="ann_h">Why these decisions, in brief</h2>
+    <div class="grid">
+      <div>
+        <h3 data-i18n="ann1_h">Three, never zero</h3>
+        <p data-i18n="ann1_p">If no perfect matches exist, we still show three — explicitly labelled imperfect, with the reasons spelled out. Echoes the B2B PRD §3.3.</p>
+      </div>
+      <div>
+        <h3 data-i18n="ann2_h">Discretion as a feature</h3>
+        <p data-i18n="ann2_p">No likes, no public profiles, no "other guests viewed this." Sharing is a private, expiring link or a printable PDF.</p>
+      </div>
+      <div>
+        <h3 data-i18n="ann3_h">Concierge always one tap</h3>
+        <p data-i18n="ann3_p">The gold pill on the home screen never goes away. Default channel is WhatsApp — that's where this segment already lives.</p>
+      </div>
+      <div>
+        <h3 data-i18n="ann4_h">Multi-principal by design</h3>
+        <p data-i18n="ann4_p">Spouses, parents, and family-office gatekeepers manage multiple profiles from one device. Active profile is always visible.</p>
+      </div>
+      <div>
+        <h3 data-i18n="ann5_h">Halal & gender as filters, not afterthoughts</h3>
+        <p data-i18n="ann5_p">Halal kitchen, gender-segregated spa, female-only practitioners — first-class metadata, surfaced on every venue card.</p>
+      </div>
+      <div>
+        <h3 data-i18n="ann6_h">Explain, never assert</h3>
+        <p data-i18n="ann6_p">The "Why this venue" panel cites which goals it addresses, which methods map to which conditions, and what makes the match imperfect.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Bilingual content. Keep small — this is a wireframe demo, not the production string store.
+  const STR = {
+    en: {
+      // Header
+      home_title: 'WellHealth',
+      // Home
+      greet: 'Good morning,', user_first: 'Khalid',
+      greet_sub: 'A quiet moment to think about your next stay.',
+      hero_eyebrow: 'Suggestion for you', hero_title: 'Time for your next trip?',
+      hero_reason: "It's been seven months since Lanserhof. You mentioned wanting to focus on sleep this year — three quiet places come to mind.",
+      hero_cta1: 'See three suggestions', hero_cta2: 'Not now',
+      upcoming: 'Upcoming', past: 'Past trips', all: 'All',
+      trip1_title: 'Lanserhof Sylt', trip1_dates: 'Mar 12 — Mar 26 · Booked',
+      trip1_badge1: 'Sleep & longevity', trip1_badge2: 'Concierge briefed',
+      trip2_title: 'SHA Wellness, Spain', trip2_dates: 'Sep 2025 · 10 nights',
+      trip2_badge1: 'Detox', trip2_badge2: 'Notes saved',
+      trip3_title: 'Palace Merano', trip3_dates: 'May 2025 · 14 nights',
+      trip3_badge1: 'Mayr method',
+      concierge_fab: 'Concierge',
+      nav_home: 'Home', nav_plan: 'Plan', nav_health: 'Health', nav_trips: 'Trips',
+      note1_t: '1 · Home',
+      note1_d: "Single hero card invites the next trip with a personalised one-line rationale. Past trips are the asset that makes repeat use lightweight.",
+
+      // Chat
+      chat_title: 'Assistant', ai_name: 'Dr. Healthman · WellHealth',
+      msg1: 'Welcome back, Khalid. I noticed you mentioned sleep when we spoke in February. Shall we plan around that, or is something else on your mind?',
+      msg2: 'Sleep, yes. And my back has been tight after the long flights last month.',
+      msg3: "Understood. I'll factor in spinal recovery alongside sleep. A few quick choices — when, and how far?",
+      qr1: 'In June', qr2: 'Within 4 hours', qr3: 'Female-only spa',
+      msg4: 'June, within four hours. Halal kitchen.',
+      msg5: 'Three places fit. Two have a Halal-certified kitchen on-site, one prepares it on request. Shall I show them?',
+      chat_ph: 'Message',
+      note2_t: '2 · Conversational onboarding',
+      note2_d: 'AI accepts code-switching, mirrors language, never overrides clinical filters. Quick replies reduce typing for older principals.',
+
+      // Recommendations
+      rec_title: 'Suggestions',
+      rec_for: 'For Khalid · June, 10 nights',
+      rec_what: 'Focus: <b>sleep recovery</b> and gentle <b>spinal rehabilitation</b>. Within 4 flight hours of Dubai. Halal kitchen.',
+      rec_edit: 'Edit ↗',
+      rec_badge1: 'Best fit', rec_badge2: 'Good fit', rec_badge3: 'Closest available — not perfect',
+      rec_v1_name: 'Lanserhof Tegernsee', rec_v1_loc: 'Bavaria, Germany · 6h',
+      rec_v1_rat: "Mayr-based programme with a sleep-physician in residence. You've responded well to similar programmes before.",
+      rec_v1_chip1: 'Sleep', rec_v1_chip2: 'Spinal', rec_v1_chip3: 'Halal on request',
+      rec_v2_name: 'Chenot Palace Weggis', rec_v2_loc: 'Lake Lucerne, Switzerland · 6h',
+      rec_v2_rat: 'Strong for biological-age recovery; spa is gender-segregated by hour. Female-only practitioners available.',
+      rec_v2_chip1: 'Longevity', rec_v2_chip2: 'Female-only spa',
+      rec_v3_name: 'Kamalaya Koh Samui', rec_v3_loc: 'Thailand · 8h (over 4h limit)',
+      rec_v3_rat: 'Excellent on sleep but exceeds your 4-hour flight cap. Showing because of strong outcomes from similar profiles.',
+      rec_v3_chip1: 'Outside flight cap', rec_v3_chip2: 'Halal on request',
+      note3_t: '3 · Recommendations',
+      note3_d: 'Always three. Imperfect matches are explicitly labelled — never bait-and-switch. The summary up top is editable in place.',
+
+      // Detail
+      det_name: 'Lanserhof Tegernsee', det_loc: 'Bavaria, Germany · est. 1984',
+      det_stay: 'Suggested stay', det_stay_v: '10–14 nights',
+      det_band: 'Indicative', det_band_v: '€€€€',
+      det_doc: 'Doctor-in-residence', det_doc_v: 'Yes',
+      why_eyebrow: 'Why this venue, for you',
+      why_h: 'A clear match on three counts',
+      why_li1: 'Their Modified Mayr Cure pairs well with your flagged <b>sleep</b> goal — they have a sleep-physician in residence (Dr. M. Lechleitner).',
+      why_li2: 'For your <b>spinal recovery</b>: hydrotherapy + Schroth-method therapists on-site.',
+      why_li3: 'Past visits at Lanserhof Sylt suggest you tolerate this protocol well; transferable plan.',
+      why_cons: '<b>Worth knowing:</b> on-site kitchen is not Halal-certified — they will cater to request, but it is not their default. The concierge can confirm before you book.',
+      det_cta1: 'Continue with concierge',
+      det_cta2: 'Send this to my doctor',
+      det_cta3: 'Save · share as PDF',
+      note4_t: '4 · Why this venue',
+      note4_d: "The explainability panel is the trust device. Pros and explicit caveats in the same view. PDF export is for sharing with the principal's doctor.",
+
+      // Concierge
+      con_title: 'Concierge',
+      con_eyebrow: 'Handing you over',
+      con_h: 'Maryam will take it from here.',
+      con_p: "She has your conversation, your three suggestions, and the venue you tapped into. You won't need to repeat anything.",
+      con_name: 'Maryam Al-Hashimi', con_role: 'Senior Wellness Concierge · Dubai',
+      con_avail: '● Available now · usually replies in 4 min',
+      ch1: 'WhatsApp', ch1s: '+971 · your usual number',
+      ch2: 'In-app chat', ch2s: 'Stays inside WellHealth',
+      ch3: 'Phone call', ch3s: 'Arabic preferred',
+      pack_lbl: 'What Maryam will see',
+      pack1: 'Goal: sleep + spinal recovery, June, 10 nights',
+      pack2: 'Top pick: Lanserhof Tegernsee · Halal caveat noted',
+      pack3: 'Past trips: Lanserhof Sylt, SHA, Palace Merano',
+      pack4: 'Constraints: 4h flight cap, female-only spa preferred',
+      con_go: 'Open WhatsApp →',
+      note5_t: '5 · Concierge handoff',
+      note5_d: "WhatsApp is the dominant 1:1 channel in this segment. The handoff packet means the principal never repeats themselves.",
+
+      // Health passport
+      hp_title: 'Health passport', hp_eye: 'Active profile',
+      who1: 'Khalid (you)', who2: 'Noura', who3: 'Father', who_add: 'Add',
+      hp_goal: 'Current goal', hp_goal_v: 'Sleep · spinal recovery',
+      hp_diag: 'Diagnoses', hp_diag_v: 'Mild lumbar disc protrusion · sleep apnoea (mild)',
+      hp_ci: 'Contraindications', hp_ci_v: 'No magnetotherapy (titanium implant, 2023)',
+      hp_pref: 'Preferences', hp_pref_v: 'Halal kitchen · female-only spa · ≤4h flight',
+      hp_docs: 'Documents', edit: 'Edit',
+      doc1: 'MRI report — lumbar spine', doc1d: 'Cleveland Clinic AD · Feb 2026',
+      doc2: 'Lab panel — full', doc2d: 'Mediclinic · Jan 2026',
+      note6_t: '6 · Health passport',
+      note6_d: 'One account, multiple principals — the gatekeeper persona switches between them. Active principal is always visible to avoid mis-attribution.',
+
+      // Annotations
+      ann_h: 'Why these decisions, in brief',
+      ann1_h: 'Three, never zero',
+      ann1_p: 'If no perfect matches exist, we still show three — explicitly labelled imperfect, with the reasons spelled out. Echoes the B2B PRD §3.3.',
+      ann2_h: 'Discretion as a feature',
+      ann2_p: 'No likes, no public profiles, no "other guests viewed this." Sharing is a private, expiring link or a printable PDF.',
+      ann3_h: 'Concierge always one tap',
+      ann3_p: "The gold pill on the home screen never goes away. Default channel is WhatsApp — that's where this segment already lives.",
+      ann4_h: 'Multi-principal by design',
+      ann4_p: 'Spouses, parents, and family-office gatekeepers manage multiple profiles from one device. Active profile is always visible.',
+      ann5_h: 'Halal & gender as filters, not afterthoughts',
+      ann5_p: 'Halal kitchen, gender-segregated spa, female-only practitioners — first-class metadata, surfaced on every venue card.',
+      ann6_h: 'Explain, never assert',
+      ann6_p: 'The "Why this venue" panel cites which goals it addresses, which methods map to which conditions, and what makes the match imperfect.',
+
+      time: '9:41'
+    },
+    ar: {
+      home_title: 'WellHealth',
+      greet: 'صباح الخير،', user_first: 'خالد',
+      greet_sub: 'لحظة هادئة للتفكير في رحلتك القادمة.',
+      hero_eyebrow: 'اقتراح لك', hero_title: 'حان وقت رحلتك القادمة؟',
+      hero_reason: 'مرّت سبعة أشهر منذ زيارتك للانسرهوف. ذكرتَ رغبتك في التركيز على النوم هذا العام — لديّ ثلاثة أماكن هادئة في بالي.',
+      hero_cta1: 'اعرض الاقتراحات الثلاثة', hero_cta2: 'ليس الآن',
+      upcoming: 'القادم', past: 'الرحلات السابقة', all: 'الكل',
+      trip1_title: 'لانسرهوف زيلت', trip1_dates: '١٢ مارس — ٢٦ مارس · محجوز',
+      trip1_badge1: 'نوم وطول العمر', trip1_badge2: 'الكونسيرج على علم',
+      trip2_title: 'شا ويلنس، إسبانيا', trip2_dates: 'سبتمبر ٢٠٢٥ · ١٠ ليالٍ',
+      trip2_badge1: 'ديتوكس', trip2_badge2: 'ملاحظاتك محفوظة',
+      trip3_title: 'بالاس ميرانو', trip3_dates: 'مايو ٢٠٢٥ · ١٤ ليلة',
+      trip3_badge1: 'منهج ماير',
+      concierge_fab: 'الكونسيرج',
+      nav_home: 'الرئيسية', nav_plan: 'خطّط', nav_health: 'الصحة', nav_trips: 'الرحلات',
+      note1_t: '١ · الشاشة الرئيسية',
+      note1_d: 'بطاقة واحدة بارزة تدعو لرحلة قادمة بسبب شخصي مختصر. الرحلات السابقة هي الأصل الذي يجعل الاستخدام المتكرر سهلاً.',
+
+      chat_title: 'المساعد', ai_name: 'د. هيلثمان · WellHealth',
+      msg1: 'مرحباً بعودتك يا خالد. لاحظتُ أنك ذكرتَ النوم في حديثنا في فبراير. هل نخطّط حوله، أم لديك أمر آخر؟',
+      msg2: 'النوم، نعم. وظهري متوتّر بعد رحلات الشهر الماضي.',
+      msg3: 'فهمت. سأضع التعافي العمودي إلى جانب النوم. اختياران سريعان — متى، وإلى أين؟',
+      qr1: 'في يونيو', qr2: 'في حدود ٤ ساعات', qr3: 'سبا للنساء فقط',
+      msg4: 'يونيو، في حدود أربع ساعات. مطبخ حلال.',
+      msg5: 'ثلاثة أماكن مناسبة. اثنان منهما يقدّمان مطبخاً حلالاً معتمداً، والثالث يُعدّه عند الطلب. هل أعرضها؟',
+      chat_ph: 'رسالة',
+      note2_t: '٢ · الاستقبال الحواري',
+      note2_d: 'يقبل المساعد التبديل بين اللغتين، يعكس لغة المستخدم، ولا يتجاوز الفلاتر الطبية. الردود السريعة تقلّل الحاجة للكتابة.',
+
+      rec_title: 'الاقتراحات',
+      rec_for: 'لخالد · يونيو، ١٠ ليالٍ',
+      rec_what: 'التركيز: <b>تعافي النوم</b> وإعادة تأهيل <b>للعمود الفقري</b> بشكل لطيف. على بُعد ٤ ساعات طيران من دبي. مطبخ حلال.',
+      rec_edit: 'تعديل ↗',
+      rec_badge1: 'الأنسب', rec_badge2: 'مناسب', rec_badge3: 'الأقرب المتاح — ليس مثالياً',
+      rec_v1_name: 'لانسرهوف تيغرنزي', rec_v1_loc: 'بافاريا، ألمانيا · ٦س',
+      rec_v1_rat: 'برنامج قائم على منهج ماير مع طبيب نوم مقيم. سبق أن استجبتَ لبرامج مشابهة بشكل ممتاز.',
+      rec_v1_chip1: 'النوم', rec_v1_chip2: 'العمود', rec_v1_chip3: 'حلال عند الطلب',
+      rec_v2_name: 'شينو بالاس ويغيس', rec_v2_loc: 'بحيرة لوسرن، سويسرا · ٦س',
+      rec_v2_rat: 'قويّ في تجديد العمر البيولوجي؛ السبا مفصول حسب الجنس بحسب الساعة. متاح فريق علاج نسائي فقط.',
+      rec_v2_chip1: 'طول العمر', rec_v2_chip2: 'سبا للنساء فقط',
+      rec_v3_name: 'كامالايا كوه ساموي', rec_v3_loc: 'تايلاند · ٨س (يتجاوز حدّ ٤س)',
+      rec_v3_rat: 'ممتاز للنوم لكنه يتجاوز سقف الأربع ساعات الذي حدّدته. نعرضه لوجود نتائج قوية لدى ملفات شبيهة.',
+      rec_v3_chip1: 'يتجاوز سقف الطيران', rec_v3_chip2: 'حلال عند الطلب',
+      note3_t: '٣ · الاقتراحات',
+      note3_d: 'دائماً ثلاثة. الخيارات غير المثالية تُوسم بصراحة — لا مفاجآت. الملخص في الأعلى قابل للتعديل مباشرة.',
+
+      det_name: 'لانسرهوف تيغرنزي', det_loc: 'بافاريا، ألمانيا · تأسس ١٩٨٤',
+      det_stay: 'مدّة مقترحة', det_stay_v: '١٠–١٤ ليلة',
+      det_band: 'تقديري', det_band_v: '€€€€',
+      det_doc: 'طبيب مقيم', det_doc_v: 'نعم',
+      why_eyebrow: 'لماذا هذا المكان، لك',
+      why_h: 'تطابق واضح في ثلاث نقاط',
+      why_li1: 'برنامج Mayr المعدّل لديهم يخدم هدف <b>النوم</b> الذي سجّلتَه — مع طبيب نوم مقيم (د. م. ليكلايتنر).',
+      why_li2: 'لتعافي <b>العمود الفقري</b>: علاج مائي ومعالجون بمنهج شروت داخل المنشأة.',
+      why_li3: 'زياراتك السابقة في لانسرهوف زيلت تشير إلى أنك تتقبّل هذا البروتوكول جيّداً؛ خطة قابلة للنقل.',
+      why_cons: '<b>جدير بالملاحظة:</b> المطبخ ليس حلالاً معتمداً — يُجهَّز عند الطلب لكنه ليس الأساس. يستطيع الكونسيرج التأكيد قبل الحجز.',
+      det_cta1: 'متابعة مع الكونسيرج',
+      det_cta2: 'إرسال هذا إلى طبيبي',
+      det_cta3: 'حفظ · مشاركة كملف PDF',
+      note4_t: '٤ · لماذا هذا المكان',
+      note4_d: 'لوحة التفسير هي أداة الثقة. المزايا والتحفّظات في مكان واحد. تصدير PDF لمشاركته مع الطبيب الشخصي.',
+
+      con_title: 'الكونسيرج',
+      con_eyebrow: 'يتمّ تحويلك',
+      con_h: 'مريم ستتولّى الأمر.',
+      con_p: 'لديها محادثتك، اقتراحاتك الثلاثة، والمكان الذي اطّلعتَ عليه. لن تحتاج لإعادة شيء.',
+      con_name: 'مريم الهاشمي', con_role: 'كبيرة كونسيرج العافية · دبي',
+      con_avail: '● متاحة الآن · ترد عادة خلال ٤ دقائق',
+      ch1: 'واتساب', ch1s: '+٩٧١ · رقمك المعتاد',
+      ch2: 'محادثة داخل التطبيق', ch2s: 'تبقى داخل WellHealth',
+      ch3: 'مكالمة هاتفية', ch3s: 'العربية مفضّلة',
+      pack_lbl: 'ما الذي ستراه مريم',
+      pack1: 'الهدف: نوم + تعافي عمود فقري، يونيو، ١٠ ليالٍ',
+      pack2: 'الاختيار الأول: لانسرهوف تيغرنزي · مع تحفّظ الحلال',
+      pack3: 'رحلات سابقة: لانسرهوف زيلت، شا، بالاس ميرانو',
+      pack4: 'القيود: ٤س طيران كحدّ أقصى، سبا نسائي مفضّل',
+      con_go: 'فتح واتساب ←',
+      note5_t: '٥ · التحويل إلى الكونسيرج',
+      note5_d: 'واتساب هو القناة الأولى للتواصل في هذه الشريحة. حزمة التحويل تعني أنّ العميل لا يكرّر نفسه.',
+
+      hp_title: 'البطاقة الصحية', hp_eye: 'الملف النشط',
+      who1: 'خالد (أنت)', who2: 'نورة', who3: 'الوالد', who_add: 'إضافة',
+      hp_goal: 'الهدف الحالي', hp_goal_v: 'النوم · تعافي العمود',
+      hp_diag: 'التشخيصات', hp_diag_v: 'بروز خفيف للقرص القطني · توقّف نفس خفيف أثناء النوم',
+      hp_ci: 'موانع', hp_ci_v: 'لا علاج مغناطيسي (زرعة تيتانيوم، ٢٠٢٣)',
+      hp_pref: 'التفضيلات', hp_pref_v: 'مطبخ حلال · سبا نسائي · ≤٤س طيران',
+      hp_docs: 'المستندات', edit: 'تعديل',
+      doc1: 'تقرير رنين — العمود القطني', doc1d: 'كليفلاند كلينك أبوظبي · فبراير ٢٠٢٦',
+      doc2: 'تحاليل شاملة', doc2d: 'ميديكلينيك · يناير ٢٠٢٦',
+      note6_t: '٦ · البطاقة الصحية',
+      note6_d: 'حساب واحد، عدّة أشخاص — البوّاب الموثوق ينتقل بينهم. الملف النشط ظاهر دائماً لمنع الالتباس.',
+
+      ann_h: 'لماذا هذه القرارات، باختصار',
+      ann1_h: 'ثلاثة، أبداً صفر',
+      ann1_p: 'إن لم توجد مطابقات مثالية، نعرض ثلاثة على أيّ حال — موسومة بصراحة كغير مثالية، مع شرح الأسباب.',
+      ann2_h: 'الخصوصية كميزة',
+      ann2_p: 'لا إعجابات، لا ملفات عامة، لا "نزلاء آخرون اطّلعوا على هذا". المشاركة بروابط خاصة تنتهي صلاحيتها أو ملفات PDF.',
+      ann3_h: 'الكونسيرج بنقرة واحدة',
+      ann3_p: 'الزرّ الذهبي على الشاشة الرئيسية لا يختفي. القناة الافتراضية واتساب — حيث تعيش هذه الشريحة فعلاً.',
+      ann4_h: 'متعدّد الأشخاص بالتصميم',
+      ann4_p: 'الأزواج، الوالدان، وموظفو المكتب العائلي يديرون عدّة ملفات من جهاز واحد. الملف النشط ظاهر دائماً.',
+      ann5_h: 'الحلال والنوع كفلاتر، لا حواش',
+      ann5_p: 'مطبخ حلال، سبا مفصول، معالجات نسائيات — بيانات أساسية تظهر في كلّ بطاقة مكان.',
+      ann6_h: 'فسّر، لا تؤكّد',
+      ann6_p: 'لوحة "لماذا هذا المكان" تذكر أيّ أهداف يخدم، وأيّ طرق تطابق أيّ حالات، وما الذي يجعل المطابقة غير مثالية.',
+
+      time: '٩:٤١'
+    }
+  };
+
+  const root = document.getElementById('root');
+  const btnEn = document.getElementById('btn-en');
+  const btnAr = document.getElementById('btn-ar');
+
+  function applyLang(lang) {
+    const dict = STR[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const k = el.getAttribute('data-i18n');
+      if (dict[k] !== undefined) el.innerHTML = dict[k];
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+      const k = el.getAttribute('data-i18n-ph');
+      if (dict[k] !== undefined) el.setAttribute('placeholder', dict[k]);
+    });
+    root.setAttribute('lang', lang);
+    root.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+    btnEn.classList.toggle('is-active', lang === 'en');
+    btnAr.classList.toggle('is-active', lang === 'ar');
+  }
+
+  btnEn.addEventListener('click', () => applyLang('en'));
+  btnAr.addEventListener('click', () => applyLang('ar'));
+
+  // Default
+  applyLang('en');
+</script>
+</body>
+</html>
