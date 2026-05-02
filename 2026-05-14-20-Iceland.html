@@ -69,6 +69,9 @@ h1 { font-size: 1.55rem; color: #fff; margin-bottom: 4px; }
 .popup-day { font-size: 0.66rem; font-weight: 700; margin-bottom: 2px; }
 .popup-name { font-size: 0.9rem; font-weight: 600; color: #ddeeff; }
 .popup-note { font-size: 0.72rem; color: #7aaabb; margin-top: 3px; line-height: 1.35; max-width: 200px; }
+.popup-link { margin-top: 6px; }
+.popup-link a { font-size: 0.72rem; color: #4ab8e0; text-decoration: none; font-weight: 600; }
+.popup-link a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
@@ -129,31 +132,32 @@ var dayColors = {1:'#e74c3c',2:'#e67e22',3:'#f1c40f',4:'#2ecc71',5:'#1abc9c',6:'
 var dayNames = {1:'Day 1',2:'Day 2',3:'Day 3',4:'Day 4',5:'Day 5',6:'Day 6',7:'Day 7'};
 
 var stops = [
-  {lat:63.8807,lng:-22.4473,label:'Blue Lagoon',day:1,note:'Geothermal spa - jet-lag reset'},
-  {lat:64.1466,lng:-21.9426,label:'Reykjavik',day:1,note:'Capital city - 2 nights'},
-  {lat:64.2553,lng:-21.1299,label:'Thingvellir NP',day:2,note:'Walk between tectonic plates - UNESCO'},
-  {lat:64.3104,lng:-20.3021,label:'Geysir',day:2,note:'Strokkur erupts every 5-10 min'},
-  {lat:64.3275,lng:-20.1216,label:'Gullfoss',day:2,note:"Iceland's most famous waterfall"},
-  {lat:64.1296,lng:-20.3001,label:'Secret Lagoon',day:2,note:"Iceland's oldest geothermal pool"},
-  {lat:63.6156,lng:-19.9886,label:'Seljalandsfoss',day:3,note:'Walk behind the waterfall'},
-  {lat:63.5320,lng:-19.5113,label:'Skogafoss',day:3,note:'60m drop - 527 stairs up the side'},
-  {lat:63.4033,lng:-19.1280,label:'Dyrholaey Cliffs',day:3,note:'Puffins nest here in May'},
-  {lat:63.4054,lng:-18.9921,label:'Reynisfjara Beach',day:3,note:'Black sand - basalt columns'},
-  {lat:63.4187,lng:-19.0049,label:'Vik',day:3,note:'Sleep here tonight'},
-  {lat:64.0161,lng:-16.9756,label:'Skaftafell',day:4,note:'Svartifoss basalt column hike'},
-  {lat:64.0490,lng:-16.3800,label:'Glacier Hike',day:4,note:'Book in advance - Glacier Adventure'},
-  {lat:64.0784,lng:-16.2306,label:'Jokulsarlon Lagoon',day:4,note:'Icebergs calving - seals lounging'},
-  {lat:64.0671,lng:-16.1799,label:'Diamond Beach',day:4,note:'Ice chunks on black sand'},
-  {lat:63.7507,lng:-18.0648,label:'Fjadrarglj­ufur Canyon',day:5,note:'Optional - Game of Thrones canyon'},
-  {lat:64.0412,lng:-20.8836,label:'Kerid Crater',day:5,note:'Optional - turquoise volcanic lake'},
-  {lat:64.9243,lng:-23.2681,label:'Grundarfjordur',day:5,note:'Sleep here - Kirkjufell outside your window'},
-  {lat:64.9408,lng:-23.3083,label:'Kirkjufell',day:6,note:'Most photographed mountain in Iceland'},
-  {lat:64.7499,lng:-23.9021,label:'Djupalonssandur',day:6,note:'Black pebble beach + shipwreck'},
-  {lat:64.8161,lng:-23.9258,label:'Snaefellsjokull',day:6,note:'Jules Verne gateway to center of earth'},
-  {lat:64.8675,lng:-23.4845,label:'Ytri Tunga',day:6,note:'Harbor seal colony'},
-  {lat:63.8876,lng:-22.0613,label:'Krysuvík',day:7,note:'Sulfur mud pools + steaming vents'},
-  {lat:63.9349,lng:-22.0520,label:'Kleifarvatn Lake',day:7,note:'Eerie black lava lake'},
-  {lat:63.9850,lng:-22.6056,label:'KEF Airport',day:7,note:'Return car by 5 PM - depart 7:50 PM'}
+  {lat:63.8807,lng:-22.4473,label:'Blue Lagoon',day:1,note:'Geothermal spa - jet-lag reset',url:'https://www.bluelagoon.com/day-visit/the-blue-lagoon'},
+  {lat:64.1466,lng:-21.9426,label:'Reykjavik',day:1,note:'Capital city - 2 nights',url:'https://visitreykjavik.is/'},
+  {lat:64.2553,lng:-21.1299,label:'Thingvellir NP',day:2,note:'Walk between tectonic plates - UNESCO',url:'https://www.thingvellir.is/en/'},
+  {lat:64.3104,lng:-20.3021,label:'Geysir',day:2,note:'Strokkur erupts every 5-10 min',url:'https://www.geysircenter.is/'},
+  {lat:64.3275,lng:-20.1216,label:'Gullfoss',day:2,note:'Iceland\'s most famous waterfall',url:'https://gullfoss.is/'},
+  {lat:64.1077,lng:-21.9430,label:'Sky Lagoon',day:2,note:'Oceanfront geothermal spa with 7-step ritual (replaces Secret Lagoon AND Fontana - both closed)',url:'https://www.skylagoon.com/'},
+  {lat:63.6156,lng:-19.9886,label:'Seljalandsfoss',day:3,note:'Walk behind the waterfall',url:'https://www.south.is/en/place/seljalandsfoss'},
+  {lat:63.5320,lng:-19.5113,label:'Skogafoss',day:3,note:'60m drop - 527 stairs up the side',url:'https://www.south.is/en/place/skogafoss'},
+  {lat:63.4033,lng:-19.1280,label:'Dyrholaey Cliffs',day:3,note:'Puffins nest here in May',url:'https://www.south.is/en/place/dyrholaey'},
+  {lat:63.4054,lng:-18.9921,label:'Reynisfjara Beach',day:3,note:'Black sand - basalt columns',url:'https://www.south.is/en/place/reynisfjara'},
+  {lat:63.4187,lng:-19.0049,label:'Vik',day:3,note:'Sleep here tonight',url:'https://www.south.is/en/municipality/vik'},
+  {lat:64.0161,lng:-16.9756,label:'Skaftafell',day:4,note:'Svartifoss basalt column hike',url:'https://www.vatnajokulsthjodgardur.is/en/areas/skaftafell'},
+  {lat:64.0490,lng:-16.3800,label:'Glacier Hike',day:4,note:'Book in advance - Glacier Adventure',url:'https://glacieradventure.is/tour/vatnajokull-glacier-walk/'},
+  {lat:64.0784,lng:-16.2306,label:'Jokulsarlon Lagoon',day:4,note:'Icebergs calving - seals lounging',url:'https://icelagoon.is/'},
+  {lat:64.0671,lng:-16.1799,label:'Diamond Beach',day:4,note:'Ice chunks on black sand',url:'https://www.south.is/en/place/diamond-beach'},
+  {lat:63.7507,lng:-18.0648,label:'Fjadrargljufur Canyon',day:5,note:'Optional - Game of Thrones canyon (often closed in May for vegetation recovery)',url:'https://www.south.is/en/place/fjadrargljufur'},
+  {lat:63.6300,lng:-18.4500,label:'Eldhraun Lava Field',day:5,note:'Optional - moss-covered lava from 1783 Laki eruption',url:'https://www.south.is/en/place/eldhraun'},
+  {lat:64.0412,lng:-20.8836,label:'Kerid Crater',day:5,note:'Optional - turquoise volcanic lake',url:'https://www.south.is/en/place/kerid'},
+  {lat:64.9243,lng:-23.2681,label:'Grundarfjordur',day:5,note:'Sleep here - Kirkjufell outside your window',url:'https://www.west.is/en/place/grundarfjordur'},
+  {lat:64.9408,lng:-23.3083,label:'Kirkjufell',day:6,note:'Most photographed mountain in Iceland',url:'https://www.west.is/en/place/kirkjufell'},
+  {lat:64.7499,lng:-23.9021,label:'Djupalonssandur',day:6,note:'Black pebble beach + shipwreck',url:'https://www.west.is/en/place/djupalonssandur'},
+  {lat:64.8161,lng:-23.9258,label:'Snaefellsjokull',day:6,note:'Jules Verne gateway to center of earth',url:'https://www.west.is/en/nature/snaefellsjokull-national-park'},
+  {lat:64.8675,lng:-23.4845,label:'Ytri Tunga',day:6,note:'Harbor seal colony',url:'https://www.west.is/en/place/ytri-tunga'},
+  {lat:63.8876,lng:-22.0613,label:'Krysuvík',day:7,note:'Sulfur mud pools + steaming vents',url:'https://www.south.is/en/place/krysuvik'},
+  {lat:63.9349,lng:-22.0520,label:'Kleifarvatn Lake',day:7,note:'Eerie black lava lake',url:'https://www.south.is/en/place/kleifarvatn'},
+  {lat:63.9850,lng:-22.6056,label:'KEF Airport',day:7,note:'Return car by 5 PM - depart 7:50 PM',url:'https://www.kefairport.is/en/'}
 ];
 
 var map, infoWindow;
@@ -220,6 +224,7 @@ function initMap() {
         '<div class="popup-day" style="color:'+dayColors[s.day]+'">Day '+s.day+'</div>' +
         '<div class="popup-name">'+s.label+'</div>' +
         '<div class="popup-note">'+s.note+'</div>' +
+        (s.url ? '<div class="popup-link"><a href="'+s.url+'" target="_blank">Visit website &#x2197;</a></div>' : '') +
         '</div>'
       );
       infoWindow.open(map, marker);
@@ -233,37 +238,37 @@ var days = [
    stops:[
     {time:'8:55 AM', name:'Land at KEF - customs, bags, car pickup', note:'Allow ~80 min for immigration, baggage claim, and rental car collection.'},
     {drive:'20 min to Blue Lagoon'},
-    {time:'10:15 AM', name:'Blue Lagoon', dur:'2.5 hrs', tags:['tag-geo','tag-book'], note:'Perfect jet-lag reset right off the airport road. Book Comfort ticket in advance - silica mask + one drink included.'},
+    {time:'10:15 AM', name:'Blue Lagoon', dur:'2.5 hrs', tags:['tag-geo','tag-book'], note:'Perfect jet-lag reset right off the airport road. Book Comfort ticket in advance - silica mask + one drink included. <a href="https://www.bluelagoon.com/day-visit/the-blue-lagoon" target="_blank" style="color:#4ab8e0">Book at bluelagoon.com &rarr;</a>'},
     {drive:'50 min to Reykjavik'},
     {time:'1:30 PM', name:'Check in to hotel + freshen up', dur:'45 min', note:'Drop bags and get oriented.'},
-    {time:'2:15 PM', name:'Hallgrimskirkja Tower', dur:'1 hr', tags:['tag-culture'], note:'Panoramic city views from the tower (~$7). Open until 5 PM.'},
+    {time:'2:15 PM', name:'Hallgrimskirkja Tower', dur:'1 hr', tags:['tag-culture'], note:'Panoramic city views from the tower (~$7). Open until 5 PM. <a href=\"https://www.hallgrimskirkja.is/en-gb/visiting-the-church\" target=\"_blank\" style=\"color:#4ab8e0\">hallgrimskirkja.is &#x2197;</a>'},
     {time:'3:30 PM', name:'Explore Reykjavik - harbor and dinner', dur:'Evening', tags:['tag-culture'], note:'Sun Voyager sculpture, Laugavegur for shopping. Dinner: Cafe Loki or Reykjavik Fish.'}
    ]},
   {n:2, date:'Fri May 15', title:'Golden Circle', km:'~230 km', sleep:'Reykjavik',
    stops:[
     {time:'8:30 AM', name:'Depart Reykjavik', note:'Last morning based in the city.'},
     {drive:'45 min to Thingvellir'},
-    {time:'9:15 AM', name:'Thingvellir National Park', dur:'2 hrs', tags:['tag-culture'], note:'Walk the rift between the North American and Eurasian tectonic plates. UNESCO site. World oldest parliament (930 AD).'},
+    {time:'9:15 AM', name:'Thingvellir National Park', dur:'2 hrs', tags:['tag-culture'], note:'Walk the rift between the North American and Eurasian tectonic plates. UNESCO site. World oldest parliament (930 AD). <a href=\"https://www.thingvellir.is/en/\" target=\"_blank\" style=\"color:#4ab8e0\">thingvellir.is &#x2197;</a>'},
     {drive:'45 min to Geysir'},
-    {time:'12:00 PM', name:'Geysir Geothermal Area', dur:'1.5 hrs', tags:['tag-geo'], note:'Strokkur erupts every 5-10 min. Lunch at on-site restaurant - Icelandic lamb soup is a must.'},
+    {time:'12:00 PM', name:'Geysir Geothermal Area', dur:'1.5 hrs', tags:['tag-geo'], note:'Strokkur erupts every 5-10 min. Lunch at on-site restaurant - Icelandic lamb soup is a must. <a href=\"https://www.geysircenter.is/\" target=\"_blank\" style=\"color:#4ab8e0\">geysircenter.is &#x2197;</a>'},
     {drive:'15 min to Gullfoss'},
-    {time:'2:00 PM', name:'Gullfoss Waterfall', dur:'45 min', tags:['tag-water'], note:'Massive two-tiered cascade. Spray can be intense up close.'},
-    {drive:'30 min to Secret Lagoon'},
-    {time:'3:30 PM', name:'Secret Lagoon (Fludir)', dur:'2 hrs', tags:['tag-geo','tag-book'], note:"Iceland's oldest geothermal pool. Far less crowded than Blue Lagoon. Book in advance."},
-    {drive:'1 hr 15 min to Reykjavik'},
+    {time:'2:00 PM', name:'Gullfoss Waterfall', dur:'45 min', tags:['tag-water'], note:'Massive two-tiered cascade. Spray can be intense up close. <a href=\"https://gullfoss.is/\" target=\"_blank\" style=\"color:#4ab8e0\">gullfoss.is &#x2197;</a>'},
+    {drive:'1 hr 30 min toward Reykjavik / Sky Lagoon'},
+    {time:'4:15 PM', name:'Sky Lagoon (Kopavogur)', dur:'2 hrs', tags:['tag-geo','tag-book'], note:"Oceanfront infinity-edge geothermal spa just outside Reykjavik. Famous 7-step ritual: warm pool, cold plunge, sauna, mist, scrub, steam, shower. <strong>Replaces Secret Lagoon</strong> (closed May 11-21) <strong>and Fontana</strong> (closed for renovation through June 2026). <a href='https://www.skylagoon.com/visit/opening-hours/' target='_blank' style='color:#4ab8e0'>Book at skylagoon.com &rarr;</a><br><br><strong>Free alternative:</strong> Reykjadalur hot river near Hveragerði - 1-hr hike each way to soak in a geothermally heated stream. Detour off Route 1 on the way back. Skip Sky Lagoon if you do this. <a href=\"https://www.south.is/en/place/reykjadalur-valley\" target=\"_blank\" style=\"color:#4ab8e0\">south.is &#x2197;</a>"},
+    {drive:'15 min to central Reykjavik'},
     {time:'7:00 PM', name:'Arrive Reykjavik - final city dinner', note:'Last night in the capital. Try Fiskfelagid or Geiri Smart.'}
    ]},
   {n:3, date:'Sat May 16', title:'South Coast - Waterfalls and Black Sand', km:'~310 km', sleep:'Vik',
    stops:[
     {time:'8:00 AM', name:'Depart Reykjavik - check out', note:"East on Ring Road (Route 1). You won't be back until May 19."},
     {drive:'1 hr 45 min to Seljalandsfoss'},
-    {time:'9:45 AM', name:'Seljalandsfoss', dur:'1 hr', tags:['tag-water'], note:'Walk completely behind the waterfall. Waterproofs essential. Bonus: Gljufrabui cave waterfall is 5 min north.'},
+    {time:'9:45 AM', name:'Seljalandsfoss', dur:'1 hr', tags:['tag-water'], note:'Walk completely behind the waterfall. Waterproofs essential. Bonus: Gljufrabui cave waterfall is 5 min north. <a href=\"https://www.south.is/en/place/seljalandsfoss\" target=\"_blank\" style=\"color:#4ab8e0\">south.is &#x2197;</a>'},
     {drive:'30 min to Skogafoss'},
-    {time:'11:15 AM', name:'Skogafoss', dur:'1.5 hrs', tags:['tag-water'], note:'60-meter drop. Climb 527 stairs for aerial views and rainbows.'},
+    {time:'11:15 AM', name:'Skogafoss', dur:'1.5 hrs', tags:['tag-water'], note:'60-meter drop. Climb 527 stairs for aerial views and rainbows. <a href=\"https://www.south.is/en/place/skogafoss\" target=\"_blank\" style=\"color:#4ab8e0\">south.is &#x2197;</a>'},
     {drive:'30 min to Dyrholaey'},
-    {time:'1:15 PM', name:'Dyrholaey Cliffs', dur:'1.5 hrs', tags:['tag-wildlife'], note:'Puffins nest here in May. Iconic basalt sea arch and lighthouse panorama.'},
+    {time:'1:15 PM', name:'Dyrholaey Cliffs', dur:'1.5 hrs', tags:['tag-wildlife'], note:'Puffins nest here in May. Iconic basalt sea arch and lighthouse panorama. <strong>Nesting season restrictions:</strong> the upper plateau (Háey) is foot-only between 9 AM and 6 PM and closed overnight 7 PM-9 AM; the lower area stays open to cars. Arctic terns dive-bomb anyone near their nests - wear a hat or hold a stick overhead. <a href=\"https://www.south.is/en/place/dyrholaey\" target=\"_blank\" style=\"color:#4ab8e0\">south.is &#x2197;</a>'},
     {drive:'15 min to Reynisfjara'},
-    {time:'3:00 PM', name:'Reynisfjara Black Sand Beach', dur:'1 hr', note:'Basalt columns, sea stacks, jet-black sand. Stay 30+ meters from water - sneaker waves are dangerous.'},
+    {time:'3:00 PM', name:'Reynisfjara Black Sand Beach', dur:'1 hr', note:'Basalt columns, sea stacks, jet-black sand. Stay 30+ meters from water - sneaker waves are dangerous. <a href=\"https://www.south.is/en/place/reynisfjara\" target=\"_blank\" style=\"color:#4ab8e0\">south.is &#x2197;</a>'},
     {drive:'10 min into Vik'},
     {time:'4:30 PM', name:'Check in - Vik', note:'Dinner at Halldorskaffi. Early night - 7:30 AM start tomorrow.'}
    ]},
@@ -271,35 +276,37 @@ var days = [
    stops:[
     {time:'7:30 AM', name:'Depart Vik', note:'Early start - 2 hrs to Skaftafell.'},
     {drive:'2 hrs to Skaftafell / Vatnajokull NP'},
-    {time:'9:30 AM', name:'Skaftafell - Svartifoss Hike', dur:'2 hrs', tags:['tag-glacier','tag-water'], note:'1.5-hr loop to Svartifoss waterfall framed by hexagonal basalt columns. Europe largest glacier above.'},
+    {time:'9:30 AM', name:'Skaftafell - Svartifoss Hike', dur:'2 hrs', tags:['tag-glacier','tag-water'], note:'1.5-hr loop to Svartifoss waterfall framed by hexagonal basalt columns. Europe largest glacier above. <a href=\"https://www.vatnajokulsthjodgardur.is/en/areas/skaftafell\" target=\"_blank\" style=\"color:#4ab8e0\">vatnajokulsthjodgardur.is &#x2197;</a>'},
     {drive:'45 min to Glacier Adventure basecamp'},
-    {time:'12:15 PM', name:'Guided Glacier Hike', dur:'4-5 hrs', tags:['tag-glacier','tag-book'], note:'Book weeks in advance. Crampons and guide provided. Glacier Adventure rated 4.9 stars.'},
+    {time:'12:15 PM', name:'Guided Glacier Hike', dur:'4-5 hrs', tags:['tag-glacier','tag-book'], note:'Book weeks in advance. Crampons and guide provided. Glacier Adventure rated 4.9 stars. <a href="https://glacieradventure.is/tour/vatnajokull-glacier-walk/" target="_blank" style="color:#4ab8e0">Book at glacieradventure.is &rarr;</a>'},
     {drive:'5 min to Jokulsarlon'},
-    {time:'5:30 PM', name:'Jokulsarlon Glacier Lagoon', dur:'1.5 hrs', tags:['tag-glacier','tag-wildlife'], note:'Icebergs calving off Breidamerkurjokull. Seals often spotted. Zodiac tours available.'},
+    {time:'5:30 PM', name:'Jokulsarlon Glacier Lagoon', dur:'1.5 hrs', tags:['tag-glacier','tag-wildlife'], note:'Icebergs calving off Breidamerkurjokull. Seals often spotted. Zodiac tours available. <a href=\"https://icelagoon.is/\" target=\"_blank\" style=\"color:#4ab8e0\">icelagoon.is &#x2197;</a>'},
     {drive:'5 min across road'},
-    {time:'7:00 PM', name:'Diamond Beach', dur:'45 min', tags:['tag-glacier'], note:'Glacial ice on black sand. Sun stays up until ~11 PM in May.'},
+    {time:'7:00 PM', name:'Diamond Beach', dur:'45 min', tags:['tag-glacier'], note:'Glacial ice on black sand. Sun stays up until ~11 PM in May. <a href=\"https://www.south.is/en/place/diamond-beach\" target=\"_blank\" style=\"color:#4ab8e0\">south.is &#x2197;</a>'},
     {time:'8:00 PM', name:'Sleep near Jokulsarlon', note:'Fosshotel Glacier Lagoon or Hotel Jokulsarlon. Very limited - book months ahead.'}
    ]},
   {n:5, date:'Mon May 18', title:'Jokulsarlon to Snaefellsnes direct', km:'~390 km', sleep:'Grundarfjordur',
    stops:[
     {time:'9:00 AM', name:'Depart Jokulsarlon northwest', note:'Drive directly to Snaefellsnes - skips Reykjavik return, saves ~200 km.'},
     {drive:'~45 min west on Ring Road'},
-    {time:'10:00 AM', name:'Optional: Fjadrargl­ufur Canyon', dur:'1 hr', note:'Winding river canyon just off Route 1. Game of Thrones filming location.'},
-    {drive:'~2 hrs west on Ring Road'},
-    {time:'1:00 PM', name:'Optional: Kerid Volcanic Crater', dur:'45 min', tags:['tag-geo'], note:'Vivid turquoise crater lake against red lava walls. Small entry fee.'},
+    {time:'10:00 AM', name:'Optional: Fjadrargl­ufur Canyon', dur:'1 hr', note:'Winding river canyon just off Route 1. Game of Thrones filming location. <strong>Heads up:</strong> often closed in May for vegetation recovery during the spring thaw - check safetravel.is before going.'},
+    {drive:'15 min west to Eldhraun'},
+    {time:'11:15 AM', name:'Optional: Eldhraun Lava Field', dur:'30 min', note:'Vast moss-covered lava field from the catastrophic 1783 Laki eruption - easy roadside stop right on Route 1. Good backup if Fjaðrárgljúfur is closed. <a href=\"https://www.south.is/en/place/eldhraun\" target=\"_blank\" style=\"color:#4ab8e0\">south.is &#x2197;</a>'},
+    {drive:'~1 hr 45 min west on Ring Road'},
+    {time:'1:00 PM', name:'Optional: Kerid Volcanic Crater', dur:'45 min', tags:['tag-geo'], note:'Vivid turquoise crater lake against red lava walls. Small entry fee. <a href=\"https://www.south.is/en/place/kerid\" target=\"_blank\" style=\"color:#4ab8e0\">south.is &#x2197;</a>'},
     {drive:'1 hr 30 min northwest to Snaefellsnes via Route 54'},
-    {time:'3:30 PM', name:'Arrive Grundarfjordur - check in', note:'Kirkjufell mountain is right outside your window. Dinner at Bjargarsteinn Mathus.'},
+    {time:'3:30 PM', name:'Arrive Grundarfjordur - check in', note:'Kirkjufell mountain is right outside your window. <strong>Heads up:</strong> Bjargarsteinn Mathús is closed Mon-Tue, so the famous local pick is out tonight (Mon May 18). Try Layla\'s, Kaffi 59, or your hotel restaurant instead.'},
     {time:'Evening', name:'Kirkjufell at golden hour', note:'Evening light on the most photographed mountain in Iceland.'}
    ]},
   {n:6, date:'Tue May 19', title:'Snaefellsnes Peninsula to Reykjavik', km:'~230 km', sleep:'Reykjavik',
    stops:[
-    {time:'9:00 AM', name:'Kirkjufell + Kirkjufellsfoss', dur:'1 hr', tags:['tag-water'], note:"You're already here. Morning light is perfect."},
+    {time:'9:00 AM', name:'Kirkjufell + Kirkjufellsfoss', dur:'1 hr', tags:['tag-water'], note:"You're already here. Morning light is perfect. <a href=\"https://www.west.is/en/place/kirkjufell\" target=\"_blank\" style=\"color:#4ab8e0\">west.is &#x2197;</a>"},
     {drive:'45 min to western tip'},
-    {time:'10:30 AM', name:'Djupalonssandur Beach', dur:'45 min', note:'Black pebble beach with rusted shipwreck remains and lava trails.'},
+    {time:'10:30 AM', name:'Djupalonssandur Beach', dur:'45 min', note:'Black pebble beach with rusted shipwreck remains and lava trails. <a href=\"https://www.west.is/en/place/djupalonssandur\" target=\"_blank\" style=\"color:#4ab8e0\">west.is &#x2197;</a>'},
     {drive:'20 min'},
-    {time:'11:30 AM', name:'Snaefellsjokull Glacier', dur:'1 hr', tags:['tag-glacier'], note:'Jules Verne set Journey to the Center of the Earth here. Walk the lava fields.'},
+    {time:'11:30 AM', name:'Snaefellsjokull Glacier', dur:'1 hr', tags:['tag-glacier'], note:'Jules Verne set Journey to the Center of the Earth here. Walk the lava fields. <a href=\"https://www.west.is/en/nature/snaefellsjokull-national-park\" target=\"_blank\" style=\"color:#4ab8e0\">west.is &#x2197;</a>'},
     {drive:'30 min east along south shore'},
-    {time:'1:00 PM', name:'Ytri Tunga Beach - Seal Colony', dur:'45 min', tags:['tag-wildlife'], note:'Harbor seals lounge on the rocks throughout May.'},
+    {time:'1:00 PM', name:'Ytri Tunga Beach - Seal Colony', dur:'45 min', tags:['tag-wildlife'], note:'Harbor seals lounge on the rocks throughout May. <a href=\"https://www.west.is/en/place/ytri-tunga\" target=\"_blank\" style=\"color:#4ab8e0\">west.is &#x2197;</a>'},
     {drive:'1 hr to Borgarnes'},
     {time:'2:30 PM', name:'Optional: Borgarnes Settlement Center', dur:'45 min', tags:['tag-culture'], note:"Iceland's Viking history museum. Good leg-stretch."},
     {drive:'1 hr to Reykjavik'},
@@ -309,11 +316,11 @@ var days = [
    stops:[
     {time:'9:00 AM', name:'Breakfast and check out', note:'Grab coffee at Braud and Co on Frakkastigur - one of Reykjavik best bakeries.'},
     {drive:'40 min to Krysuvík (Route 42 south)'},
-    {time:'9:45 AM', name:'Krysuvík Geothermal Fields', dur:'1.5 hrs', tags:['tag-geo'], note:'Bubbling sulfur mud pools, steaming vents, vivid rust-orange earth. Free entry, easy boardwalk.'},
+    {time:'9:45 AM', name:'Krysuvík Geothermal Fields', dur:'1.5 hrs', tags:['tag-geo'], note:'Bubbling sulfur mud pools, steaming vents, vivid rust-orange earth. Free entry, easy boardwalk. <a href=\"https://www.south.is/en/place/krysuvik\" target=\"_blank\" style=\"color:#4ab8e0\">south.is &#x2197;</a>'},
     {drive:'10 min to Kleifarvatn'},
-    {time:'11:30 AM', name:'Kleifarvatn Lake', dur:'1.5 hrs', note:'Iceland largest lake on Reykjanes peninsula. Ringed by black lava and dramatic cliffs. Eerily quiet.'},
+    {time:'11:30 AM', name:'Kleifarvatn Lake', dur:'1.5 hrs', note:'Iceland largest lake on Reykjanes peninsula. Ringed by black lava and dramatic cliffs. Eerily quiet. <a href=\"https://www.south.is/en/place/kleifarvatn\" target=\"_blank\" style=\"color:#4ab8e0\">south.is &#x2197;</a>'},
     {drive:'35 min to KEF Airport (Route 43 then Route 41)'},
-    {time:'1:45 PM', name:'Arrive KEF - return rental car', note:'Duty-free: skyr, chocolate, Brennivin, lopapeysa wool sweaters. Plenty of time before flight.'},
+    {time:'1:45 PM', name:'Arrive KEF - return rental car', note:'Duty-free: skyr, chocolate, Brennivin, lopapeysa wool sweaters. Plenty of time before flight. <strong>Routing note:</strong> Route 43 (Grindavíkurvegur) has been intermittently closed during the Reykjanes eruption sequence. Check road.is and safetravel.is the morning of May 20 - if 43 is closed, detour via Route 42 → Reykjanesbraut (Route 41) which adds ~15-20 min. Allow buffer.'},
     {time:'5:00 PM', name:'Car returned - check in', note:'Rental car returned by deadline. Check in for flight.'},
     {time:'7:50 PM', name:'Depart KEF', note:'Go home happy.'}
    ]}
