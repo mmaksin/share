@@ -24,6 +24,9 @@ h1 { font-size: 1.3rem; color: #fff; margin-bottom: 2px; }
 .filter-btn { padding: 4px 10px; border-radius: 20px; border: 1.5px solid transparent; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; gap: 4px; background: transparent; }
 .filter-btn.active { opacity: 1; }
 .filter-btn.inactive { opacity: 0.25; }
+#fav-chip { padding: 4px 12px; border-radius: 20px; border: 1.5px solid #c0406080; background: transparent; color: #e07090; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s; flex-shrink: 0; }
+#fav-chip.fav-active { background: #c04060; color: #fff; border-color: #c04060; }
+#fav-chip.fav-inactive { opacity: 0.55; }
 .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .badge { font-size: 0.6rem; background: rgba(255,255,255,0.18); padding: 1px 4px; border-radius: 8px; }
 #map { flex: 1; width: 100%; min-height: 0; }
@@ -44,6 +47,7 @@ h1 { font-size: 1.3rem; color: #fff; margin-bottom: 2px; }
 </div>
 <div class="controls" id="filters">
   <button id="toggle-all">Deselect all</button>
+  <button id="fav-chip">❤️ Favorites</button>
 </div>
 <div id="map"></div>
 <p class="footer" id="stats"></p>
@@ -388,6 +392,58 @@ const PLACES = [
 let map, infoWindow;
 const markers = [];
 const activeFilters = new Set(CATS.map(c => c.id));
+let showFavsOnly = false;
+
+// ── Cookie helpers ─────────────────────────────────────────────────────────
+function getFavorites() {
+  const m = document.cookie.match(/(?:^|; )favorites=([^;]*)/);
+  return m ? new Set(decodeURIComponent(m[1]).split(',').filter(Boolean)) : new Set();
+}
+function saveFavorites(set) {
+  document.cookie = `favorites=${encodeURIComponent([...set].join(','))};max-age=31536000;path=/`;
+}
+function isFav(name) { return getFavorites().has(name); }
+function toggleFav(name) {
+  const favs = getFavorites();
+  favs.has(name) ? favs.delete(name) : favs.add(name);
+  saveFavorites(favs);
+  return favs.has(name);
+}
+
+// ── Popup builder ──────────────────────────────────────────────────────────
+function openPopup(place, marker) {
+  const cat = catFor(place.cat);
+  const fav = isFav(place.name);
+  const link = place.url.startsWith('http') ? place.url : BASE + place.url;
+  infoWindow.setContent(`
+    <div style="background:#1a2a3d;color:#e8edf2;padding:13px 15px;border-radius:10px;max-width:270px;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.5);">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:5px;">
+        <div style="font-size:.95rem;font-weight:700;color:#fff;">${place.name}</div>
+        <button id="fav-toggle" title="${fav ? 'Remove from favorites' : 'Add to favorites'}"
+          style="background:none;border:none;cursor:pointer;font-size:1.2rem;line-height:1;padding:0;flex-shrink:0;
+          filter:${fav ? 'none' : 'grayscale(1) opacity(0.45)'};transition:filter .15s;">${fav ? '❤️' : '❤️'}</button>
+      </div>
+      <span style="display:inline-block;background:${cat.color}25;color:${cat.color};border:1px solid ${cat.color}60;
+        padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:600;margin-bottom:8px;">${cat.emoji} ${cat.label}</span>
+      <div style="font-size:.8rem;color:#b0c8d8;line-height:1.5;margin-bottom:10px;">${place.desc}</div>
+      <a href="${link}" target="_blank"
+        style="display:inline-block;background:${cat.color}30;color:${cat.color};border:1px solid ${cat.color}70;
+        padding:4px 12px;border-radius:8px;font-size:.72rem;font-weight:600;text-decoration:none;">
+        → Visit page
+      </a>
+    </div>`);
+  infoWindow.open(map, marker);
+  google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
+    document.getElementById('fav-toggle').addEventListener('click', () => {
+      const nowFav = toggleFav(place.name);
+      document.getElementById('fav-toggle').style.filter = nowFav ? 'none' : 'grayscale(1) opacity(0.45)';
+      document.getElementById('fav-toggle').title = nowFav ? 'Remove from favorites' : 'Add to favorites';
+      updateFavChip();
+      if (showFavsOnly) updateVisibility();
+    });
+  });
+}
 
 function catFor(id) { return CATS.find(c => c.id === id); }
 
@@ -439,23 +495,7 @@ function initMap() {
       position: { lat: place.lat, lng: place.lng },
       map, title: place.name, icon: makeIcon(place.cat), visible: true
     });
-    marker.addListener('click', () => {
-      const cat = catFor(place.cat);
-      infoWindow.setContent(`
-        <div style="background:#1a2a3d;color:#e8edf2;padding:13px 15px;border-radius:10px;max-width:270px;
-          font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.5);">
-          <div style="font-size:.95rem;font-weight:700;color:#fff;margin-bottom:5px;">${place.name}</div>
-          <span style="display:inline-block;background:${cat.color}25;color:${cat.color};border:1px solid ${cat.color}60;
-            padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:600;margin-bottom:8px;">${cat.emoji} ${cat.label}</span>
-          <div style="font-size:.8rem;color:#b0c8d8;line-height:1.5;margin-bottom:10px;">${place.desc}</div>
-          <a href="${place.url.startsWith('http') ? place.url : BASE + place.url}" target="_blank"
-            style="display:inline-block;background:${cat.color}30;color:${cat.color};border:1px solid ${cat.color}70;
-            padding:4px 12px;border-radius:8px;font-size:.72rem;font-weight:600;text-decoration:none;">
-            → Visit on south.is
-          </a>
-        </div>`);
-      infoWindow.open(map, marker);
-    });
+    marker.addListener('click', () => openPopup(place, marker));
     place._marker = marker;
     markers.push({ place, marker });
   });
@@ -470,17 +510,26 @@ function getSearchQuery() {
 
 function updateVisibility() {
   const q = getSearchQuery();
+  const favs = getFavorites();
   let visible = 0;
   markers.forEach(({place, marker}) => {
     const inCat = activeFilters.has(place.cat);
     const inSearch = !q || place.name.toLowerCase().includes(q) || place.desc.toLowerCase().includes(q);
-    const show = inCat && inSearch;
+    const inFavs = !showFavsOnly || favs.has(place.name);
+    const show = inCat && inSearch && inFavs;
     marker.setVisible(show);
     if (show) visible++;
   });
   const q2 = q ? ` matching "${q}"` : '';
   document.getElementById('stats').textContent = `Showing ${visible} of ${PLACES.length} destinations${q2} · Click any marker for details`;
   document.getElementById('map-count').textContent = `${visible} / ${PLACES.length}`;
+}
+
+function updateFavChip() {
+  const count = getFavorites().size;
+  const chip = document.getElementById('fav-chip');
+  chip.textContent = count ? `❤️ Favorites (${count})` : '❤️ Favorites';
+  chip.className = showFavsOnly ? 'fav-active' : (count ? '' : 'fav-inactive');
 }
 
 function buildFilters() {
@@ -520,6 +569,14 @@ function buildFilters() {
   el.querySelectorAll('.filter-btn').forEach(b => {
     b.addEventListener('click', syncToggleLabel, true);
   });
+
+  const favChip = document.getElementById('fav-chip');
+  favChip.addEventListener('click', () => {
+    showFavsOnly = !showFavsOnly;
+    updateFavChip();
+    updateVisibility();
+  });
+  updateFavChip();
 
   const searchEl = document.getElementById('search');
   const clearBtn = document.getElementById('search-clear');
