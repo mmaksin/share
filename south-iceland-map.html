@@ -31,6 +31,12 @@ h1 { font-size: 1.3rem; color: #fff; margin-bottom: 2px; }
 .badge { font-size: 0.6rem; background: rgba(255,255,255,0.18); padding: 1px 4px; border-radius: 8px; }
 #map { flex: 1; width: 100%; min-height: 0; }
 .footer { text-align: center; color: #3a6080; font-size: 0.65rem; padding: 4px 20px; flex-shrink: 0; }
+.star-row { padding: 2px 14px 4px; display: flex; align-items: center; gap: 6px; justify-content: center; flex-shrink: 0; }
+.star-label { font-size: 0.65rem; color: #4a7090; }
+.star-btn { padding: 3px 10px; border-radius: 20px; border: 1.5px solid #2a4a6a; background: transparent; color: #7a9bb5; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+.star-btn.star-active { background: #b8860b; color: #fff; border-color: #b8860b; }
+.star-btn:hover:not(.star-active) { border-color: #f5c842; color: #f5c842; }
+#rating-loading { font-size: 0.62rem; color: #4a7090; margin-left: 4px; }
 </style>
 </head>
 <body>
@@ -48,6 +54,15 @@ h1 { font-size: 1.3rem; color: #fff; margin-bottom: 2px; }
 <div class="controls" id="filters">
   <button id="toggle-all">Deselect all</button>
   <button id="fav-chip">❤️ Favorites</button>
+</div>
+<div class="star-row">
+  <span class="star-label">Min rating:</span>
+  <button class="star-btn star-active" data-min="0">All</button>
+  <button class="star-btn" data-min="4.5">⭐ 4.5+</button>
+  <button class="star-btn" data-min="4.7">⭐ 4.7+</button>
+  <button class="star-btn" data-min="4.9">⭐ 4.9+</button>
+  <span id="rating-loading"></span>
+  <button id="rating-retry" title="Clear cached ratings and re-fetch" style="background:none;border:none;color:#4a7090;font-size:.65rem;cursor:pointer;padding:0 4px;">↺ retry</button>
 </div>
 <div id="map"></div>
 <p class="footer" id="stats"></p>
@@ -94,8 +109,8 @@ const PLACES = [
   {name:'Gjáin Valley',        cat:'waterfall', lat:64.1040, lng:-19.8700, url:'/en/destinations/nature/waterfalls/gjain-in-thjorsardalur-valley',       desc:'A hidden fairytale valley in Þjórsárdalur with twisting lava, pools and cascading waterfalls — magical.'},
 
   // ── GLACIERS & ICE ──────────────────────────────────────────────────────────
-  {name:'Jökulsárlón Glacier Lagoon', cat:'glacier', lat:64.0784, lng:-16.2306, url:'/en/destinations/nature/glaciers/jokulsarlon-glacier-lagoon',        desc:'Stunning glacial lake filled with floating icebergs calved from Breiðamerkurjökull. Boat tours available.'},
-  {name:'Fjallsárlón Glacial Lagoon', cat:'glacier', lat:63.9983, lng:-16.4250, url:'/en/destinations/nature/glaciers/fjallsarlon-glacial-lagoon',        desc:'Quieter sister lagoon to Jökulsárlón with zodiac boat tours.'},
+  {name:'Jökulsárlón Glacier Lagoon', searchName:'Jokulsarlon', cat:'glacier', lat:64.0784, lng:-16.2306, url:'/en/destinations/nature/glaciers/jokulsarlon-glacier-lagoon',        desc:'Stunning glacial lake filled with floating icebergs calved from Breiðamerkurjökull. Boat tours available.'},
+  {name:'Fjallsárlón Glacial Lagoon', searchName:'Fjallsarlon', cat:'glacier', lat:63.9983, lng:-16.4250, url:'/en/destinations/nature/glaciers/fjallsarlon-glacial-lagoon',        desc:'Quieter sister lagoon to Jökulsárlón with zodiac boat tours.'},
   {name:'Sólheimajökull',      cat:'glacier', lat:63.5422, lng:-19.3564, url:'/en/destinations/nature/glaciers/solheimajokull',                           desc:'Accessible glacier tongue — one of Iceland\'s most popular glacier hike destinations.'},
   {name:'Vatnajökull Glacier', cat:'glacier', lat:64.4167, lng:-16.9500, url:'/en/destinations/nature/glaciers/vatnajokull-glacier',                      desc:'Europe\'s largest glacier by volume, covering ~8% of Iceland.'},
   {name:'Langjökull Glacier',  cat:'glacier', lat:64.6333, lng:-20.5167, url:'/en/destinations/nature/glaciers/langjokull-glacier',                       desc:'Iceland\'s second-largest glacier, accessible via snowmobile tours.'},
@@ -411,7 +426,15 @@ function toggleFav(name) {
 }
 
 // ── Popup builder ──────────────────────────────────────────────────────────
+let _openPlace = null, _openMarker = null;
+
+function ratingLineHtml(place) {
+  if (place.rating) return starsHtml(place.rating, place.ratingCount, place.placeId);
+  return `<div id="rating-placeholder" style="font-size:.72rem;color:#4a7090;margin-bottom:6px;">⭐ fetching rating…</div>`;
+}
+
 function openPopup(place, marker) {
+  _openPlace = place; _openMarker = marker;
   const cat = catFor(place.cat);
   const fav = isFav(place.name);
   const link = place.url.startsWith('http') ? place.url : BASE + place.url;
@@ -422,10 +445,11 @@ function openPopup(place, marker) {
         <div style="font-size:.95rem;font-weight:700;color:#fff;">${place.name}</div>
         <button id="fav-toggle" title="${fav ? 'Remove from favorites' : 'Add to favorites'}"
           style="background:none;border:none;cursor:pointer;font-size:1.2rem;line-height:1;padding:0;flex-shrink:0;
-          filter:${fav ? 'none' : 'grayscale(1) opacity(0.45)'};transition:filter .15s;">${fav ? '❤️' : '❤️'}</button>
+          filter:${fav ? 'none' : 'grayscale(1) opacity(0.45)'};transition:filter .15s;">❤️</button>
       </div>
       <span style="display:inline-block;background:${cat.color}25;color:${cat.color};border:1px solid ${cat.color}60;
         padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:600;margin-bottom:8px;">${cat.emoji} ${cat.label}</span>
+      ${ratingLineHtml(place)}
       <div style="font-size:.8rem;color:#b0c8d8;line-height:1.5;margin-bottom:10px;">${place.desc}</div>
       <a href="${link}" target="_blank"
         style="display:inline-block;background:${cat.color}30;color:${cat.color};border:1px solid ${cat.color}70;
@@ -443,6 +467,12 @@ function openPopup(place, marker) {
       if (showFavsOnly) updateVisibility();
     });
   });
+}
+
+function refreshOpenPopupRating() {
+  if (!_openPlace || !_openPlace.rating) return;
+  const el = document.getElementById('rating-placeholder');
+  if (el) el.outerHTML = starsHtml(_openPlace.rating, _openPlace.ratingCount, _openPlace.placeId);
 }
 
 function catFor(id) { return CATS.find(c => c.id === id); }
@@ -489,6 +519,7 @@ function initMap() {
   });
 
   infoWindow = new google.maps.InfoWindow({ pixelOffset: new google.maps.Size(0,-4) });
+  infoWindow.addListener('closeclick', () => { _openPlace = null; _openMarker = null; });
 
   PLACES.forEach(place => {
     const marker = new google.maps.Marker({
@@ -501,7 +532,9 @@ function initMap() {
   });
 
   buildFilters();
+  buildStarFilter();
   updateStats();
+  fetchAllRatings();
 }
 
 function getSearchQuery() {
@@ -516,7 +549,8 @@ function updateVisibility() {
     const inCat = activeFilters.has(place.cat);
     const inSearch = !q || place.name.toLowerCase().includes(q) || place.desc.toLowerCase().includes(q);
     const inFavs = !showFavsOnly || favs.has(place.name);
-    const show = inCat && inSearch && inFavs;
+    const inRating = minRating === 0 || (place.rating && place.rating >= minRating);
+    const show = inCat && inSearch && inFavs && inRating;
     marker.setVisible(show);
     if (show) visible++;
   });
@@ -530,6 +564,143 @@ function updateFavChip() {
   const chip = document.getElementById('fav-chip');
   chip.textContent = count ? `❤️ Favorites (${count})` : '❤️ Favorites';
   chip.className = showFavsOnly ? 'fav-active' : (count ? '' : 'fav-inactive');
+}
+
+// ── Star ratings ───────────────────────────────────────────────────────────
+let minRating = 0;
+const RATINGS_KEY = 'iceland_map_ratings_v2';
+const CACHE_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+function starsHtml(rating, count, placeId) {
+  if (!rating) return '';
+  const full = Math.floor(rating);
+  const half = (rating - full) >= 0.3 ? 1 : 0;
+  const empty = 5 - full - half;
+  const stars = '★'.repeat(full) + (half ? '⯨' : '') + '☆'.repeat(empty);
+  const cnt = count ? ` <span style="opacity:.55">(${count >= 1000 ? (count/1000).toFixed(1)+'k' : count})</span>` : '';
+  const href = placeId ? `https://www.google.com/maps/place/?q=place_id:${placeId}` : `https://www.google.com/maps/search/${encodeURIComponent(stars)}`;
+  return `<a href="${href}" target="_blank" style="display:block;color:#f5c842;font-size:.8rem;margin-bottom:6px;text-decoration:none;cursor:pointer;" title="View on Google Maps">${stars} <span style="color:#c8a820">${rating.toFixed(1)}</span>${cnt} <span style="font-size:.6rem;color:#4a9abb">↗</span></a>`;
+}
+
+function loadRatingsCache() {
+  try {
+    const raw = localStorage.getItem(RATINGS_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (Date.now() - obj.ts > CACHE_TTL) return null;
+    if (Object.keys(obj.data).length === 0) return null; // don't re-use empty cache
+    return obj.data;
+  } catch(e) { return null; }
+}
+
+function applyRatings(data) {
+  PLACES.forEach(p => {
+    if (data[p.name]) { p.rating = data[p.name].r; p.ratingCount = data[p.name].c; p.placeId = data[p.name].id; }
+  });
+}
+
+function saveRatingsCache() {
+  const data = {};
+  PLACES.forEach(p => { if (p.rating) data[p.name] = { r: p.rating, c: p.ratingCount || 0, id: p.placeId || null }; });
+  if (Object.keys(data).length === 0) return; // don't cache empty results
+  try { localStorage.setItem(RATINGS_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
+}
+
+function normalizeQuery(name) {
+  return name
+    .replace(/[áàâ]/gi, 'a').replace(/[éèê]/gi, 'e').replace(/[íìî]/gi, 'i')
+    .replace(/[óòô]/gi, 'o').replace(/[úùû]/gi, 'u').replace(/[ý]/gi, 'y')
+    .replace(/[ä]/gi, 'ae').replace(/[ö]/gi, 'o').replace(/[ü]/gi, 'u')
+    .replace(/[ð]/gi, 'd').replace(/[þ]/gi, 'th').replace(/[æ]/gi, 'ae')
+    .replace(/[ø]/gi, 'o');
+}
+
+async function fetchPlaceRating(place, service) {
+  const trySearch = (query) => new Promise(resolve => {
+    service.textSearch({
+      query,
+      location: new google.maps.LatLng(place.lat, place.lng),
+      radius: 1000
+    }, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results?.[0]?.rating) {
+        resolve({ r: results[0].rating, c: results[0].user_ratings_total || 0, id: results[0].place_id || null });
+      } else resolve(null);
+    });
+  });
+
+  // Try original name first, then ASCII-normalized fallback
+  const searchName = place.searchName || place.name;
+  const result = await trySearch(`${searchName} Iceland`);
+  if (result) return result;
+  const normalized = normalizeQuery(searchName);
+  if (normalized !== searchName) return await trySearch(`${normalized} Iceland`);
+  return null;
+}
+
+async function fetchAllRatings() {
+  const cached = loadRatingsCache();
+  if (cached) { applyRatings(cached); updateVisibility(); return; }
+
+  if (!google.maps.places) {
+    document.getElementById('rating-loading').textContent = '(Places API unavailable)';
+    return;
+  }
+
+  const service = new google.maps.places.PlacesService(map);
+  const loading = document.getElementById('rating-loading');
+
+  // Probe first place to check API is working before running all 267
+  loading.textContent = 'Checking ratings API…';
+  const probe = await fetchPlaceRating(PLACES[0], service);
+  if (!probe) {
+    loading.textContent = '⚠ Ratings unavailable — enable Places API for this key';
+    return;
+  }
+  PLACES[0].rating = probe.r; PLACES[0].ratingCount = probe.c; PLACES[0].placeId = probe.id;
+
+  const BATCH = 4;
+  let done = 1;
+  const remaining = PLACES.slice(1);
+
+  for (let i = 0; i < remaining.length; i += BATCH) {
+    const batch = remaining.slice(i, i + BATCH);
+    await Promise.all(batch.map(async p => {
+      const res = await fetchPlaceRating(p, service);
+      if (res) { p.rating = res.r; p.ratingCount = res.c; p.placeId = res.id; }
+      done++;
+    }));
+    loading.textContent = `Fetching ratings… ${Math.round(done / PLACES.length * 100)}%`;
+    refreshOpenPopupRating();
+    await new Promise(r => setTimeout(r, 300));
+  }
+  loading.textContent = '';
+  saveRatingsCache();
+  updateVisibility();
+  const rated = PLACES.filter(p => p.rating).length;
+  if (rated > 0) {
+    document.getElementById('rating-loading').textContent = `${rated} ratings loaded`;
+    setTimeout(() => { document.getElementById('rating-loading').textContent = ''; }, 3000);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('rating-retry').addEventListener('click', () => {
+    localStorage.removeItem(RATINGS_KEY);
+    PLACES.forEach(p => { delete p.rating; delete p.ratingCount; delete p.placeId; });
+    document.getElementById('rating-retry').style.display = 'none';
+    fetchAllRatings();
+  });
+});
+
+function buildStarFilter() {
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      minRating = parseFloat(btn.dataset.min);
+      document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('star-active'));
+      btn.classList.add('star-active');
+      updateVisibility();
+    });
+  });
 }
 
 function buildFilters() {
@@ -594,6 +765,6 @@ function buildFilters() {
 
 function updateStats() { updateVisibility(); }
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJEs-ueLaREIRJVaa2hmCb5qHHzBnWYUY&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJEs-ueLaREIRJVaa2hmCb5qHHzBnWYUY&libraries=places&callback=initMap" async defer></script>
 </body>
 </html>
