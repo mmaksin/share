@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="ru" id="root-html">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>WellHealth · Подбор оздоровительной поездки по ситуации</title>
+<meta name="description" content="WellHealth подбирает санатории для оздоровления и восстановления по вашей ситуации — на клинической базе знаний, не на отзывах."/>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500&display=swap" rel="stylesheet"/>
+
+<style>
+/* WellHealth · RU landing
+   Same teal + sienna + bone palette as the premium variant — brand reads as one family. */
+
+:root {
+  --teal:        #1B4D54;
+  --teal-deep:   #103942;
+  --teal-soft:   #2D6770;
+  --sienna:      #C2724A;
+  --sienna-soft: #DDA181;
+  --sienna-ink:  #7A4426;
+  --bone:        #F4EFE4;
+  --bone-warm:   #EBE3D2;
+  --surface:     #FFFFFF;
+  --ink:         #1F262B;
+  --ink-soft:    #6B7378;
+  --line:        #E2DBC9;
+  --danger:      #8B3A2F;
+  --shadow-sm:   0 4px 14px rgba(27, 77, 84, 0.08);
+  --shadow-md:   0 10px 30px rgba(27, 77, 84, 0.12);
+  --shadow-lg:   0 30px 60px rgba(27, 77, 84, 0.18);
+  --radius-card: 12px;
+  --radius-soft: 10px;
+  --radius-pill: 999px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background:
+    radial-gradient(1400px 700px at 5% -10%, #fbf6ec 0%, transparent 60%),
+    radial-gradient(1100px 600px at 110% 110%, #e6efef 0%, transparent 60%),
+    var(--bone);
+  color: var(--ink);
+  min-height: 100vh;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--sienna-ink);
+  font-weight: 700;
+}
+.serif {
+  font-family: 'Lora', serif;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: 0.1px;
+}
+h1.serif { font-size: clamp(36px, 5.2vw, 56px); margin: 0; }
+h2.serif { font-size: clamp(26px, 3.4vw, 40px); margin: 0; }
+h3.serif { font-size: 22px; margin: 0; }
+.lede { font-size: 16.5px; color: var(--ink-soft); line-height: 1.65; max-width: 60ch; }
+.body-soft { color: var(--ink-soft); font-size: 14px; line-height: 1.65; }
+
+/* ---------- Header ---------- */
+.site-head {
+  position: sticky; top: 0; z-index: 30;
+  backdrop-filter: blur(12px);
+  background: rgba(244, 239, 228, 0.78);
+  border-bottom: 1px solid rgba(226, 219, 201, 0.8);
+}
+.site-head .row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px;
+  padding: 16px 0;
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-mark {
+  width: 38px; height: 38px; border-radius: 9px;
+  background: var(--teal); color: var(--bone);
+  display: grid; place-items: center;
+  font-family: 'Lora', serif; font-size: 21px; font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+.brand-mark::after {
+  content: ''; position: absolute; right: -2px; bottom: -2px;
+  width: 10px; height: 10px; border-radius: 3px;
+  background: var(--sienna);
+  box-shadow: 0 2px 6px rgba(194, 114, 74, 0.4);
+}
+.brand-name {
+  font-family: 'Lora', serif;
+  font-size: 22px; font-weight: 500; letter-spacing: 0.2px;
+  color: var(--ink);
+}
+.head-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.lang-toggle {
+  display: inline-flex;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  padding: 3px;
+  box-shadow: var(--shadow-sm);
+}
+.lang-toggle button {
+  border: 0; background: transparent;
+  padding: 7px 14px;
+  font-size: 13px; font-weight: 500;
+  border-radius: var(--radius-pill);
+  cursor: pointer; color: var(--ink-soft);
+}
+.lang-toggle button.is-active { background: var(--teal); color: var(--bone); }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px 22px; border-radius: var(--radius-soft); border: 0;
+  cursor: pointer; font-weight: 600; font-size: 15px;
+  background: var(--teal); color: var(--bone);
+  transition: transform .12s ease, box-shadow .2s ease;
+  box-shadow: var(--shadow-sm);
+}
+.btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn.ghost { background: transparent; border: 1px solid var(--teal); color: var(--teal); box-shadow: none; }
+.btn.sienna { background: var(--sienna); color: #fff; }
+.btn.sm { padding: 10px 16px; font-size: 13px; }
+
+/* ---------- Store badges ---------- */
+.store-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.store-badge {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 10px 18px;
+  background: var(--ink); color: var(--bone);
+  border-radius: var(--radius-soft); min-width: 184px;
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: transform .12s ease, box-shadow .2s ease;
+  box-shadow: var(--shadow-sm);
+}
+.store-badge:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.store-badge .glyph { width: 32px; height: 32px; display: grid; place-items: center; color: var(--bone); }
+.store-badge .lbl { display: flex; flex-direction: column; line-height: 1.1; }
+.store-badge .lbl .small { font-size: 10px; opacity: 0.78; letter-spacing: 0.6px; text-transform: uppercase; }
+.store-badge .lbl .big { font-family: 'Lora', serif; font-size: 19px; font-weight: 500; }
+
+.store-badge.rustore {
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line);
+  position: relative;
+}
+.store-badge.rustore::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  border-radius: var(--radius-soft) 0 0 var(--radius-soft);
+  background: var(--sienna);
+}
+.store-badge.rustore .glyph { color: var(--teal); }
+.store-badge.rustore .lbl .small { color: var(--ink-soft); opacity: 1; }
+
+/* ---------- Hero with inline matcher ---------- */
+.hero { position: relative; padding: 56px 0 72px; overflow: hidden; }
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+  align-items: start;
+}
+@media (max-width: 940px) { .hero-grid { grid-template-columns: 1fr; gap: 40px; } }
+.hero h1 .accent { color: var(--teal); }
+.hero .trust-line {
+  margin-top: 24px;
+  display: flex; align-items: center; gap: 14px;
+  font-size: 13px; color: var(--ink-soft);
+  flex-wrap: wrap;
+}
+.trust-line .dot { width: 4px; height: 4px; background: var(--sienna); border-radius: 50%; }
+.hero-cta-stack { margin-top: 24px; display: flex; flex-direction: column; gap: 16px; }
+.hero-cta-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+/* ---------- Matcher widget ---------- */
+.matcher {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+.matcher::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  border-radius: 18px 0 0 18px;
+  background: var(--sienna);
+}
+.matcher-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 14px;
+}
+.matcher-head .lbl {
+  font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--sienna-ink); font-weight: 700;
+}
+.matcher-head .count { font-size: 12px; color: var(--ink-soft); font-weight: 500; }
+
+.matcher-q {
+  font-family: 'Lora', serif; font-size: 18px; font-weight: 500;
+  color: var(--teal-deep);
+  margin-bottom: 14px; line-height: 1.3;
+}
+.condition-chips {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 18px;
+}
+.cond-chip {
+  border: 1px solid var(--line);
+  background: var(--bone);
+  color: var(--ink-soft);
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 13px; font-weight: 500;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.cond-chip:hover { border-color: var(--teal-soft); color: var(--teal); }
+.text-input-row { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+.text-input {
+  flex: 1; min-width: 0;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-soft);
+  background: var(--bone);
+  font: inherit; font-size: 14px;
+  color: var(--ink);
+  transition: border-color .15s ease, background .15s ease;
+}
+.text-input::placeholder { color: var(--ink-soft); }
+.text-input:focus { border-color: var(--teal); outline: none; background: var(--surface); }
+.text-input:disabled { opacity: 0.6; cursor: not-allowed; }
+.submit-btn {
+  width: 44px; height: 44px; flex: 0 0 44px;
+  border: 0; border-radius: var(--radius-soft);
+  background: var(--teal); color: var(--bone);
+  cursor: pointer; font-size: 18px;
+  display: grid; place-items: center;
+  transition: opacity .15s ease, transform .15s ease;
+}
+.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.submit-btn:not(:disabled):hover { transform: translateY(-1px); }
+.loader-dot {
+  display: block; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--bone);
+  animation: ldot 0.9s infinite ease-in-out;
+}
+@keyframes ldot {
+  0%, 100% { opacity: 0.3; transform: scale(0.7); }
+  50%      { opacity: 1;   transform: scale(1.2); }
+}
+.loading-line {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12.5px; color: var(--ink-soft);
+  padding: 4px 2px 12px;
+}
+.loading-line::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--sienna); animation: ldot 0.9s infinite ease-in-out;
+}
+.or-row {
+  font-size: 11.5px; color: var(--ink-soft);
+  margin: 4px 0 10px;
+  letter-spacing: 0.4px;
+  text-transform: lowercase;
+}
+.no-match {
+  font-size: 13px; color: var(--ink-soft);
+  background: var(--bone-warm);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-soft);
+  padding: 12px 14px;
+  margin-top: 8px;
+  line-height: 1.6;
+}
+.submit-btn.submit-btn--text {
+  width: auto; flex: 0 0 auto;
+  padding: 0 18px;
+  font-size: 14px; font-weight: 600;
+  height: 44px;
+}
+.cond-chip.is-active {
+  background: var(--teal); color: var(--bone); border-color: var(--teal);
+}
+
+.match-list { display: flex; flex-direction: column; gap: 10px; }
+.match-card {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  gap: 12px; align-items: center;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--bone-warm);
+  transition: transform .12s ease, box-shadow .2s ease, background .15s ease;
+}
+.match-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); background: var(--surface); }
+.match-card .thumb {
+  width: 56px; height: 56px; border-radius: 10px;
+  display: grid; place-items: center;
+  font-family: 'Lora', serif; font-size: 22px; font-weight: 600;
+  color: var(--bone);
+}
+.match-card .body { min-width: 0; }
+.match-card .name { font-weight: 600; font-size: 14px; color: var(--ink); }
+.match-card .why { font-size: 12px; color: var(--ink-soft); margin-top: 3px; line-height: 1.45; }
+.match-card .price { text-align: right; }
+.match-card .price .num { font-family: 'Lora', serif; font-size: 18px; font-weight: 500; color: var(--teal-deep); }
+.match-card .price .unit { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
+
+.thumb.lans      { background: linear-gradient(135deg, #A8B2A8 0%, #3F4A47 100%); }
+.thumb.bad-ragaz { background: linear-gradient(135deg, #7E8B8E 0%, #3A4549 100%); }
+.thumb.sha       { background: linear-gradient(135deg, #C5B8A3 0%, #7A6D56 100%); }
+.thumb.karlovy   { background: linear-gradient(135deg, #B89970 0%, #5C4220 100%); }
+.thumb.marianske { background: linear-gradient(135deg, #B0A488 0%, #5C4F33 100%); }
+.thumb.heviz     { background: linear-gradient(135deg, #8AA398 0%, #3D5447 100%); }
+.thumb.rixos     { background: linear-gradient(135deg, #C29066 0%, #6E4D2E 100%); }
+.thumb.atmanjai  { background: linear-gradient(135deg, #97A88E 0%, #4A5A40 100%); }
+.thumb.kislovodsk{ background: linear-gradient(135deg, #9DA67A 0%, #4F5536 100%); }
+.thumb.velingrad { background: linear-gradient(135deg, #A38670 0%, #5A4231 100%); }
+.thumb.altay     { background: linear-gradient(135deg, #6F8B82 0%, #2D423B 100%); }
+.thumb.heritance { background: linear-gradient(135deg, #B8A47C 0%, #6B5832 100%); }
+.thumb.terme     { background: linear-gradient(135deg, #8FA6A2 0%, #3F5650 100%); }
+
+.matcher-foot {
+  margin-top: 14px;
+  font-size: 12px; color: var(--ink-soft);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 8px;
+}
+.matcher-foot .open { color: var(--teal); font-weight: 600; }
+
+/* ---------- Section frame ---------- */
+.section { padding: 80px 0; }
+.section.alt { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.section-head { max-width: 720px; margin-bottom: 40px; }
+.section-head h2 { margin-top: 8px; color: var(--teal-deep); }
+.section-head p { margin: 16px 0 0; }
+
+/* ---------- How it works ---------- */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+@media (max-width: 820px) { .steps { grid-template-columns: 1fr; } }
+.step {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  padding: 26px;
+  transition: transform .15s ease, box-shadow .2s ease;
+}
+.step:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.step .num {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: rgba(27,77,84,0.07);
+  color: var(--teal);
+  display: grid; place-items: center;
+  font-family: 'Lora', serif; font-size: 18px; font-weight: 600;
+  margin-bottom: 18px;
+}
+.step h3 { color: var(--teal-deep); margin-bottom: 8px; }
+.step p { color: var(--ink-soft); font-size: 14px; line-height: 1.7; margin: 0; }
+
+/* ---------- Browse by condition ---------- */
+.cond-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+.cond-tile {
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 18px 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  min-height: 130px;
+  transition: transform .12s ease, box-shadow .2s ease, border-color .15s ease;
+}
+.cond-tile:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); border-color: var(--teal-soft); }
+.cond-tile .name { font-weight: 600; font-size: 16px; color: var(--ink); }
+.cond-tile .meta { font-size: 12px; color: var(--ink-soft); margin-top: 6px; line-height: 1.55; }
+.cond-tile .arr { color: var(--teal); font-size: 18px; align-self: flex-end; }
+
+/* ---------- Featured venues (full grid) ---------- */
+.venue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 18px;
+}
+.venue-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  transition: transform .12s ease, box-shadow .2s ease;
+}
+.venue-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.venue-card .photo { height: 130px; position: relative; }
+.venue-card .photo .price-badge {
+  position: absolute; bottom: 10px; right: 10px;
+  background: rgba(244,239,228,0.95);
+  color: var(--teal-deep);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px; font-weight: 600;
+}
+.venue-card .body { padding: 16px 18px 18px; }
+.venue-card .name { font-family: 'Lora', serif; font-size: 19px; font-weight: 500; color: var(--ink); }
+.venue-card .loc { font-size: 12px; color: var(--ink-soft); margin-top: 4px; letter-spacing: 0.4px; }
+.venue-card .conds { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+.chip-cond {
+  padding: 4px 10px; border-radius: var(--radius-pill);
+  background: rgba(27,77,84,0.07); color: var(--teal-deep);
+  font-size: 11px; font-weight: 500;
+  border: 1px solid rgba(27,77,84,0.18);
+}
+
+/* ---------- Trust block ---------- */
+.trust-frame {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 18px;
+  padding: 30px;
+  background: linear-gradient(135deg, rgba(27,77,84,0.05) 0%, rgba(194,114,74,0.06) 100%);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+@media (max-width: 760px) { .trust-frame { grid-template-columns: 1fr; } }
+.trust-stat .num {
+  font-family: 'Lora', serif;
+  font-size: 36px; font-weight: 600;
+  color: var(--teal-deep);
+  line-height: 1;
+}
+.trust-stat .lbl { font-size: 13px; color: var(--ink-soft); margin-top: 6px; line-height: 1.5; }
+.trust-foot {
+  margin-top: 20px;
+  font-size: 14px; color: var(--ink-soft);
+  line-height: 1.65; max-width: 760px;
+}
+
+/* ---------- Privacy (compact) ---------- */
+.privacy-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 760px) { .privacy-row { grid-template-columns: 1fr; } }
+.privacy-item {
+  background: var(--bone-warm);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-soft);
+  padding: 18px 20px;
+}
+.privacy-item h4 { margin: 0 0 6px; font-size: 14.5px; color: var(--teal-deep); font-weight: 600; }
+.privacy-item p { margin: 0; font-size: 13.5px; color: var(--ink-soft); line-height: 1.65; }
+
+/* ---------- For doctors ---------- */
+.doctors-block {
+  display: flex; gap: 24px; align-items: center; justify-content: space-between;
+  padding: 26px 32px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  flex-wrap: wrap;
+}
+.doctors-block .copy { max-width: 640px; }
+.doctors-block .eyebrow { color: var(--sienna-ink); }
+.doctors-block h3 { color: var(--teal-deep); margin: 8px 0 6px; }
+.doctors-block p { margin: 0; color: var(--ink-soft); font-size: 14px; line-height: 1.65; }
+
+/* ---------- FAQ ---------- */
+.faq-list { display: flex; flex-direction: column; gap: 10px; max-width: 820px; margin: 0 auto; }
+.faq {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-soft);
+  overflow: hidden;
+}
+.faq summary {
+  padding: 18px 22px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; list-style: none;
+  font-weight: 600; color: var(--teal-deep); font-size: 15px;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after {
+  content: '+';
+  font-family: 'Lora', serif;
+  font-size: 22px; color: var(--sienna-ink); font-weight: 500;
+}
+.faq[open] summary::after { content: '–'; }
+.faq .faq-body { padding: 0 22px 20px; color: var(--ink-soft); font-size: 14px; line-height: 1.7; }
+
+/* ---------- Footer ---------- */
+.site-foot {
+  background: var(--teal-deep);
+  color: rgba(244,239,228,0.7);
+  padding: 56px 0 24px;
+}
+.site-foot a { color: var(--bone); }
+.foot-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 32px;
+}
+@media (max-width: 820px) { .foot-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 540px) { .foot-grid { grid-template-columns: 1fr; } }
+.foot-brand .brand-name { color: var(--bone); }
+.foot-brand .tag { font-family: 'Lora', serif; font-size: 16px; color: rgba(244,239,228,0.78); margin-top: 12px; max-width: 320px; line-height: 1.45; }
+.foot-col h5 {
+  font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase;
+  color: var(--sienna-soft); font-weight: 700; margin: 0 0 14px;
+}
+.foot-col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.foot-col p { margin: 0 0 8px; font-size: 13px; line-height: 1.55; }
+.foot-bottom {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(244,239,228,0.1);
+  display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  font-size: 12px; color: rgba(244,239,228,0.55);
+}
+.foot-bottom .legal { display: flex; gap: 18px; flex-wrap: wrap; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo } = React;
+
+// ---------------- Conditions ----------------
+const CONDITIONS = [
+  { id: "sleep",     ru: "Сон",                              en: "Sleep" },
+  { id: "spine",     ru: "Спина и суставы",                   en: "Spine & joints" },
+  { id: "postop",    ru: "Восстановление после операции",     en: "Post-op recovery" },
+  { id: "stress",    ru: "Стресс и выгорание",                 en: "Stress & burnout" },
+  { id: "weight",    ru: "Вес",                              en: "Weight" },
+  { id: "longevity", ru: "Возраст",                            en: "Longevity" },
+  { id: "cardiac",   ru: "Сердце",                            en: "Cardiac" },
+];
+
+// ---------------- Venues ----------------
+// Wide price spread on purpose — premium European clinics next to Czech / Hungarian /
+// Russian sanatoria and Asian wellness. The price column is the load-bearing addition
+// versus the premium landing.
+const VENUES = [
+  {
+    id: "lanserhof", thumb: "lans",
+    name: { ru: "Lanserhof Tegernsee", en: "Lanserhof Tegernsee" },
+    loc:  { ru: "Германия · Бавария",  en: "Germany · Bavaria" },
+    price: 7500,
+    rationale: {
+      sleep:     { ru: "Расширенная диагностика сна, метод Майера 2.0, тихий горный режим.", en: "Extended sleep diagnostics, Mayr 2.0, quiet mountain regime." },
+      stress:    { ru: "Программы нервной регуляции, без стимуляторов и связи с офисом.",     en: "Nervous-regulation programmes, no stimulants, no office contact." },
+      longevity: { ru: "Метаболика, эпигенетика, программа на 7–14 ночей.",                  en: "Metabolic and epigenetic markers, 7–14-night programme." },
+    },
+  },
+  {
+    id: "bad-ragaz", thumb: "bad-ragaz",
+    name: { ru: "Bad Ragaz Grand Resort", en: "Bad Ragaz Grand Resort" },
+    loc:  { ru: "Швейцария · 1 ч от Цюриха", en: "Switzerland · 1 h from Zurich" },
+    price: 8400,
+    rationale: {
+      spine:  { ru: "Термальный источник Тамина, ортопедическая клиника на территории.", en: "Tamina thermal spring, in-house orthopaedic clinic." },
+      postop: { ru: "Послеоперационная реабилитация в связке с клиникой Hirslanden.",     en: "Post-op rehabilitation tied to Hirslanden clinic." },
+    },
+  },
+  {
+    id: "sha", thumb: "sha",
+    name: { ru: "SHA Wellness", en: "SHA Wellness" },
+    loc:  { ru: "Испания · Аликанте", en: "Spain · Alicante" },
+    price: 6200,
+    rationale: {
+      cardiac:   { ru: "Кардио-диагностика, поведенческие протоколы.",  en: "Cardiac diagnostics, behaviour-change clinics." },
+      longevity: { ru: "Программа anti-age с реальной медицинской командой.", en: "Longevity programme with a real medical team." },
+      weight:    { ru: "Структурированный план питания и метаболика.", en: "Structured nutrition and metabolic plan." },
+    },
+  },
+  {
+    id: "karlovy-imperial", thumb: "karlovy",
+    name: { ru: "Карловы Вары · Imperial", en: "Karlovy Vary · Imperial" },
+    loc:  { ru: "Чехия · 2 ч от Москвы", en: "Czech Republic · 2 h from Moscow" },
+    price: 1750,
+    rationale: {
+      sleep:   { ru: "Минеральные воды Vřídlo, классический санаторный режим.", en: "Vřídlo mineral springs, classical sanatorium routine." },
+      spine:   { ru: "Вода с высоким содержанием бикарбонатов и протоколы для опорно-двигательного аппарата.", en: "Bicarbonate-rich waters, musculoskeletal protocols." },
+      cardiac: { ru: "Бальнеологические программы при гипертонии и постинфарктном восстановлении.", en: "Balneology for hypertension and post-MI recovery." },
+    },
+  },
+  {
+    id: "marianske", thumb: "marianske",
+    name: { ru: "Марианские Лазни · Nové Lázně", en: "Mariánské Lázně · Nové Lázně" },
+    loc:  { ru: "Чехия", en: "Czech Republic" },
+    price: 1400,
+    rationale: {
+      spine:   { ru: "Холодные минеральные источники, грязевые ванны.", en: "Cold mineral springs, mud baths." },
+      cardiac: { ru: "Историческая программа при кардиологии и метаболическом синдроме.", en: "Historic cardiology + metabolic-syndrome programme." },
+    },
+  },
+  {
+    id: "heviz", thumb: "heviz",
+    name: { ru: "Hévíz Thermal", en: "Hévíz Thermal" },
+    loc:  { ru: "Венгрия", en: "Hungary" },
+    price: 1100,
+    rationale: {
+      spine:  { ru: "Крупнейшее термальное озеро в Европе, ортопедические протоколы.", en: "Largest thermal lake in Europe, orthopaedic protocols." },
+      postop: { ru: "Реабилитация после эндопротезирования и спинальных операций.",  en: "Rehab after joint replacement and spinal surgery." },
+    },
+  },
+  {
+    id: "rixos", thumb: "rixos",
+    name: { ru: "Rixos Premium Belek", en: "Rixos Premium Belek" },
+    loc:  { ru: "Турция · Анталья", en: "Turkey · Antalya" },
+    price: 1300,
+    rationale: {
+      stress: { ru: "Талассотерапия, мягкий климат, без виз для большинства паспортов.", en: "Thalassotherapy, mild climate, visa-free for most passports." },
+      postop: { ru: "Послеоперационное восстановление в тёплом климате с медицинским контролем.", en: "Post-op recovery in a warm climate with medical supervision." },
+    },
+  },
+  {
+    id: "atmanjai", thumb: "atmanjai",
+    name: { ru: "Atmanjai Detox", en: "Atmanjai Detox" },
+    loc:  { ru: "Таиланд · Пхукет",  en: "Thailand · Phuket" },
+    price: 1600,
+    rationale: {
+      weight: { ru: "Программа фастинга и детокса от 7 до 21 ночей.",      en: "Fasting and detox programmes, 7–21 nights." },
+      stress: { ru: "Йога, дыхательные практики, отключение от часовых поясов.", en: "Yoga, breathwork, time-zone reset." },
+    },
+  },
+  {
+    id: "kislovodsk", thumb: "kislovodsk",
+    name: { ru: "Кисловодск · Plaza", en: "Kislovodsk · Plaza" },
+    loc:  { ru: "Россия · 2 ч лёта из Москвы", en: "Russia · 2 h flight from Moscow" },
+    price: 950,
+    rationale: {
+      cardiac: { ru: "Нарзанные ванны, мягкий горный климат, без виз и долгих перелётов.", en: "Narzan baths, mild mountain climate, no visas, no long flights." },
+      stress:  { ru: "Курортный режим, кисловодский парк, лечебная ходьба.",            en: "Resort routine, Kislovodsk park, therapeutic walks." },
+    },
+  },
+  {
+    id: "velingrad", thumb: "velingrad",
+    name: { ru: "Велинград · Дворянска Баня", en: "Velingrad · Dvoryanska Banya" },
+    loc:  { ru: "Болгария", en: "Bulgaria" },
+    price: 720,
+    rationale: {
+      spine: { ru: "Термальные воды и грязелечение, доступные цены.", en: "Thermal waters and mud therapy at accessible prices." },
+      sleep: { ru: "Тихий курорт в горах Родопы, программы по сну.",  en: "Quiet resort in the Rhodope mountains, sleep programmes." },
+    },
+  },
+  {
+    id: "altay", thumb: "altay",
+    name: { ru: "Алтай · Беловодье",  en: "Altai · Belovodye" },
+    loc:  { ru: "Россия · 4 ч лёта из Москвы", en: "Russia · 4 h flight from Moscow" },
+    price: 540,
+    rationale: {
+      sleep:  { ru: "Горный воздух, без перелётов через ночь, тишина.", en: "Mountain air, no overnight flights, quiet." },
+      stress: { ru: "Травяные программы, пантовые ванны, устойчивый режим.", en: "Herbal programmes, antler baths, steady routine." },
+    },
+  },
+  {
+    id: "heritance", thumb: "heritance",
+    name: { ru: "Heritance Ayurveda Maha Gedara", en: "Heritance Ayurveda Maha Gedara" },
+    loc:  { ru: "Шри-Ланка", en: "Sri Lanka" },
+    price: 1100,
+    rationale: {
+      stress: { ru: "Полная аюрведическая программа от 14 ночей, домашние врачи.", en: "Full Ayurvedic programme, 14+ nights, in-house doctors." },
+      sleep:  { ru: "Очень тихий пляж, режим без новостей и кофеина.",            en: "Very quiet beach, no-news, no-caffeine routine." },
+    },
+  },
+  {
+    id: "terme-olimia", thumb: "terme",
+    name: { ru: "Terme Olimia", en: "Terme Olimia" },
+    loc:  { ru: "Словения", en: "Slovenia" },
+    price: 880,
+    rationale: {
+      spine:  { ru: "Термальная вода + физиотерапия, акцент на опорно-двигательный аппарат.", en: "Thermal water + physiotherapy, musculoskeletal focus." },
+      postop: { ru: "Реабилитация после ортопедических операций.",                            en: "Post-orthopaedic-surgery rehab." },
+    },
+  },
+];
+
+// ---------------- Free-text keyword inference (stub for backend) ----------------
+const KEYWORDS = {
+  sleep:     /сон|спать|спал|бессонн|sleep|insomn/i,
+  spine:     /спин|поясн|сустав|колен|шея|радикул|spine|back|joint|sciatic/i,
+  postop:    /после операц|реабилит|восстанов|прооперир|операци|post.?op|surgery|surgical/i,
+  stress:    /стресс|выгор|тревог|нерв|истощ|устал|stress|burn.?out|anxious|anxiety|fatigue/i,
+  weight:    /вес|похуд|лишн|тучн|полнота|weight|lose|kg|lbs/i,
+  longevity: /возраст|гормон|менопауз|старе|молод|longevity|aging|age|hormone/i,
+  cardiac:   /сердц|давлен|гипертон|инфаркт|стенокард|cardiac|heart|blood pressure|hypertens/i,
+};
+const inferSituation = (text) => {
+  if (!text) return null;
+  for (const [k, re] of Object.entries(KEYWORDS)) {
+    if (re.test(text)) return k;
+  }
+  return null;
+};
+
+// ---------------- Copy ----------------
+const COPY = {
+  ru: {
+    nav: { web_app: "Открыть веб-приложение" },
+    hero: {
+      eyebrow: "Подбор по ситуации",
+      title_a: "Что вас беспокоит?",
+      title_b: "Найдём санатории, которые с этим справятся.",
+      lede:
+        "WellHealth ищет не отель с пятью звёздами, а санаторий, который лечит именно то, что нужно вам. Сначала ситуация, потом — три-четыре подходящих варианта, в любом ценовом диапазоне.",
+      cta_web: "Открыть веб-приложение",
+      cta_app_store_small: "Скачать в",
+      cta_app_store_big: "App Store",
+      cta_rustore_small: "Загрузить в",
+      cta_rustore_big: "RuStore",
+      trust1: "Клиническая база МКБ",
+      trust2: "Без VPN",
+      trust3: "Цены видны сразу",
+    },
+    matcher: {
+      lbl: "Подбор",
+      countSuffix: " вариантов",
+      q: "Что беспокоит?",
+      input_ph: "Опишите своими словами",
+      submit_a: "Подобрать",
+      loading: "Подбираю варианты…",
+      no_match: "Не удалось распознать запрос. Попробуйте: «плохо сплю», «болит спина», «после операции».",
+      open_all: "Все направления →",
+      from: "от",
+      per: "за 7 ночей",
+    },
+    how: {
+      eyebrow: "Как работает",
+      title: "Три простых шага.",
+      lede:
+        "Подбор делает не редакция и не алгоритм по отзывам. Под капотом — клиническая база знаний: диагноз, терапия, противопоказания, а уже затем санаторий.",
+      step1_t: "Обозначьте ситуацию.",
+      step1_d:
+        "Опишите своими словами. Можно загрузить выписку или результаты анализов — это уточнит подбор, но не обязательно.",
+      step2_t: "Просмотрите 3 самых подходящих санатория.",
+      step2_d:
+        "Каждая карточка показывает, чем именно этот санаторий помогает в вашей ситуации, цену за неделю и язык программы. Премиум и доступные варианты — рядом.",
+      step3_t: "Сохраните для врача.",
+      step3_d:
+        "Любой подбор выгружается как PDF — отнесите его на ближайший приём или передайте напрямую в санаторий.",
+    },
+    conds: {
+      eyebrow: "По ситуациям",
+      title: "Куда смотрят чаще всего.",
+      lede: "Семь самых частых ситуаций — подбор от 540 € до 8 400 € за 7 ночей.",
+      meta_pref: "вариантов",
+    },
+    venues: {
+      eyebrow: "Санатории",
+      title: "От Алтая до Цюриха.",
+      lede:
+        "Премиальные европейские клиники, чешские и венгерские курорты с минеральными водами, Турция и Балканы, Россия и Шри-Ланка. Цены публикуем; редкие исключения отмечены «по запросу».",
+    },
+    trust: {
+      eyebrow: "На чём построен подбор",
+      title: "Не отзывы. Клинические данные.",
+      lede:
+        "Под капотом WellHealth — структурированная база знаний: диагноз → профиль лечения → терапия → санаторий. Сопоставления проверяют врачи; противопоказания применяются как жёсткие фильтры, а не подсказки.",
+      stat1_n: "12+",
+      stat1_l: "ситуаций и целей · от сна до послеоперационного восстановления",
+      stat2_n: "200+",
+      stat2_l: "проверенных направлений · санатории, клиники, ретриты",
+      stat3_n: "МКБ-10",
+      stat3_l: "клиническая база · диагноз → терапия → санаторий, с противопоказаниями",
+      foot:
+        "Мы не ставим диагнозов и не назначаем лечения. Подбор — для обсуждения с вашим лечащим врачом; PDF к каждой рекомендации настроен под этот разговор.",
+    },
+    privacy: {
+      eyebrow: "Данные",
+      title: "Абсолютный минимум, необходимый для качественного подбора.",
+      p1_t: "Вход без социальных сетей",
+      p1_d: "Apple ID, СМС-код или магическая ссылка по почте. Без VK и Google.",
+      p2_t: "Документы шифруются",
+      p2_d: "Загружать выписки не обязательно — но если загружаете, они шифруются при хранении.",
+      p3_t: "Без перепродажи данных",
+      p3_d: "Профиль ситуаций используется только для подбора. Никакой рекламной таргетировки.",
+    },
+    doctors: {
+      eyebrow: "Для врачей",
+      title: "Хотите рекомендовать пациентам конкретные программы — а не «любой санаторий»?",
+      desc:
+        "В WellHealth для врачей есть отдельная панель: загружаете случай, видите подходящие санатории с обоснованием, печатаете для пациента. Бесплатно для практикующих врачей до конца 2026.",
+      cta: "Открыть для врача",
+    },
+    faq: {
+      eyebrow: "Коротко",
+      title: "Что обычно спрашивают.",
+      items: [
+        {
+          q: "Чем это лучше Букинга и TripAdvisor?",
+          a: "Букинг показывает отели по геолокации и цене; TripAdvisor — по отзывам. Мы показываем санатории по тому, чем они лечат. Под капотом — клиническая база знаний с противопоказаниями. Если санаторий не подходит вашей ситуации, он просто не попадёт в список — даже если у него высокий рейтинг.",
+        },
+        {
+          q: "Это медицинская консультация?",
+          a: "Нет. WellHealth помогает выбрать санаторий — он не ставит диагнозов и не назначает лечения. Любая рекомендация — повод для разговора с вашим лечащим врачом. PDF, который мы выгружаем, как раз и сделан под этот разговор.",
+        },
+        {
+          q: "Откуда цены и насколько они актуальны?",
+          a: "Цены — от санаториев и партнёров. Мы пересчитываем диапазон еженедельно и помечаем «по запросу» там, где санаторий не публикует цену. Финальное предложение всегда подтверждает сам санаторий — без «звёздочки внизу».",
+        },
+        {
+          q: "Что с приложениями в России?",
+          a: "Приложение в App Store и в RuStore. Веб-версия открывается без VPN в любом современном браузере и работает так же, как мобильное приложение.",
+        },
+        {
+          q: "Сколько стоит сам подбор?",
+          a: "Подбор — бесплатно. Никаких комиссий и наценок поверх цены санатория. Бронирование — напрямую в санатории.",
+        },
+      ],
+    },
+    foot: {
+      tagline: "Подбор оздоровительной поездки по тому, что именно вы хотите поправить.",
+      col_product: "Продукт",
+      col_company: "О компании",
+      col_contact: "Контакты",
+      l_match: "Подбор",
+      l_conds: "По ситуациям",
+      l_venues: "Санатории",
+      l_doctors: "Для врачей",
+      l_about: "О нас",
+      l_data: "Данные и приватность",
+      l_press: "Пресса",
+      l_careers: "Вакансии",
+      addr_msk_t: "Москва",
+      addr_msk_d: "Пресненская наб., д. 12 · Башня «Федерация»",
+      addr_spb_t: "Санкт-Петербург",
+      addr_spb_d: "Невский пр., 28 · Дом Зингера",
+      contact_email: "support@wellhealth.world",
+      contact_phone: "+7 495 000 00 00",
+      legal: ["Приватность", "Условия", "Дисклеймер"],
+      copyright:
+        "© 2026 WellHealth Holdings Ltd. WellHealth — сервис подбора оздоровительной поездки; не является поставщиком медицинских консультаций.",
+    },
+  },
+  en: {
+    nav: { web_app: "Open the web app" },
+    hero: {
+      eyebrow: "Matched by situation",
+      title_a: "What's troubling you?",
+      title_b: "We'll find places that can handle it.",
+      lede:
+        "WellHealth doesn't search for hotels with five stars — it searches for places that treat the situation you've named. Pick the goal first, then see three or four matched options across price ranges.",
+      cta_web: "Open the web app",
+      cta_app_store_small: "Download on the",
+      cta_app_store_big: "App Store",
+      cta_rustore_small: "Get it on",
+      cta_rustore_big: "RuStore",
+      trust1: "ICD-grounded knowledge base",
+      trust2: "No VPN required",
+      trust3: "Prices visible upfront",
+    },
+    matcher: {
+      lbl: "Match",
+      countSuffix: " options",
+      q: "What's the trouble?",
+      input_ph: "Describe in your own words",
+      submit_a: "Find",
+      loading: "Finding matches…",
+      no_match: "Couldn't parse the request. Try: 'poor sleep', 'back pain', 'after surgery'.",
+      open_all: "All venues →",
+      from: "from",
+      per: "for 7 nights",
+    },
+    how: {
+      eyebrow: "How it works",
+      title: "Three simple steps.",
+      lede:
+        "The match isn't done by an editorial team or a review-ranking algorithm. Under the hood it is a clinical knowledge base: diagnosis, therapy, contraindications — and then the venue.",
+      step1_t: "Describe the situation.",
+      step1_d:
+        "Describe it in plain language. You can upload a discharge note or lab result to refine the match — but you don't have to.",
+      step2_t: "See the 3 best-matched venues.",
+      step2_d:
+        "Each card shows what it treats for your situation, the price for a week, and the programme language. Premium and accessible options sit side by side.",
+      step3_t: "Save for your doctor.",
+      step3_d:
+        "Every match exports as a clean PDF — bring it to your next appointment or pass it directly to the venue.",
+    },
+    conds: {
+      eyebrow: "By situation",
+      title: "Where people look most often.",
+      lede: "The seven most common situations, with options from €540 to €8,400 for 7 nights.",
+      meta_pref: "options",
+    },
+    venues: {
+      eyebrow: "Places",
+      title: "From Altai to Zurich.",
+      lede:
+        "European premium clinics, Czech and Hungarian mineral-water resorts, Turkey and the Balkans, Russia and Sri Lanka. Prices are public; the rare exceptions are marked 'on request'.",
+    },
+    trust: {
+      eyebrow: "What the match is built on",
+      title: "Not reviews. Clinical data.",
+      lede:
+        "Under the hood, a structured knowledge base: diagnosis → treatment profile → therapy → venue. Mappings are reviewed by clinicians; contraindications run as hard filters, not soft hints.",
+      stat1_n: "12+",
+      stat1_l: "situations and goals · from sleep to post-op recovery",
+      stat2_n: "200+",
+      stat2_l: "vetted venues · sanatoria, clinics, retreats",
+      stat3_n: "ICD-10",
+      stat3_l: "clinical base · diagnosis → therapy → venue, with contraindications",
+      foot:
+        "We don't diagnose or treat. The match is meant for a conversation with your doctor; the PDF for every recommendation is shaped for exactly that conversation.",
+    },
+    privacy: {
+      eyebrow: "Data",
+      title: "The absolute minimum needed for an accurate match.",
+      p1_t: "Sign in without social",
+      p1_d: "Apple ID, phone OTP, or magic-link email. No VK, no Google.",
+      p2_t: "Documents are encrypted",
+      p2_d: "You don't have to upload medical records — but if you do, they're encrypted at rest.",
+      p3_t: "No data resale",
+      p3_d: "Your situation profile is used only for matching. No ad targeting.",
+    },
+    doctors: {
+      eyebrow: "For physicians",
+      title: "Want to recommend a specific programme to a patient — not just 'any sanatorium'?",
+      desc:
+        "WellHealth has a separate panel for doctors: load a case, see matched places with reasoning, print for the patient. Free for practising clinicians through 2026.",
+      cta: "Open the doctor panel",
+    },
+    faq: {
+      eyebrow: "Briefly",
+      title: "What people usually ask.",
+      items: [
+        {
+          q: "How is this better than Booking or TripAdvisor?",
+          a: "Booking sorts hotels by location and price; TripAdvisor sorts by reviews. We sort by what places actually treat. Under the hood is a clinical knowledge base with contraindication logic. If a venue doesn't fit your situation, it simply doesn't appear in the list — even if it's well-rated.",
+        },
+        {
+          q: "Is this medical advice?",
+          a: "No. WellHealth helps you choose a place; it doesn't diagnose or treat. Every recommendation is meant as a conversation with your doctor. The PDF we export is shaped for exactly that conversation.",
+        },
+        {
+          q: "Where do prices come from, and how current are they?",
+          a: "Prices come from venues and partners. We refresh the range weekly and mark 'on request' where the venue doesn't publish a rate. The final offer is confirmed by the venue directly — no asterisks at the bottom.",
+        },
+        {
+          q: "What's the app situation in Russia?",
+          a: "The app is in the App Store and in RuStore. The web version opens without a VPN in any modern browser and works the same as the mobile app.",
+        },
+        {
+          q: "What does matching itself cost?",
+          a: "Matching is free. No commissions or markups on top of the venue's price. Booking is done directly with the venue.",
+        },
+      ],
+    },
+    foot: {
+      tagline: "Wellness travel matched to what you're actually trying to fix.",
+      col_product: "Product",
+      col_company: "Company",
+      col_contact: "Contact",
+      l_match: "Match",
+      l_conds: "By situation",
+      l_venues: "Venues",
+      l_doctors: "For doctors",
+      l_about: "About",
+      l_data: "Data and privacy",
+      l_press: "Press",
+      l_careers: "Careers",
+      addr_msk_t: "Moscow",
+      addr_msk_d: "Presnenskaya nab. 12 · Federation Tower",
+      addr_spb_t: "Saint Petersburg",
+      addr_spb_d: "Nevsky Prospekt 28 · Singer House",
+      contact_email: "support@wellhealth.world",
+      contact_phone: "+7 495 000 00 00",
+      legal: ["Privacy", "Terms", "Disclaimer"],
+      copyright:
+        "© 2026 WellHealth Holdings Ltd. WellHealth is a wellness-travel matching service; it is not a provider of medical advice.",
+    },
+  },
+};
+
+// ---------------- Inline glyphs ----------------
+const Glyph = {
+  Apple: () => (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+      <path d="M16.36 12.86c-.02-2.27 1.85-3.36 1.93-3.41-1.05-1.54-2.69-1.75-3.27-1.78-1.39-.14-2.71.82-3.42.82-.71 0-1.81-.8-2.97-.78-1.53.02-2.94.89-3.73 2.26-1.59 2.76-.41 6.85 1.14 9.1.76 1.1 1.66 2.34 2.83 2.3 1.13-.04 1.56-.73 2.93-.73 1.37 0 1.76.73 2.97.71 1.23-.02 2.01-1.12 2.76-2.23.87-1.28 1.23-2.52 1.25-2.59-.03-.01-2.4-.92-2.42-3.67zM14.13 6.46c.62-.75 1.04-1.79.92-2.83-.89.04-1.97.59-2.61 1.34-.57.66-1.08 1.72-.94 2.74.99.08 2.01-.5 2.63-1.25z"/>
+    </svg>
+  ),
+  RuStore: () => (
+    <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true">
+      <rect x="2" y="2" width="28" height="28" rx="7" fill="currentColor"/>
+      <path d="M11 9h7c2.5 0 4.3 1.6 4.3 4 0 1.8-1 3.1-2.6 3.7l3.1 6.3h-3.4l-2.7-5.7H14v5.7h-3V9zm3 5.5h3.6c1.2 0 1.9-.6 1.9-1.5s-.7-1.5-1.9-1.5H14v3z" fill="#F4EFE4"/>
+    </svg>
+  ),
+  Stethoscope: () => (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 3v6a4 4 0 0 0 8 0V3"/>
+      <path d="M8 13v3a5 5 0 0 0 10 0v-3"/>
+      <circle cx="18" cy="9" r="2"/>
+    </svg>
+  ),
+};
+
+// ---------------- App ----------------
+function App() {
+  const [lang, setLang] = useState("ru");
+  const [selected, setSelected] = useState("sleep");
+  const t = COPY[lang];
+
+  useEffect(() => {
+    const html = document.getElementById("root-html") || document.documentElement;
+    html.setAttribute("lang", lang);
+  }, [lang]);
+
+  // Filter venues that match the selected condition; cap at 4 in the matcher widget.
+  const matched = useMemo(
+    () => VENUES.filter(v => Object.prototype.hasOwnProperty.call(v.rationale, selected)),
+    [selected]
+  );
+
+  return (
+    <React.Fragment>
+      <Header lang={lang} setLang={setLang} t={t}/>
+      <Hero t={t} lang={lang} selected={selected} setSelected={setSelected} matched={matched}/>
+      <HowItWorks t={t}/>
+      <Conditions t={t} lang={lang} setSelected={setSelected}/>
+      <Venues t={t} lang={lang}/>
+      <Trust t={t}/>
+      <Privacy t={t}/>
+      <ForDoctors t={t}/>
+      <FAQ t={t}/>
+      <Footer t={t}/>
+    </React.Fragment>
+  );
+}
+
+function Header({ lang, setLang, t }) {
+  return (
+    <header className="site-head">
+      <div className="container row">
+        <div className="brand">
+          <div className="brand-mark">W</div>
+          <div className="brand-name">WellHealth</div>
+        </div>
+        <div className="head-actions">
+          <a href="https://app.wellhealth.world" className="btn sm">{t.nav.web_app}</a>
+          <div className="lang-toggle" role="tablist">
+            <button type="button" className={lang === "ru" ? "is-active" : ""} onClick={() => setLang("ru")} aria-pressed={lang === "ru"}>RU</button>
+            <button type="button" className={lang === "en" ? "is-active" : ""} onClick={() => setLang("en")} aria-pressed={lang === "en"}>EN</button>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function Hero({ t, lang, selected, setSelected, matched }) {
+  return (
+    <section className="hero">
+      <div className="container hero-grid">
+        <div className="hero-copy">
+          <div className="eyebrow">{t.hero.eyebrow}</div>
+          <h1 className="serif" style={{ marginTop: 12 }}>
+            <span className="accent">{t.hero.title_a}</span><br/>
+            {t.hero.title_b}
+          </h1>
+          <p className="lede" style={{ marginTop: 18 }}>{t.hero.lede}</p>
+
+          <div className="hero-cta-stack">
+            <div className="hero-cta-row">
+              <a className="btn" href="https://app.wellhealth.world">{t.hero.cta_web}</a>
+            </div>
+            <div className="store-row">
+              <a className="store-badge" href="https://apps.apple.com/app/wellhealth/id000000000" aria-label={t.hero.cta_app_store_big}>
+                <span className="glyph"><Glyph.Apple/></span>
+                <span className="lbl">
+                  <span className="small">{t.hero.cta_app_store_small}</span>
+                  <span className="big">{t.hero.cta_app_store_big}</span>
+                </span>
+              </a>
+              <a className="store-badge rustore" href="https://www.rustore.ru/catalog/app/world.wellhealth.app" aria-label={t.hero.cta_rustore_big}>
+                <span className="glyph"><Glyph.RuStore/></span>
+                <span className="lbl">
+                  <span className="small">{t.hero.cta_rustore_small}</span>
+                  <span className="big">{t.hero.cta_rustore_big}</span>
+                </span>
+              </a>
+            </div>
+          </div>
+
+          <div className="trust-line">
+            <span>{t.hero.trust1}</span>
+            <span className="dot"/>
+            <span>{t.hero.trust2}</span>
+            <span className="dot"/>
+            <span>{t.hero.trust3}</span>
+          </div>
+        </div>
+
+        <Matcher t={t} lang={lang} selected={selected} setSelected={setSelected} matched={matched}/>
+      </div>
+    </section>
+  );
+}
+
+function Matcher({ t, lang, selected, setSelected, matched }) {
+  const top = matched.slice(0, 3);
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+  const [didMatch, setDidMatch] = useState(false);
+
+  const handleSubmit = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!query.trim() || loading) return;
+    setLoading(true);
+    setTimeout(() => {
+      const inferred = inferSituation(query);
+      if (inferred) {
+        setSelected(inferred);
+        setDidMatch(true);
+      } else {
+        setDidMatch(false);
+      }
+      setSearched(true);
+      setLoading(false);
+    }, 900);
+  };
+
+  const showResults = searched && didMatch && !loading;
+  const showNoMatch = searched && !didMatch && !loading;
+
+  return (
+    <div className="matcher" aria-live="polite">
+      <div className="matcher-head">
+        <span className="lbl">{t.matcher.lbl}</span>
+        {showResults && <span className="count">{top.length}{t.matcher.countSuffix}</span>}
+      </div>
+      <div className="matcher-q">{t.matcher.q}</div>
+      <form className="text-input-row" onSubmit={handleSubmit}>
+        <input
+          type="text"
+          className="text-input"
+          placeholder={t.matcher.input_ph}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          disabled={loading}
+        />
+        <button
+          type="submit"
+          className="submit-btn submit-btn--text"
+          disabled={loading || !query.trim()}
+        >
+          {loading ? <span className="loader-dot"/> : t.matcher.submit_a}
+        </button>
+      </form>
+      {loading && <div className="loading-line">{t.matcher.loading}</div>}
+      {showNoMatch && <div className="no-match">{t.matcher.no_match}</div>}
+      {showResults && (
+        <React.Fragment>
+          <div className="match-list" style={{ marginTop: 16 }}>
+            {top.map(v => (
+              <div className="match-card" key={v.id}>
+                <div className={"thumb " + v.thumb}>{v.name[lang].charAt(0)}</div>
+                <div className="body">
+                  <div className="name">{v.name[lang]}</div>
+                  <div className="why">{v.rationale[selected][lang]}</div>
+                </div>
+                <div className="price">
+                  <div className="num">{t.matcher.from} €{v.price.toLocaleString(lang === "ru" ? "ru-RU" : "en-US")}</div>
+                  <div className="unit">{t.matcher.per}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="matcher-foot">
+            <span>{t.matcher.lbl}: {CONDITIONS.find(c => c.id === selected)[lang]}</span>
+            <a href="#venues" className="open">{t.matcher.open_all}</a>
+          </div>
+        </React.Fragment>
+      )}
+    </div>
+  );
+}
+
+function HowItWorks({ t }) {
+  return (
+    <section className="section alt" id="how">
+      <div className="container">
+        <div className="section-head">
+          <div className="eyebrow">{t.how.eyebrow}</div>
+          <h2 className="serif">{t.how.title}</h2>
+          <p className="lede">{t.how.lede}</p>
+        </div>
+        <div className="steps">
+          {[
+            { n: "I",   t: t.how.step1_t, d: t.how.step1_d },
+            { n: "II",  t: t.how.step2_t, d: t.how.step2_d },
+            { n: "III", t: t.how.step3_t, d: t.how.step3_d },
+          ].map((s, i) => (
+            <div className="step" key={i}>
+              <div className="num">{s.n}</div>
+              <h3 className="serif">{s.t}</h3>
+              <p>{s.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Conditions({ t, lang, setSelected }) {
+  // For each condition, count matching venues and find the cheapest "from €X" tile metadata.
+  const tiles = CONDITIONS.map(c => {
+    const matches = VENUES.filter(v => Object.prototype.hasOwnProperty.call(v.rationale, c.id));
+    const minPrice = matches.length ? Math.min(...matches.map(v => v.price)) : null;
+    return { ...c, count: matches.length, min: minPrice };
+  });
+  return (
+    <section className="section" id="conds">
+      <div className="container">
+        <div className="section-head">
+          <div className="eyebrow">{t.conds.eyebrow}</div>
+          <h2 className="serif">{t.conds.title}</h2>
+          <p className="lede">{t.conds.lede}</p>
+        </div>
+        <div className="cond-grid">
+          {tiles.map(tile => (
+            <a
+              className="cond-tile"
+              key={tile.id}
+              href="#"
+              onClick={e => { e.preventDefault(); setSelected(tile.id); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+            >
+              <div>
+                <div className="name">{tile[lang]}</div>
+                <div className="meta">{tile.count} {t.conds.meta_pref} · {t.matcher.from} €{tile.min.toLocaleString(lang === "ru" ? "ru-RU" : "en-US")}</div>
+              </div>
+              <div className="arr">→</div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Venues({ t, lang }) {
+  return (
+    <section className="section alt" id="venues">
+      <div className="container">
+        <div className="section-head">
+          <div className="eyebrow">{t.venues.eyebrow}</div>
+          <h2 className="serif">{t.venues.title}</h2>
+          <p className="lede">{t.venues.lede}</p>
+        </div>
+        <div className="venue-grid">
+          {VENUES.map(v => {
+            const conds = Object.keys(v.rationale)
+              .map(cid => CONDITIONS.find(c => c.id === cid))
+              .filter(Boolean);
+            return (
+              <article className="venue-card" key={v.id}>
+                <div className={"photo thumb " + v.thumb}>
+                  <span className="price-badge">{t.matcher.from} €{v.price.toLocaleString(lang === "ru" ? "ru-RU" : "en-US")}</span>
+                </div>
+                <div className="body">
+                  <div className="name">{v.name[lang]}</div>
+                  <div className="loc">{v.loc[lang]}</div>
+                  <div className="conds">
+                    {conds.map(c => <span key={c.id} className="chip-cond">{c[lang]}</span>)}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Trust({ t }) {
+  return (
+    <section className="section" id="trust">
+      <div className="container">
+        <div className="section-head">
+          <div className="eyebrow">{t.trust.eyebrow}</div>
+          <h2 className="serif">{t.trust.title}</h2>
+          <p className="lede">{t.trust.lede}</p>
+        </div>
+        <div className="trust-frame">
+          <div className="trust-stat"><div className="num">{t.trust.stat1_n}</div><div className="lbl">{t.trust.stat1_l}</div></div>
+          <div className="trust-stat"><div className="num">{t.trust.stat2_n}</div><div className="lbl">{t.trust.stat2_l}</div></div>
+          <div className="trust-stat"><div className="num">{t.trust.stat3_n}</div><div className="lbl">{t.trust.stat3_l}</div></div>
+        </div>
+        <p className="trust-foot">{t.trust.foot}</p>
+      </div>
+    </section>
+  );
+}
+
+function Privacy({ t }) {
+  return (
+    <section className="section alt" id="privacy">
+      <div className="container">
+        <div className="section-head">
+          <div className="eyebrow">{t.privacy.eyebrow}</div>
+          <h2 className="serif">{t.privacy.title}</h2>
+        </div>
+        <div className="privacy-row">
+          <div className="privacy-item"><h4>{t.privacy.p1_t}</h4><p>{t.privacy.p1_d}</p></div>
+          <div className="privacy-item"><h4>{t.privacy.p2_t}</h4><p>{t.privacy.p2_d}</p></div>
+          <div className="privacy-item"><h4>{t.privacy.p3_t}</h4><p>{t.privacy.p3_d}</p></div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ForDoctors({ t }) {
+  return (
+    <section className="section alt" id="doctors">
+      <div className="container">
+        <div className="doctors-block">
+          <div className="copy">
+            <div className="eyebrow">{t.doctors.eyebrow}</div>
+            <h3 className="serif">{t.doctors.title}</h3>
+            <p>{t.doctors.desc}</p>
+          </div>
+          <a href="../b2b/index.html" className="btn ghost">
+            <Glyph.Stethoscope/>
+            <span>{t.doctors.cta}</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FAQ({ t }) {
+  return (
+    <section className="section" id="faq">
+      <div className="container">
+        <div className="section-head" style={{ textAlign: "center", marginInline: "auto" }}>
+          <div className="eyebrow">{t.faq.eyebrow}</div>
+          <h2 className="serif">{t.faq.title}</h2>
+        </div>
+        <div className="faq-list">
+          {t.faq.items.map((it, i) => (
+            <details className="faq" key={i}>
+              <summary>{it.q}</summary>
+              <div className="faq-body">{it.a}</div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer({ t }) {
+  return (
+    <footer className="site-foot">
+      <div className="container">
+        <div className="foot-grid">
+          <div className="foot-brand">
+            <div className="brand">
+              <div className="brand-mark">W</div>
+              <div className="brand-name">WellHealth</div>
+            </div>
+            <div className="tag">{t.foot.tagline}</div>
+          </div>
+          <div className="foot-col">
+            <h5>{t.foot.col_product}</h5>
+            <ul>
+              <li><a href="#how">{t.foot.l_match}</a></li>
+              <li><a href="#conds">{t.foot.l_conds}</a></li>
+              <li><a href="#venues">{t.foot.l_venues}</a></li>
+              <li><a href="#doctors">{t.foot.l_doctors}</a></li>
+            </ul>
+          </div>
+          <div className="foot-col">
+            <h5>{t.foot.col_company}</h5>
+            <ul>
+              <li><a href="#">{t.foot.l_about}</a></li>
+              <li><a href="#privacy">{t.foot.l_data}</a></li>
+              <li><a href="#">{t.foot.l_press}</a></li>
+              <li><a href="#">{t.foot.l_careers}</a></li>
+            </ul>
+          </div>
+          <div className="foot-col">
+            <h5>{t.foot.col_contact}</h5>
+            <p><b style={{ color: "var(--bone)" }}>{t.foot.addr_msk_t}</b><br/>{t.foot.addr_msk_d}</p>
+            <p><b style={{ color: "var(--bone)" }}>{t.foot.addr_spb_t}</b><br/>{t.foot.addr_spb_d}</p>
+            <p><a href={`mailto:${t.foot.contact_email}`}>{t.foot.contact_email}</a><br/>{t.foot.contact_phone}</p>
+          </div>
+        </div>
+        <div className="foot-bottom">
+          <div>{t.foot.copyright}</div>
+          <div className="legal">
+            {t.foot.legal.map((l, i) => <a key={i} href="#">{l}</a>)}
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App/>);
+</script>
+</body>
+</html>
