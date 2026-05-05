@@ -2,8 +2,8 @@
 <html lang="ru" id="root-html">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>WellHealth · Прототип v0.2 (RU)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>WellHealth · Dr. Healthman</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500&display=swap" rel="stylesheet"/>
@@ -25,236 +25,562 @@
   --danger:      #8B3A2F;
   --shadow-sm:   0 4px 14px rgba(27, 77, 84, 0.08);
   --shadow-md:   0 10px 30px rgba(27, 77, 84, 0.12);
-  --shadow-lg:   0 30px 60px rgba(27, 77, 84, 0.18);
-  --r-card: 12px;
+  --shadow-lg:   0 24px 60px rgba(27, 77, 84, 0.20);
+  --r-card: 14px;
   --r-soft: 10px;
   --r-pill: 999px;
 }
 *,*::before,*::after { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
+html, body { margin: 0; padding: 0; height: 100%; }
 body {
   font-family: 'Manrope', system-ui, -apple-system, sans-serif;
-  background:
-    radial-gradient(1200px 600px at 8% -10%, #fbf7ed 0%, transparent 60%),
-    radial-gradient(900px 500px at 110% 110%, #e8efef 0%, transparent 60%),
-    var(--bone);
-  color: var(--ink); min-height: 100vh; line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
-a { color: inherit; text-decoration: none; }
-button { font: inherit; }
-
-/* ---------- Page chrome ---------- */
-.page { max-width: 1280px; margin: 0 auto; padding: 28px 24px 80px; }
-.page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
-.brand { display: flex; align-items: center; gap: 14px; }
-.brand-mark {
-  width: 42px; height: 42px; border-radius: 10px;
-  background: var(--teal); color: var(--bone);
-  display: grid; place-items: center;
-  font-family: 'Lora', serif; font-size: 24px; font-weight: 600;
-  box-shadow: var(--shadow-sm); position: relative;
-}
-.brand-mark::after {
-  content: ''; position: absolute; right: -2px; bottom: -2px;
-  width: 10px; height: 10px; border-radius: 3px;
-  background: var(--sienna); box-shadow: 0 2px 6px rgba(194,114,74,0.35);
-}
-.brand-name { font-family: 'Lora', serif; font-size: 24px; font-weight: 500; }
-.brand-sub { font-size: 11px; color: var(--ink-soft); letter-spacing: 1.6px; text-transform: uppercase; margin-top: 4px; font-weight: 600; }
-.page-meta { font-size: 13px; color: var(--ink-soft); line-height: 1.6; max-width: 64ch; }
-.page-meta b { color: var(--ink); font-weight: 600; }
-
-.lang-toggle { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-pill); padding: 3px; box-shadow: var(--shadow-sm); }
-.lang-toggle button { border: 0; background: transparent; padding: 7px 16px; font-size: 13px; border-radius: var(--r-pill); cursor: pointer; color: var(--ink-soft); font-weight: 500; }
-.lang-toggle button.is-active { background: var(--teal); color: var(--bone); }
-
-.legend {
-  margin-top: 16px; padding: 14px 18px; border-radius: var(--r-card);
-  background: var(--surface); border: 1px solid var(--line); color: var(--ink-soft);
-  font-size: 13px; line-height: 1.65;
-}
-.legend b { color: var(--ink); }
-
-/* ---------- Stage layout ---------- */
-.stage {
-  margin-top: 28px;
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 40px;
-  align-items: start;
-}
-@media (max-width: 940px) { .stage { grid-template-columns: 1fr; } }
-
-/* ---------- Phone shell ---------- */
-.phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
-.phone {
-  width: 360px; height: 760px;
-  border-radius: 50px;
-  background: #111; padding: 14px;
-  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0,0,0,0.4) inset;
-  position: relative;
-}
-.phone::after {
-  content: ''; position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-  width: 120px; height: 30px; background: #000; border-radius: 16px; z-index: 5;
-}
-.screen {
-  width: 100%; height: 100%;
   background: var(--bone);
-  border-radius: 38px; overflow: hidden;
+  color: var(--ink);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+button { font: inherit; }
+a { color: inherit; text-decoration: none; }
+
+#root { height: 100%; }
+
+/* ---------------- App shell ---------------- */
+.app {
+  height: 100%;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--bone);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   position: relative;
+}
+@media (min-width: 720px) {
+  .app { max-width: 760px; box-shadow: 0 0 80px rgba(27,77,84,0.08); }
+}
+
+/* The whole window is just chat. The stage holds the thread; overlays
+   (venue card, profile sheet) float on top without displacing the thread. */
+.stage {
+  flex: 1;
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---------------- Chat ---------------- */
+.chat-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  /* Keep messages glued to the composer so an empty conversation feels
+     like a clean room rather than a wall of empty canvas. */
+  justify-content: flex-end;
+}
+.chat-scroll::-webkit-scrollbar { width: 5px; }
+.chat-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
+
+.chat-thread {
   display: flex; flex-direction: column;
+  gap: 10px;
+  padding-bottom: 4px;
 }
-.status-bar { height: 46px; flex: 0 0 46px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 26px 6px; font-size: 12px; color: var(--ink); font-weight: 600; }
-.status-bar .right { display: flex; gap: 6px; align-items: center; }
-.dot { width: 6px; height: 6px; background: var(--ink); border-radius: 50%; }
 
-.nav-top {
-  height: 56px; flex: 0 0 56px;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 18px;
+/* Bubbles */
+.bubble {
+  max-width: 86%;
+  padding: 11px 14px;
+  border-radius: 16px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
-.nav-top .icon-btn {
-  width: 36px; height: 36px; border-radius: 10px; background: var(--surface);
-  display: grid; place-items: center; color: var(--ink); border: 1px solid var(--line);
-  font-size: 16px; cursor: pointer; transition: background .12s ease;
-}
-.nav-top .icon-btn:hover { background: var(--bone-warm); }
-.nav-top .title { font-family: 'Lora', serif; font-size: 18px; font-weight: 500; }
-
-.scroll { flex: 1; overflow-y: auto; padding: 0 18px 16px; }
-
-.nav-bottom {
-  height: 76px; flex: 0 0 76px;
-  background: var(--surface); border-top: 1px solid var(--line);
-  display: flex; justify-content: space-around; align-items: flex-start; padding-top: 12px;
-}
-.nb-item { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; color: var(--ink-soft); font-weight: 500; cursor: pointer; }
-.nb-item.is-active { color: var(--teal); }
-.nb-glyph { width: 28px; height: 28px; border-radius: 8px; background: var(--bone-warm); display: grid; place-items: center; font-size: 13px; }
-.nb-item.is-active .nb-glyph { background: var(--teal); color: var(--bone); }
-
-/* ---------- Reusable type ---------- */
-.eyebrow { font-size: 10.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--sienna-ink); font-weight: 700; }
-.serif { font-family: 'Lora', serif; font-weight: 500; line-height: 1.15; }
-
-/* ---------- Home / Matcher ---------- */
-.greet-block { padding-top: 4px; }
-.greet { font-family: 'Lora', serif; font-size: 22px; font-weight: 500; }
-.greet .nm { color: var(--teal); }
-.greet-sub { color: var(--ink-soft); font-size: 13px; margin-top: 4px; }
-
-.matcher-card {
-  margin-top: 16px;
+.bubble.assistant {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-left: 4px solid var(--sienna);
-  border-radius: var(--r-card);
-  padding: 16px;
-}
-.matcher-q { font-family: 'Lora', serif; font-size: 17px; font-weight: 500; color: var(--teal-deep); margin-bottom: 10px; }
-.chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
-.s-chip {
-  padding: 6px 11px; border-radius: var(--r-pill);
-  background: var(--bone); color: var(--ink-soft);
-  border: 1px solid var(--line);
-  font-size: 12px; font-weight: 500; cursor: pointer;
-  transition: background .12s ease, color .12s ease, border-color .12s ease;
-}
-.s-chip:hover { border-color: var(--teal-soft); color: var(--teal); }
-.s-chip.is-active { background: var(--teal); color: var(--bone); border-color: var(--teal); }
-
-.text-input-row { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
-.text-input {
-  flex: 1; min-width: 0;
-  padding: 9px 11px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-soft);
-  background: var(--bone);
-  font: inherit; font-size: 12.5px;
+  border-bottom-left-radius: 6px;
+  align-self: flex-start;
   color: var(--ink);
-  transition: border-color .12s ease, background .12s ease;
+  box-shadow: 0 1px 2px rgba(27,77,84,0.05);
 }
-.text-input::placeholder { color: var(--ink-soft); }
-.text-input:focus { border-color: var(--teal); outline: none; background: var(--surface); }
-.text-input:disabled { opacity: 0.6; cursor: not-allowed; }
-.submit-btn {
-  width: 36px; height: 36px; flex: 0 0 36px;
-  border: 0; border-radius: var(--r-soft);
-  background: var(--teal); color: var(--bone);
-  cursor: pointer; font-size: 16px;
-  display: grid; place-items: center;
-  transition: opacity .12s ease, transform .12s ease;
+.bubble.user {
+  background: var(--teal);
+  color: var(--bone);
+  border-bottom-right-radius: 6px;
+  align-self: flex-end;
 }
-.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.submit-btn:not(:disabled):hover { transform: translateY(-1px); }
-.loader-dot {
-  display: block; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--bone);
+.bubble.assistant b { color: var(--teal-deep); font-weight: 600; }
+
+.typing-bubble {
+  align-self: flex-start;
+  display: flex; gap: 4px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  border-bottom-left-radius: 6px;
+}
+.typing-bubble span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ink-soft);
   animation: ldot 0.9s infinite ease-in-out;
 }
+.typing-bubble span:nth-child(2) { animation-delay: 0.15s; }
+.typing-bubble span:nth-child(3) { animation-delay: 0.3s; }
 @keyframes ldot {
   0%, 100% { opacity: 0.3; transform: scale(0.7); }
   50%      { opacity: 1;   transform: scale(1.2); }
 }
-.loading-line {
-  display: flex; align-items: center; gap: 7px;
-  font-size: 11px; color: var(--ink-soft);
-  padding: 2px 2px 8px;
-}
-.loading-line::before {
-  content: ''; width: 5px; height: 5px; border-radius: 50%;
-  background: var(--sienna); animation: ldot 0.9s infinite ease-in-out;
-}
-.or-row {
-  font-size: 10.5px; color: var(--ink-soft);
-  margin: 4px 0 8px;
-  letter-spacing: 0.4px;
-  text-transform: lowercase;
-}
-.no-match {
-  font-size: 11.5px; color: var(--ink-soft);
-  background: var(--bone-warm);
-  border: 1px solid var(--line);
-  border-radius: var(--r-soft);
-  padding: 9px 11px;
-  margin-top: 6px;
-  line-height: 1.55;
-}
-.submit-btn.submit-btn--text {
-  width: auto; flex: 0 0 auto;
-  padding: 0 14px;
-  font-size: 12.5px; font-weight: 600;
-  height: 36px;
-}
 
-.section-h { display: flex; align-items: center; justify-content: space-between; margin: 18px 0 8px; }
-.section-h .lbl { font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
-.section-h a { font-size: 12px; color: var(--teal); font-weight: 600; cursor: pointer; }
+/* Suggestion chips inside the thread */
+.suggest-row {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  align-self: flex-start;
+  max-width: 100%;
+}
+.suggest-chip {
+  padding: 8px 13px;
+  border: 1px solid var(--teal-soft);
+  background: rgba(45,103,112,0.06);
+  color: var(--teal-deep);
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
+}
+.suggest-chip:hover { background: var(--teal); color: var(--bone); border-color: var(--teal); }
+.suggest-chip:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.match-card {
-  display: grid; grid-template-columns: 48px 1fr; gap: 11px;
+/* Venue list inside the chat (top-3 recommendations) */
+.chat-venue-stack {
+  display: flex; flex-direction: column; gap: 7px;
+  width: 100%;
+  align-self: flex-start;
+}
+.chat-venue-card {
+  display: grid; grid-template-columns: 48px 1fr;
+  gap: 11px;
   padding: 10px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--r-soft);
-  margin-bottom: 7px;
   cursor: pointer;
-  transition: transform .12s ease, box-shadow .15s ease;
+  transition: transform .12s, box-shadow .15s, border-color .12s;
 }
-.match-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-.match-card .thumb {
+.chat-venue-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); border-color: var(--teal-soft); }
+.chat-venue-card .thumb {
   width: 48px; height: 48px; border-radius: 9px;
   display: grid; place-items: center;
   font-family: 'Lora', serif; font-size: 18px; font-weight: 600; color: var(--bone);
 }
-.match-card .name { font-weight: 600; font-size: 13px; }
-.match-card .why { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; line-height: 1.45; }
-.match-card .price-row { display: flex; align-items: center; justify-content: space-between; margin-top: 5px; gap: 8px; }
-.match-card .price { font-family: 'Lora', serif; font-size: 14px; font-weight: 600; color: var(--teal-deep); white-space: nowrap; }
-.match-card .loc { font-size: 11px; color: var(--ink-soft); }
+.chat-venue-card .name { font-weight: 600; font-size: 13.5px; line-height: 1.25; }
+.chat-venue-card .why { font-size: 12px; color: var(--ink-soft); margin-top: 2px; line-height: 1.4; }
+.chat-venue-card .meta { font-size: 11px; color: var(--ink-soft); margin-top: 5px; display: flex; justify-content: space-between; gap: 6px; align-items: baseline; }
+.chat-venue-card .meta .price { font-family: 'Lora', serif; font-weight: 600; color: var(--teal-deep); font-size: 13px; }
 
+/* Inline reservation form + confirm card (unchanged from prior wireframe) */
+.reserve-form {
+  background: var(--surface);
+  border: 1px solid var(--sienna);
+  border-left: 4px solid var(--sienna);
+  border-radius: var(--r-card);
+  padding: 12px 13px 13px;
+  display: flex; flex-direction: column; gap: 10px;
+  align-self: flex-start;
+  width: 100%;
+}
+.reserve-form .ttl {
+  font-family: 'Lora', serif;
+  font-size: 14.5px; font-weight: 600; color: var(--teal-deep);
+  line-height: 1.25;
+}
+.reserve-form label {
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+.reserve-field {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-soft);
+  background: var(--bone);
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+}
+.reserve-field:focus { border-color: var(--teal); outline: none; background: var(--surface); }
+.people-row { display: flex; align-items: center; gap: 12px; }
+.people-row button {
+  width: 32px; height: 32px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: var(--r-soft);
+  font-size: 16px; font-weight: 600;
+  color: var(--teal);
+  cursor: pointer;
+  display: grid; place-items: center;
+}
+.people-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+.people-row .count {
+  font-family: 'Lora', serif;
+  font-size: 18px; font-weight: 600;
+  min-width: 18px; text-align: center;
+}
+.reserve-submit {
+  background: var(--teal);
+  color: var(--bone);
+  padding: 11px;
+  border: 0;
+  border-radius: var(--r-soft);
+  font: inherit; font-weight: 600; font-size: 13.5px;
+  cursor: pointer;
+  transition: background .12s;
+}
+.reserve-submit:hover { background: var(--teal-deep); }
+.reserve-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.confirm-card {
+  background: var(--surface);
+  border: 1px solid var(--teal);
+  border-left: 4px solid var(--teal);
+  border-radius: var(--r-card);
+  padding: 13px;
+  display: flex; flex-direction: column; gap: 7px;
+  align-self: flex-start;
+  width: 100%;
+}
+.confirm-card .badge {
+  align-self: flex-start;
+  font-size: 9.5px; letter-spacing: 1.4px; font-weight: 700;
+  text-transform: uppercase;
+  background: var(--teal); color: var(--bone);
+  padding: 3px 9px; border-radius: var(--r-pill);
+}
+.confirm-card .ttl {
+  font-family: 'Lora', serif;
+  font-size: 16px; font-weight: 600;
+  color: var(--teal-deep); line-height: 1.2;
+}
+.confirm-card .row { font-size: 12.5px; color: var(--ink); }
+.confirm-card .row b { color: var(--teal-deep); font-weight: 600; }
+.confirm-card .ref {
+  font-size: 11.5px; color: var(--ink-soft);
+  font-family: 'Lora', serif;
+  letter-spacing: 0.6px;
+}
+
+/* ---------------- Bottom dock ---------------- */
+/* Two avatars + a composer "bubble" between them. The composer visually
+   emerges from the user's avatar on the right (speech-bubble tail) — the
+   doctor's avatar on the left is the symmetric anchor. */
+.dock {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 56px 1fr 56px;
+  gap: 10px;
+  align-items: end;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: transparent;
+  position: relative;
+  z-index: 4;
+}
+
+/* Persistent avatars at the bottom corners */
+.avatar {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  cursor: pointer;
+  border: 0;
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  transition: transform .12s, box-shadow .15s;
+}
+.avatar:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.avatar.doctor {
+  background: linear-gradient(155deg, var(--teal-soft) 0%, var(--teal-deep) 100%);
+  color: var(--bone);
+}
+.avatar.user {
+  background: linear-gradient(155deg, var(--sienna-soft) 0%, var(--sienna) 100%);
+  color: var(--bone);
+  font-family: 'Lora', serif;
+  font-size: 22px;
+  font-weight: 600;
+}
+.avatar svg { width: 28px; height: 28px; display: block; }
+.avatar .name-tag {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9.5px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* The composer is shaped like a chat bubble with a tail pointing right
+   toward the user's avatar — it reads as "the user's input bubble". */
+.composer-bubble {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  border-bottom-right-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 6px 14px;
+  min-height: 48px;
+  box-shadow: 0 2px 10px rgba(27,77,84,0.06);
+  transition: border-color .15s, box-shadow .15s;
+}
+.composer-bubble:focus-within {
+  border-color: var(--teal-soft);
+  box-shadow: 0 4px 18px rgba(27,77,84,0.10);
+}
+/* Speech-bubble tail: a tiny rotated square at the right edge that visually
+   stitches the bubble to the user's avatar. */
+.composer-bubble::after {
+  content: "";
+  position: absolute;
+  right: -7px; bottom: 6px;
+  width: 14px; height: 14px;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  transform: rotate(-45deg);
+  border-bottom-right-radius: 3px;
+}
+.text-input {
+  flex: 1; min-width: 0;
+  border: 0; outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 14.5px;
+  color: var(--ink);
+  padding: 6px 0;
+}
+.text-input::placeholder { color: var(--ink-soft); }
+.text-input:disabled { opacity: 0.6; cursor: not-allowed; }
+.send-btn {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--teal);
+  color: var(--bone);
+  cursor: pointer;
+  display: grid; place-items: center;
+  transition: background .12s, transform .12s, opacity .12s;
+  flex: 0 0 auto;
+}
+.send-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.send-btn:not(:disabled):hover { background: var(--teal-deep); transform: scale(1.04); }
+.send-btn svg { width: 16px; height: 16px; display: block; }
+.send-btn .loader-dot {
+  display: block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--bone);
+  animation: ldot 0.9s infinite ease-in-out;
+}
+
+/* ---------------- Floating venue card overlay ---------------- */
+/* The card "hovers" above the chat — chat is visible underneath through a
+   gentle fade, and the composer at the bottom keeps working with the card
+   as additional context. */
+.venue-overlay-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.venue-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    rgba(244,239,228,0.55) 0%,
+    rgba(244,239,228,0.10) 60%,
+    rgba(244,239,228,0) 100%);
+  pointer-events: none;
+}
+.venue-overlay {
+  position: absolute;
+  left: 16px; right: 16px;
+  top: 16px;
+  max-height: 60%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+  animation: cardIn .22s ease-out;
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Compact header — thumbnail, name, location and close all live here. */
+.venue-overlay .venue-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 10px 10px 12px;
+  border-bottom: 1px solid var(--line);
+  flex: 0 0 auto;
+  background: var(--surface);
+}
+.venue-overlay .venue-head-thumb {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  font-family: 'Lora', serif;
+  font-size: 16px; font-weight: 600;
+  color: var(--bone);
+  flex: 0 0 auto;
+}
+.venue-overlay .venue-head-text {
+  flex: 1; min-width: 0;
+}
+.venue-overlay .card-name {
+  font-family: 'Lora', serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--teal-deep);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.venue-overlay .card-loc {
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.venue-overlay .card-close {
+  flex: 0 0 auto;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--bone-warm);
+  border: 0;
+  font-size: 18px; line-height: 1;
+  color: var(--ink-soft);
+  cursor: pointer;
+  display: grid; place-items: center;
+  font-weight: 500;
+  transition: background .12s, color .12s, transform .12s;
+}
+.venue-overlay .card-close:hover {
+  background: var(--bone);
+  color: var(--teal-deep);
+  transform: scale(1.05);
+}
+
+.venue-overlay .card-body {
+  padding: 12px 14px 14px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex; flex-direction: column;
+}
+.venue-overlay .card-body::-webkit-scrollbar { width: 4px; }
+.venue-overlay .card-body::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+
+.venue-overlay .fact-table {
+  border: 1px solid var(--line);
+  border-radius: var(--r-soft);
+  overflow: hidden;
+  background: var(--bone-warm);
+}
+.venue-overlay .fact-row {
+  display: flex; padding: 5px 10px; gap: 8px;
+  border-bottom: 1px solid var(--line);
+  font-size: 11.5px;
+}
+.venue-overlay .fact-row:last-child { border-bottom: 0; }
+.venue-overlay .fact-row .k {
+  color: var(--ink-soft);
+  flex: 0 0 88px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  font-size: 9.5px;
+  padding-top: 1px;
+}
+.venue-overlay .fact-row .v {
+  color: var(--ink);
+  font-weight: 500;
+}
+.venue-overlay .why-panel {
+  margin-top: 10px;
+  border: 1px solid var(--sienna);
+  background: rgba(194,114,74,0.06);
+  border-radius: var(--r-soft);
+  padding: 9px 11px;
+}
+.venue-overlay .why-panel .eyebrow {
+  font-size: 9px;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--sienna-ink);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.venue-overlay .why-list {
+  margin: 0;
+  padding-inline-start: 15px;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.venue-overlay .why-list li { margin-bottom: 3px; }
+.venue-overlay .why-cons {
+  font-size: 10.5px;
+  color: var(--danger);
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid rgba(139,58,47,0.2);
+}
+.venue-overlay .reserve-cta {
+  margin-top: 10px;
+}
+.venue-overlay .reserve-cta button {
+  width: 100%;
+  padding: 10px;
+  background: var(--sienna);
+  color: var(--bone);
+  border: 0;
+  border-radius: var(--r-soft);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .12s;
+}
+.venue-overlay .reserve-cta button:hover { background: var(--sienna-ink); }
+
+/* hero gradient backgrounds (re-used from prior wireframe) */
 .thumb.lans      { background: linear-gradient(135deg, #A8B2A8 0%, #3F4A47 100%); }
 .thumb.bad-ragaz { background: linear-gradient(135deg, #7E8B8E 0%, #3A4549 100%); }
 .thumb.sha       { background: linear-gradient(135deg, #C5B8A3 0%, #7A6D56 100%); }
@@ -269,152 +595,148 @@ button { font: inherit; }
 .thumb.heritance { background: linear-gradient(135deg, #B8A47C 0%, #6B5832 100%); }
 .thumb.terme     { background: linear-gradient(135deg, #8FA6A2 0%, #3F5650 100%); }
 
-/* ---------- Detail screen ---------- */
-.det-hero { height: 180px; flex: 0 0 180px; position: relative; overflow: hidden; }
-.det-hero .nav { position: absolute; top: 14px; width: 36px; height: 36px; border-radius: 10px; background: rgba(244,239,228,0.95); display: grid; place-items: center; color: var(--ink); cursor: pointer; }
-.det-hero .nav.left { left: 14px; }
-.det-hero .nav.right { right: 14px; }
-.det-title-block { background: var(--surface); padding: 14px 18px 12px; border-bottom: 1px solid var(--line); }
-.det-title-block .name { font-family: 'Lora', serif; font-size: 22px; font-weight: 500; line-height: 1.2; }
-.det-title-block .loc { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
-.fact-table { margin-top: 12px; border: 1px solid var(--line); border-radius: var(--r-soft); overflow: hidden; background: var(--bone-warm); }
-.fact-row { display: flex; padding: 8px 12px; gap: 10px; border-bottom: 1px solid var(--line); font-size: 12px; }
-.fact-row:last-child { border-bottom: 0; }
-.fact-row .k { color: var(--ink-soft); flex: 0 0 100px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; font-size: 10.5px; padding-top: 1px; }
-.fact-row .v { color: var(--ink); font-weight: 500; }
-
-.why-panel { margin-top: 12px; border: 1px solid var(--sienna); background: rgba(194,114,74,0.06); border-radius: var(--r-card); padding: 14px 16px; }
-.why-panel h4 { margin: 6px 0 8px; font-family: 'Lora', serif; font-weight: 600; font-size: 16px; color: var(--teal-deep); }
-.why-list { margin: 0; padding-inline-start: 18px; font-size: 12.5px; line-height: 1.6; color: var(--ink); }
-.why-list li { margin-bottom: 5px; }
-.why-cons { font-size: 11.5px; color: var(--danger); margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(139,58,47,0.2); }
-
-.cta-stack { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; border-radius: var(--r-soft); border: 0; cursor: pointer; font-weight: 600; font-size: 13px; background: var(--teal); color: var(--bone); width: 100%; }
-.btn.ghost { background: transparent; border: 1px solid var(--teal); color: var(--teal); }
-
-/* ---------- Saved / PDF screen ---------- */
-.saved-frame { padding-top: 6px; }
-.saved-banner { background: var(--surface); border: 1px solid var(--sienna); border-radius: var(--r-card); padding: 14px; margin-bottom: 14px; position: relative; overflow: hidden; }
-.saved-banner::after { content: ''; position: absolute; right: -30px; top: -30px; width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle, rgba(194,114,74,0.18) 0%, transparent 70%); }
-.saved-banner .ttl { font-family: 'Lora', serif; font-size: 18px; font-weight: 500; color: var(--teal-deep); }
-.saved-banner .sub { font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
-
-.pdf-mock {
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card);
-  padding: 16px; min-height: 200px; margin-bottom: 14px;
-  position: relative;
+/* ---------------- Profile sheet ---------------- */
+.sheet-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(16, 57, 66, 0.36);
+  z-index: 5;
+  animation: scrimIn .18s ease-out;
 }
-.pdf-mock::before { content: 'PDF'; position: absolute; top: 12px; right: 14px; font-size: 9px; letter-spacing: 1.3px; font-weight: 700; color: var(--ink-soft); }
-.pdf-line { background: var(--line); height: 8px; border-radius: 2px; margin-bottom: 8px; }
-.pdf-line.s60 { width: 60%; }
-.pdf-line.s90 { width: 90%; }
-.pdf-line.s40 { width: 40%; height: 12px; background: var(--teal); margin-bottom: 14px; }
-.pdf-line.s75 { width: 75%; }
-.pdf-line.s30 { width: 30%; background: var(--sienna); height: 6px; }
+@keyframes scrimIn { from { opacity: 0; } to { opacity: 1; } }
 
-.share-list { display: flex; flex-direction: column; gap: 8px; }
-.share-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-soft);
-  cursor: pointer; transition: background .12s ease;
+.profile-sheet {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 6;
+  background: var(--bone);
+  border-top-left-radius: 22px;
+  border-top-right-radius: 22px;
+  box-shadow: 0 -16px 40px rgba(16,57,66,0.20);
+  display: flex; flex-direction: column;
+  max-height: 88%;
+  animation: sheetIn .25s cubic-bezier(.2,.8,.25,1);
 }
-.share-row:hover { background: var(--bone-warm); }
-.share-row .ic { width: 28px; height: 28px; border-radius: 7px; background: var(--bone-warm); display: grid; place-items: center; color: var(--teal); font-size: 13px; font-weight: 700; }
-.share-row .nm { font-size: 13px; font-weight: 500; }
-
-.share-foot { font-size: 11px; color: var(--ink-soft); margin-top: 12px; padding: 0 4px; }
-
-/* ---------- Browse screen ---------- */
-.search-bar { display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-soft); margin-bottom: 10px; }
-.search-bar .ic { color: var(--ink-soft); font-size: 14px; }
-.search-bar .input { flex: 1; font-size: 13px; color: var(--ink-soft); }
-
-.filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
-
-.browse-card {
-  display: grid; grid-template-columns: 48px 1fr;
-  gap: 11px; padding: 10px;
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-soft);
-  margin-bottom: 7px; cursor: pointer;
-  transition: transform .12s ease, box-shadow .15s ease;
+@keyframes sheetIn {
+  from { transform: translateY(20%); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
 }
-.browse-card:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-.browse-card .thumb {
-  width: 48px; height: 48px; border-radius: 9px;
+.sheet-handle {
+  align-self: center;
+  width: 38px; height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+  margin: 8px 0 4px;
+}
+.sheet-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 6px 18px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.sheet-head .avatar.user {
+  width: 48px; height: 48px;
+  font-size: 18px;
+  cursor: default;
+}
+.sheet-head .id-block { flex: 1; min-width: 0; }
+.sheet-head .id-name {
+  font-family: 'Lora', serif;
+  font-weight: 600;
+  font-size: 17px;
+  color: var(--teal-deep);
+}
+.sheet-head .id-sub {
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  margin-top: 1px;
+}
+.sheet-head .sheet-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 18px;
+  color: var(--ink-soft);
+  cursor: pointer;
   display: grid; place-items: center;
-  font-family: 'Lora', serif; font-size: 18px; font-weight: 600; color: var(--bone);
+  transition: background .12s, color .12s;
 }
-.browse-card .name { font-weight: 600; font-size: 13px; }
-.browse-card .loc { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
-.browse-card .price { font-family: 'Lora', serif; font-size: 13px; font-weight: 600; color: var(--teal-deep); margin-top: 4px; }
-.browse-card .tags { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
-.browse-card .tag { font-size: 10px; padding: 2px 7px; background: rgba(27,77,84,0.07); color: var(--teal-deep); border: 1px solid rgba(27,77,84,0.18); border-radius: var(--r-pill); }
+.sheet-head .sheet-close:hover { background: var(--bone-warm); color: var(--teal-deep); }
 
-/* ---------- Profile screen ---------- */
+.sheet-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 18px 24px;
+}
 .profile-card {
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card);
-  padding: 14px; margin-bottom: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: 14px;
+  margin-bottom: 12px;
 }
-.profile-card .lbl { font-size: 10.5px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
-.profile-card .lbl + .v { margin-top: 4px; font-size: 14px; font-weight: 500; }
-.profile-card .v.tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-.profile-card .edit { font-size: 12px; color: var(--teal); font-weight: 600; cursor: pointer; }
-.profile-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.profile-card .lbl {
+  font-size: 10.5px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+.profile-card .lbl + .v {
+  margin-top: 6px;
+  font-size: 14.5px;
+  font-weight: 500;
+}
+.profile-card .v.tags {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-top: 8px;
+}
+.profile-card .edit {
+  font-size: 12.5px;
+  color: var(--teal);
+  font-weight: 600;
+  cursor: pointer;
+}
+.profile-row {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+}
+.s-chip {
+  padding: 7px 12px; border-radius: var(--r-pill);
+  background: var(--surface); color: var(--ink-soft);
+  border: 1px solid var(--line);
+  font-size: 12.5px; font-weight: 500; cursor: pointer;
+  transition: background .12s, color .12s, border-color .12s;
+}
+.s-chip:hover { border-color: var(--teal-soft); color: var(--teal); }
+.s-chip.is-active { background: var(--teal); color: var(--bone); border-color: var(--teal); }
 
-.doc-row {
-  display: flex; gap: 10px; padding: 10px 12px; background: var(--bone-warm);
-  border-radius: var(--r-soft); margin-bottom: 6px; align-items: center;
+/* Tiny settings row inside the sheet (lang toggle + about link) */
+.sheet-foot {
+  margin-top: 6px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px;
+  color: var(--ink-soft);
 }
-.doc-row .ic { width: 30px; height: 30px; border-radius: 7px; background: var(--surface); display: grid; place-items: center; color: var(--teal); font-weight: 700; font-size: 11px; }
-.doc-row .nm { font-size: 13px; font-weight: 500; }
-.doc-row .d { font-size: 11px; color: var(--ink-soft); }
-.doc-row .lock { margin-left: auto; color: var(--ink-soft); font-size: 13px; }
-
-.doc-add {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 10px; border: 1px dashed var(--line); border-radius: var(--r-soft);
-  color: var(--teal); font-size: 13px; font-weight: 600; cursor: pointer;
+.sheet-foot .lang-toggle {
+  display: inline-flex;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  padding: 2px;
+  height: 28px;
+  align-items: center;
 }
-
-/* ---------- Annotations panel ---------- */
-.annot {
-  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card);
-  padding: 22px 24px;
+.sheet-foot .lang-toggle button {
+  border: 0; background: transparent;
+  padding: 3px 10px; font-size: 11.5px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  color: var(--ink-soft);
+  font-weight: 700;
+  height: 22px;
 }
-.annot h2 { font-family: 'Lora', serif; font-weight: 500; font-size: 22px; color: var(--teal-deep); margin: 0 0 6px; }
-.annot .sub { font-size: 13px; color: var(--ink-soft); margin-bottom: 18px; line-height: 1.6; }
-.annot h3 { font-size: 13px; margin: 0 0 4px; color: var(--teal-deep); font-weight: 600; }
-.annot p { font-size: 12.5px; color: var(--ink-soft); line-height: 1.65; margin: 0 0 10px; }
-.annot .step-list { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
-.annot .step {
-  display: grid; grid-template-columns: 28px 1fr; gap: 10px;
-  padding: 10px 12px; background: var(--bone-warm); border-radius: var(--r-soft);
-  border-left: 3px solid var(--bone-warm);
-  transition: background .15s, border-color .15s;
-}
-.annot .step.is-active { background: rgba(194,114,74,0.08); border-left-color: var(--sienna); }
-.annot .step .num { font-family: 'Lora', serif; font-size: 16px; font-weight: 600; color: var(--teal); }
-.annot .step .b { font-weight: 600; font-size: 13px; color: var(--ink); }
-.annot .step .m { font-size: 12px; color: var(--ink-soft); margin-top: 2px; line-height: 1.55; }
-
-.annot .reset {
-  margin-top: 18px;
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; color: var(--ink-soft); cursor: pointer;
-}
-.annot .reset:hover { color: var(--teal); }
-
-/* ---------- Footer notes ---------- */
-.foot-notes {
-  margin-top: 36px; padding: 22px 24px; background: var(--surface);
-  border: 1px solid var(--line); border-radius: var(--r-card);
-}
-.foot-notes h3 { font-family: 'Lora', serif; font-weight: 500; font-size: 19px; color: var(--teal-deep); margin: 0 0 14px; }
-.foot-notes .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-.foot-notes .grid > div { padding: 12px 14px; background: var(--bone-warm); border-radius: var(--r-soft); border: 1px solid var(--line); }
-.foot-notes h4 { font-size: 12.5px; margin: 0 0 6px; color: var(--teal-deep); font-weight: 600; }
-.foot-notes p { font-size: 12px; color: var(--ink-soft); line-height: 1.65; margin: 0; }
+.sheet-foot .lang-toggle button.is-active { background: var(--teal); color: var(--bone); }
+.sheet-foot a { color: var(--teal); font-weight: 600; cursor: pointer; }
 </style>
 
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
@@ -425,29 +747,28 @@ button { font: inherit; }
 <div id="root"></div>
 
 <script type="text/babel" data-presets="react">
-const { useState, useEffect, useMemo } = React;
+const { useState, useEffect, useRef } = React;
 
-// ---------------- Situations ----------------
+// ---------------- Data (re-used from wireframe_ru.html) ----------------
 const SITUATIONS = [
-  { id: "sleep",     ru: "Сон",                              en: "Sleep" },
-  { id: "spine",     ru: "Спина и суставы",                  en: "Spine & joints" },
-  { id: "postop",    ru: "После операции",                   en: "Post-op" },
-  { id: "stress",    ru: "Стресс",                           en: "Stress" },
-  { id: "weight",    ru: "Вес",                              en: "Weight" },
-  { id: "longevity", ru: "Возраст",                          en: "Longevity" },
-  { id: "cardiac",   ru: "Сердце",                           en: "Cardiac" },
+  { id: "sleep",     ru: "Сон",                  en: "Sleep" },
+  { id: "spine",     ru: "Спина и суставы",      en: "Spine & joints" },
+  { id: "postop",    ru: "После операции",       en: "Post-op" },
+  { id: "stress",    ru: "Стресс",               en: "Stress" },
+  { id: "weight",    ru: "Вес",                  en: "Weight" },
+  { id: "longevity", ru: "Возраст",              en: "Longevity" },
+  { id: "cardiac",   ru: "Сердце",               en: "Cardiac" },
 ];
 
-// ---------------- Venues (mirrored from landing_ru) ----------------
 const VENUES = [
   { id: "lanserhof", thumb: "lans",
     name: { ru: "Lanserhof Tegernsee", en: "Lanserhof Tegernsee" },
     loc:  { ru: "Германия · Бавария", en: "Germany · Bavaria" },
     price: 7500,
     rationale: {
-      sleep:     { ru: "Расширенная диагностика сна, метод Майера 2.0.",      en: "Extended sleep diagnostics, Mayr 2.0." },
-      stress:    { ru: "Программы нервной регуляции, без офисной связи.",    en: "Nervous-regulation programmes, no office contact." },
-      longevity: { ru: "Метаболика, эпигенетика, 7–14 ночей.",                en: "Metabolic markers, 7–14 nights." },
+      sleep:     { ru: "Расширенная диагностика сна, метод Майера 2.0.", en: "Extended sleep diagnostics, Mayr 2.0." },
+      stress:    { ru: "Программы нервной регуляции, без офисной связи.", en: "Nervous-regulation programmes, no office contact." },
+      longevity: { ru: "Метаболика, эпигенетика, 7–14 ночей.", en: "Metabolic markers, 7–14 nights." },
     },
   },
   { id: "bad-ragaz", thumb: "bad-ragaz",
@@ -455,8 +776,8 @@ const VENUES = [
     loc:  { ru: "Швейцария · 1 ч от Цюриха", en: "Switzerland · 1 h from Zurich" },
     price: 8400,
     rationale: {
-      spine:  { ru: "Термальный источник Тамина, ортопедическая клиника.",  en: "Tamina thermal spring, orthopaedic clinic." },
-      postop: { ru: "Реабилитация в связке с клиникой Hirslanden.",         en: "Rehab tied to Hirslanden clinic." },
+      spine:  { ru: "Термальный источник Тамина, ортопедическая клиника.", en: "Tamina thermal spring, orthopaedic clinic." },
+      postop: { ru: "Реабилитация в связке с клиникой Hirslanden.", en: "Rehab tied to Hirslanden clinic." },
     },
   },
   { id: "sha", thumb: "sha",
@@ -464,7 +785,7 @@ const VENUES = [
     loc:  { ru: "Испания · Аликанте", en: "Spain · Alicante" },
     price: 6200,
     rationale: {
-      cardiac:   { ru: "Кардио-диагностика, поведенческие протоколы.",  en: "Cardiac diagnostics, behaviour-change clinics." },
+      cardiac:   { ru: "Кардио-диагностика, поведенческие протоколы.", en: "Cardiac diagnostics, behaviour-change clinics." },
       longevity: { ru: "Программа anti-age с реальной медицинской командой.", en: "Longevity programme with a real medical team." },
       weight:    { ru: "Структурированный план питания и метаболика.", en: "Structured nutrition and metabolic plan." },
     },
@@ -485,7 +806,7 @@ const VENUES = [
     price: 1400,
     rationale: {
       spine:   { ru: "Холодные минеральные источники, грязевые ванны.", en: "Cold mineral springs, mud baths." },
-      cardiac: { ru: "Кардиология и метаболический синдром.",          en: "Cardiology and metabolic syndrome." },
+      cardiac: { ru: "Кардиология и метаболический синдром.", en: "Cardiology and metabolic syndrome." },
     },
   },
   { id: "heviz", thumb: "heviz",
@@ -493,8 +814,8 @@ const VENUES = [
     loc:  { ru: "Венгрия", en: "Hungary" },
     price: 1100,
     rationale: {
-      spine:  { ru: "Крупнейшее термальное озеро в Европе.",       en: "Europe's largest thermal lake." },
-      postop: { ru: "Реабилитация после эндопротезирования.",       en: "Joint-replacement rehabilitation." },
+      spine:  { ru: "Крупнейшее термальное озеро в Европе.", en: "Europe's largest thermal lake." },
+      postop: { ru: "Реабилитация после эндопротезирования.", en: "Joint-replacement rehabilitation." },
     },
   },
   { id: "rixos", thumb: "rixos",
@@ -511,8 +832,8 @@ const VENUES = [
     loc:  { ru: "Таиланд · Пхукет", en: "Thailand · Phuket" },
     price: 1600,
     rationale: {
-      weight: { ru: "Программа фастинга и детокса от 7 до 21 ночей.",   en: "Fasting and detox programmes, 7–21 nights." },
-      stress: { ru: "Йога, дыхательные практики, отключение.",          en: "Yoga, breathwork, time-zone reset." },
+      weight: { ru: "Программа фастинга и детокса от 7 до 21 ночей.", en: "Fasting and detox programmes, 7–21 nights." },
+      stress: { ru: "Йога, дыхательные практики, отключение.", en: "Yoga, breathwork, time-zone reset." },
     },
   },
   { id: "kislovodsk", thumb: "kislovodsk",
@@ -520,7 +841,7 @@ const VENUES = [
     loc:  { ru: "Россия · 2 ч лёта из Москвы", en: "Russia · 2 h flight from Moscow" },
     price: 950,
     rationale: {
-      cardiac: { ru: "Нарзанные ванны, мягкий горный климат.",           en: "Narzan baths, mild mountain climate." },
+      cardiac: { ru: "Нарзанные ванны, мягкий горный климат.", en: "Narzan baths, mild mountain climate." },
       stress:  { ru: "Курортный режим, кисловодский парк, лечебная ходьба.", en: "Resort routine, Kislovodsk park, therapeutic walks." },
     },
   },
@@ -530,7 +851,7 @@ const VENUES = [
     price: 720,
     rationale: {
       spine: { ru: "Термальные воды и грязелечение, доступные цены.", en: "Thermal waters and mud therapy, accessible prices." },
-      sleep: { ru: "Тихий курорт в горах Родопы.",                     en: "Quiet resort in the Rhodope mountains." },
+      sleep: { ru: "Тихий курорт в горах Родопы.", en: "Quiet resort in the Rhodope mountains." },
     },
   },
   { id: "altay", thumb: "altay",
@@ -538,8 +859,8 @@ const VENUES = [
     loc:  { ru: "Россия · 4 ч лёта из Москвы", en: "Russia · 4 h flight from Moscow" },
     price: 540,
     rationale: {
-      sleep:  { ru: "Горный воздух, без перелётов через ночь.",  en: "Mountain air, no overnight flights." },
-      stress: { ru: "Травяные программы, пантовые ванны.",         en: "Herbal programmes, antler baths." },
+      sleep:  { ru: "Горный воздух, без перелётов через ночь.", en: "Mountain air, no overnight flights." },
+      stress: { ru: "Травяные программы, пантовые ванны.", en: "Herbal programmes, antler baths." },
     },
   },
   { id: "heritance", thumb: "heritance",
@@ -548,7 +869,7 @@ const VENUES = [
     price: 1100,
     rationale: {
       stress: { ru: "Аюрведическая программа от 14 ночей, домашние врачи.", en: "Ayurvedic programme, 14+ nights, in-house doctors." },
-      sleep:  { ru: "Очень тихий пляж, режим без новостей.",                en: "Very quiet beach, no-news routine." },
+      sleep:  { ru: "Очень тихий пляж, режим без новостей.", en: "Very quiet beach, no-news routine." },
     },
   },
   { id: "terme-olimia", thumb: "terme",
@@ -557,12 +878,11 @@ const VENUES = [
     price: 880,
     rationale: {
       spine:  { ru: "Термальная вода + физиотерапия, опорно-двигательный фокус.", en: "Thermal water + physiotherapy, musculoskeletal focus." },
-      postop: { ru: "Реабилитация после ортопедических операций.",                en: "Post-orthopaedic rehab." },
+      postop: { ru: "Реабилитация после ортопедических операций.", en: "Post-orthopaedic rehab." },
     },
   },
 ];
 
-// Per-venue detail metadata used in the Detail screen.
 const VENUE_DETAIL = {
   "lanserhof":        { stay: { ru: "7–14 ночей · рекомендуется 10",   en: "7–14 nights · 10 recommended" }, therapy: { ru: "Метод Майера 2.0, диагностика сна, нейровегетология", en: "Mayr 2.0, sleep diagnostics, neuro-vegetology" }, lang: { ru: "Английский, немецкий, русский по запросу", en: "English, German, Russian on request" }, cons: { ru: "Дороже Карловых Вар примерно вдвое.", en: "Roughly twice the price of Karlovy Vary." } },
   "bad-ragaz":        { stay: { ru: "10–21 ночь",                      en: "10–21 nights" },                    therapy: { ru: "Бальнеология, ортопедическая реабилитация",          en: "Balneology, orthopaedic rehabilitation" },           lang: { ru: "Немецкий, английский, русский в клинике",   en: "German, English, Russian at the clinic" }, cons: { ru: "Запись в клинику Hirslanden — за 2–3 месяца.", en: "Hirslanden booking takes 2–3 months ahead." } },
@@ -579,11 +899,8 @@ const VENUE_DETAIL = {
   "terme-olimia":     { stay: { ru: "7–10 ночей",                      en: "7–10 nights" },                     therapy: { ru: "Термальная вода, физиотерапия",                       en: "Thermal water, physiotherapy" },                      lang: { ru: "Словенский, немецкий, английский",          en: "Slovenian, German, English" },                       cons: { ru: "Без виз с 2026 в заявке.",            en: "Visa-free pending in 2026." } },
 };
 
-// ---------------- Free-text keyword inference (stub for backend) ----------------
-// Maps loose phrases in RU + EN to a situation id. The Home matcher uses this
-// to set the inferred situation after a fake ~900 ms backend round-trip.
 const KEYWORDS = {
-  sleep:     /сон|спать|спал|бессонн|sleep|insomn/i,
+  sleep:     /сон|сплю|спать|спал|бессонн|sleep|insomn/i,
   spine:     /спин|поясн|сустав|колен|шея|радикул|spine|back|joint|sciatic/i,
   postop:    /после операц|реабилит|восстанов|прооперир|операци|post.?op|surgery|surgical/i,
   stress:    /стресс|выгор|тревог|нерв|истощ|устал|stress|burn.?out|anxious|anxiety|fatigue/i,
@@ -591,7 +908,6 @@ const KEYWORDS = {
   longevity: /возраст|гормон|менопауз|старе|молод|longevity|aging|age|hormone/i,
   cardiac:   /сердц|давлен|гипертон|инфаркт|стенокард|cardiac|heart|blood pressure|hypertens/i,
 };
-
 const inferSituation = (text) => {
   if (!text) return null;
   for (const [k, re] of Object.entries(KEYWORDS)) {
@@ -603,426 +919,539 @@ const inferSituation = (text) => {
 // ---------------- Copy ----------------
 const COPY = {
   ru: {
-    brand_sub: "B2C · Прототип v0.2",
-    meta:
-      "Кликабельный прототип, отражающий обновлённое предложение: подбор санатория по ситуации. Введите запрос свободным текстом, затем листайте подбор и экраны внутри телефона.",
-    legend_palette: "Палитра:",
-    legend_palette_v: "сланцево-бирюзовая база, тёплая сиена-акцент, костяной фон.",
-    legend_type: "Шрифты:",
-    legend_type_v: "Manrope для основного текста, Lora для редакционных акцентов.",
-    legend_inter: "Интерактив:",
-    legend_inter_v: "свободный текстовый запрос отправляется на бэкенд и возвращает три самых подходящих санатория; карточка ведёт на подробный экран с PDF-выгрузкой для врача.",
-
-    annot_title: "Что показывает прототип",
-    annot_sub:
-      "Один телефон, пять связанных экранов. Текущий шаг подсвечивается ниже.",
-    annot_step1_b: "Главная · подбор",
-    annot_step1_m: "Свободный текстовый запрос → подбор из трёх санаториев с ценами. Без отзывов и звёзд.",
-    annot_step2_b: "Подробнее",
-    annot_step2_m: "Структурированные факты, панель «Почему именно сюда» с явными оговорками.",
-    annot_step3_b: "Сохранить для врача",
-    annot_step3_m: "PDF-выгрузка для печати или приватная ссылка на 7 дней.",
-    annot_step4_b: "Поиск",
-    annot_step4_m: "Все санатории с фильтрами по ситуациям. Без отзывов и звёзд.",
-    annot_step5_b: "Профиль",
-    annot_step5_m: "Активные ситуации и цели. Документы — по желанию, шифруются при загрузке.",
-
-    reset: "Сбросить прототип →",
-
-    foot_h: "Чем этот прототип отличается от прежнего",
-    foot_old_h: "Ставка — на качество подбора",
-    foot_old_p: "Обновлённое предложение опирается на точность сопоставления и прямой контакт пользователя с санаторием. Между ними никого нет.",
-    foot_situ_h: "Ситуация, а не диагноз",
-    foot_situ_p: "Ассистент не просит ставить себе диагноз. «Что беспокоит?» — про самочувствие; алгоритм сам сопоставит с МКБ-картой.",
-    foot_browse_h: "Поиск рядом с подбором",
-    foot_browse_p: "Кому хочется самим — список всех санаториев с фильтрами по ситуациям. Подбор и каталог сосуществуют, не конкурируют.",
-    foot_doc_h: "PDF для врача — встроенный шаг",
-    foot_doc_p: "В прежней версии PDF выгружался по запросу. Теперь это явный третий шаг и отдельный экран.",
-    foot_no_passport_h: "Карта здоровья — облегчена",
-    foot_no_passport_p: "Многопрофильности и медицинских документов в обязательном виде нет; только то, что уточняет подбор.",
-    foot_endpoint_h: "Чёткое завершение пути",
-    foot_endpoint_p: "Поток заканчивается сохранением для врача или прямым обращением в санаторий — без промежуточного экрана.",
-
-    // Phone screens
-    home_title: "Главная",
-    detail_title: "Подробнее",
-    saved_title: "Сохранено",
-    browse_title: "Все санатории",
-    profile_title: "Профиль",
-
-    greet: "Доброе утро,",
     user_first: "Пётр",
-    greet_sub: "Запланируем оздоровительный отдых?",
+    user_initial: "П",
+    doctor_name: "Доктор Хелтман",
+    doctor_role: "ваш помощник по подбору санаторно-курортного лечения",
 
-    matcher_q: "Что беспокоит?",
-    input_ph: "Опишите своими словами",
-    submit_a: "Подобрать",
-    loading: "Подбираю варианты…",
-    no_match: "Не удалось распознать запрос. Попробуйте: «плохо сплю», «болит спина», «после операции».",
-    show_all: "Все →",
+    chat_welcome:
+      "Здравствуйте, Пётр. Я — доктор Хелтман, ваш помощник по подбору санаторно-курортного лечения. Расскажите, что сейчас беспокоит — самочувствие, что хочется поправить.",
+    chat_situ_chips: [
+      { label: "Плохо сплю",          text: "Плохо сплю последние пару месяцев" },
+      { label: "Болит спина",         text: "Болит спина" },
+      { label: "Стресс и выгорание",  text: "Стресс, выгорание" },
+      { label: "После операции",      text: "Восстанавливаюсь после операции" },
+    ],
+    chat_ack: (label) => `Понял — ${label}. Уточню пару деталей, чтобы подобрать точнее.`,
+    chat_q_length: "Сколько ночей готовы выделить на поездку?",
+    chat_length_chips: [
+      { label: "5–7 ночей",           text: "5–7 ночей" },
+      { label: "10–14 ночей",         text: "10–14 ночей" },
+      { label: "Дольше / не важно",   text: "Дольше или не важно" },
+    ],
+    chat_q_region: "И последнее — куда удобнее ехать?",
+    chat_region_chips: [
+      { label: "Европа",              text: "Европа" },
+      { label: "Россия / СНГ",        text: "Россия или СНГ" },
+      { label: "Тёплое море",         text: "Тёплое море" },
+      { label: "Не важно",            text: "Не важно" },
+    ],
+    chat_recommend_intro:
+      "Спасибо. Лучше всего по вашему запросу подходят эти три санатория — нажмите на карточку, чтобы открыть подробности, и спрашивайте, что уточнить:",
+    chat_no_match:
+      "Не удалось распознать запрос. Попробуйте описать иначе или выберите из подсказок:",
 
-    // Detail
-    fact_stay: "Длительность",
+    qa_prices_l: "Сравнить цены",
+    qa_lang_l:   "Какие языки",
+    qa_when_l:   "Когда лучше ехать",
+    qa_food_l:   "Питание и диеты",
+    qa_diff_l:   "Чем отличаются",
+
+    qa_when_a:
+      "Оптимально — март–май и сентябрь–октябрь. Летом многие курорты загружены, зимой холоднее и часть программ ограничена. Точные окна по конкретным санаториям подскажу при оформлении.",
+    qa_food_a:
+      "Базово — диетический стол по протоколу клиники. Halal, вегетарианское, безглютеновое и индивидуальные ограничения — по запросу при оформлении заявки, без доплаты.",
+    qa_default:
+      "Я уточню это по данным санатория и вернусь с ответом. Что ещё уточнить?",
+    qa_prices_intro: "Цены за 7 ночей, без перелёта",
+    qa_lang_intro:   "Языки в клинике",
+    qa_diff_intro:   "Чем отличаются",
+
+    chat_reserve_intro: (name) =>
+      `Отлично — оформляем заявку в ${name}. Заполните даты и количество гостей.`,
+    chat_reserve_user: (name) => `Хочу забронировать: ${name}`,
+    chat_reserve_confirmed_user: (dates, people) =>
+      `Подтверждаю: ${dates}, гостей — ${people}`,
+    chat_reservation_done:
+      "Заявка отправлена. Санаторий или партнёр по бронированию подтвердит наличие мест и точную стоимость. Никакая оплата сейчас не требуется.",
+    chat_post_done:
+      "Если нужно изменить заявку, подобрать ещё один санаторий или спросить что-то ещё — напишите.",
+
+    reserve_title:    (name) => `Заявка · ${name}`,
+    reserve_dates_l:  "Даты поездки",
+    reserve_dates_ph: "10–24 мая 2026",
+    reserve_people_l: "Гостей",
+    reserve_submit:   "Отправить заявку",
+
+    confirm_badge:  "Заявка отправлена",
+    confirm_dates:  "Даты",
+    confirm_people: "Гостей",
+    confirm_ref:    "Номер заявки",
+
+    input_ph:        "Напишите доктору Хелтману…",
+    input_ph_card:   (name) => `Спросить про ${name}…`,
+    cta_reserve:     "Забронировать",
+    card_close:      "Закрыть",
+
+    fact_stay:    "Длительность",
     fact_therapy: "Терапия",
-    fact_price: "Цена",
-    fact_lang: "Язык",
-    why_eb: "Почему именно сюда",
-    why_h: "Что говорит в пользу",
-    cta_save: "Сохранить для врача",
-    cta_open: "Забронировать",
-    from: "от",
-    per: "за 7 ночей",
+    fact_price:   "Цена",
+    fact_lang:    "Язык",
+    why_eb:       "Почему именно сюда",
+    why_h:        "Что говорит в пользу",
+    from:         "от",
+    per:          "за 7 ночей",
 
-    // Saved
-    saved_t: "Сохранено для врача",
-    saved_sub: "Готово · 3 мая 2026",
-    pdf_label: "Карточка для печати или передачи врачу — без ваших персональных данных, кроме имени и активной ситуации.",
-    share1: "Скопировать ссылку",
-    share2: "Отправить по email",
-    share3: "Сохранить PDF",
-    share_foot: "Приватная ссылка действует 7 дней. Документы зашифрованы при хранении.",
-
-    // Browse
-    search_ph: "Найти санаторий",
-    filter_lbl: "Фильтр по ситуациям",
-
-    // Profile
-    profile_situ_l: "Ваша ситуация",
-    profile_goals_l: "Цели",
-    profile_goals_v: "Восстановление сна, снижение нагрузки",
-    profile_docs_l: "Документы",
-    profile_docs_empty: "Документов нет",
-    profile_doc_add: "Добавить выписку или анализы",
-    profile_docs_note: "Загрузка не обязательна. Шифруется при хранении.",
-    edit: "Изменить",
-
-    // Bottom nav
-    nav_home: "Главная",
-    nav_search: "Поиск",
-    nav_saved: "Сохранённое",
-    nav_profile: "Профиль",
+    // Profile sheet
+    profile_title:    "Профиль",
+    profile_situ_l:   "Ваша ситуация",
+    profile_goals_l:  "Цели",
+    profile_goals_v:  "Восстановление сна, снижение нагрузки",
+    profile_med_l:    "Медицинская информация",
+    profile_med_sub:  "Кратко опишите важные медицинские факты — Доктор Хелтман будет учитывать их в рекомендациях.",
+    profile_about:    "О прототипе",
+    edit:             "Изменить",
+    context_pill: "Карточка",
   },
   en: {
-    brand_sub: "B2C · Prototype v0.2",
-    meta:
-      "A clickable prototype reflecting the updated offer: situation-led sanatorium matching. Type a free-text request, then explore the matches and screens inside the phone.",
-    legend_palette: "Palette:",
-    legend_palette_v: "slate-teal base, warm sienna accent, bone canvas.",
-    legend_type: "Type:",
-    legend_type_v: "Manrope for body, Lora for editorial accents.",
-    legend_inter: "Interaction:",
-    legend_inter_v: "a free-text request is sent to the backend and returns the three best-matched sanatoria; tapping a card opens detail with a PDF export for the doctor.",
-
-    annot_title: "What the prototype shows",
-    annot_sub:
-      "One phone, five connected screens. The current step is highlighted below.",
-    annot_step1_b: "Home · matcher",
-    annot_step1_m: "A free-text request returns three matched sanatoria with prices. No reviews or star ratings.",
-    annot_step2_b: "Detail",
-    annot_step2_m: "Structured facts plus a 'Why this place' panel with explicit caveats.",
-    annot_step3_b: "Save for the doctor",
-    annot_step3_m: "Printable PDF export or a private link valid for 7 days.",
-    annot_step4_b: "Browse",
-    annot_step4_m: "Every sanatorium with situation filters. No reviews, no stars.",
-    annot_step5_b: "Profile",
-    annot_step5_m: "Active situations and goals. Documents are optional and encrypted at upload.",
-
-    reset: "Reset prototype →",
-
-    foot_h: "How this prototype differs from the previous one",
-    foot_old_h: "The bet is match quality",
-    foot_old_p: "The updated offer leans on matching precision and direct contact between the user and the sanatorium. No one in between.",
-    foot_situ_h: "Situation, not diagnosis",
-    foot_situ_p: "The assistant doesn't ask the user to self-diagnose. 'What's the trouble?' is about how they feel; the algorithm maps it onto the ICD knowledge graph.",
-    foot_browse_h: "Browse next to match",
-    foot_browse_p: "For users who prefer to look themselves — the full list of sanatoria with situation filters. Match and catalogue coexist, they don't compete.",
-    foot_doc_h: "PDF for the doctor — a built-in step",
-    foot_doc_p: "Previously the PDF was on request. Now it's an explicit third step with its own screen.",
-    foot_no_passport_h: "Health card — lighter",
-    foot_no_passport_p: "No multi-principal switch and no mandatory medical documents — only what refines the match.",
-    foot_endpoint_h: "A clear endpoint",
-    foot_endpoint_p: "The flow ends with saving for the doctor or contacting the sanatorium directly — no intermediate screen.",
-
-    home_title: "Home",
-    detail_title: "Detail",
-    saved_title: "Saved",
-    browse_title: "All sanatoria",
-    profile_title: "Profile",
-
-    greet: "Good morning,",
     user_first: "Peter",
-    greet_sub: "Shall we plan a wellness trip?",
+    user_initial: "P",
+    doctor_name: "Dr. Healthman",
+    doctor_role: "your sanatorium-care assistant",
 
-    matcher_q: "What's the trouble?",
-    input_ph: "Describe in your own words",
-    submit_a: "Find",
-    loading: "Finding matches…",
-    no_match: "Couldn't parse the request. Try: 'poor sleep', 'back pain', 'after surgery'.",
-    show_all: "All →",
+    chat_welcome:
+      "Good day, Peter. I'm Dr. Healthman, your sanatorium-care assistant. Tell me what's bothering you — how you feel, what you'd like to address.",
+    chat_situ_chips: [
+      { label: "Poor sleep",            text: "I haven't been sleeping well for a couple of months" },
+      { label: "Back pain",             text: "My back hurts" },
+      { label: "Stress and burnout",    text: "Stress, burnout" },
+      { label: "Post-op recovery",      text: "Recovering after surgery" },
+    ],
+    chat_ack: (label) => `Got it — ${label}. Let me clarify a couple of details so the match is sharper.`,
+    chat_q_length: "How many nights are you considering for the trip?",
+    chat_length_chips: [
+      { label: "5–7 nights",            text: "5–7 nights" },
+      { label: "10–14 nights",          text: "10–14 nights" },
+      { label: "Longer / no preference", text: "Longer or no preference" },
+    ],
+    chat_q_region: "And finally — where is easier to travel?",
+    chat_region_chips: [
+      { label: "Europe",                text: "Europe" },
+      { label: "Russia / CIS",          text: "Russia or CIS" },
+      { label: "Warm sea",              text: "Warm sea" },
+      { label: "No preference",         text: "No preference" },
+    ],
+    chat_recommend_intro:
+      "Thanks. These three sanatoria fit your request best — tap a card to open the details, and ask whatever you'd like to clarify:",
+    chat_no_match:
+      "Couldn't parse that. Try describing it differently, or pick from the hints:",
 
-    fact_stay: "Stay length",
+    qa_prices_l: "Compare prices",
+    qa_lang_l:   "Which languages",
+    qa_when_l:   "Best time to go",
+    qa_food_l:   "Food and diets",
+    qa_diff_l:   "How they differ",
+
+    qa_when_a:
+      "Best windows are March–May and September–October. Many resorts are crowded in summer; winters are colder and some programmes are limited. I'll confirm exact windows for the chosen sanatorium when you file the request.",
+    qa_food_a:
+      "By default — clinic-protocol diet menu. Halal, vegetarian, gluten-free or individual restrictions are available on request when filing the reservation, at no extra charge.",
+    qa_default:
+      "I'll check that against the venue data and come back with an answer. Anything else to clarify?",
+    qa_prices_intro: "Prices for 7 nights, flights not included",
+    qa_lang_intro:   "Languages spoken at the clinic",
+    qa_diff_intro:   "How they differ",
+
+    chat_reserve_intro: (name) =>
+      `Great — let's file the request to ${name}. Pick the dates and the number of guests.`,
+    chat_reserve_user: (name) => `I'd like to book: ${name}`,
+    chat_reserve_confirmed_user: (dates, people) =>
+      `Confirming: ${dates}, ${people} guest(s)`,
+    chat_reservation_done:
+      "Request filed. The venue or booking partner will confirm availability and the exact price. No payment is required now.",
+    chat_post_done:
+      "If you'd like to change the request, look at another sanatorium or ask anything else — just say.",
+
+    reserve_title:    (name) => `Request · ${name}`,
+    reserve_dates_l:  "Trip dates",
+    reserve_dates_ph: "10–24 May 2026",
+    reserve_people_l: "Guests",
+    reserve_submit:   "File request",
+
+    confirm_badge:  "Request filed",
+    confirm_dates:  "Dates",
+    confirm_people: "Guests",
+    confirm_ref:    "Reference",
+
+    input_ph:        "Write to Dr. Healthman…",
+    input_ph_card:   (name) => `Ask about ${name}…`,
+    cta_reserve:     "Book",
+    card_close:      "Close",
+
+    fact_stay:    "Stay length",
     fact_therapy: "Therapy",
-    fact_price: "Price",
-    fact_lang: "Language",
-    why_eb: "Why this place",
-    why_h: "What argues for it",
-    cta_save: "Save for doctor",
-    cta_open: "Book",
-    from: "from",
-    per: "for 7 nights",
+    fact_price:   "Price",
+    fact_lang:    "Language",
+    why_eb:       "Why this place",
+    why_h:        "What argues for it",
+    from:         "from",
+    per:          "for 7 nights",
 
-    saved_t: "Saved for the doctor",
-    saved_sub: "Ready · 3 May 2026",
-    pdf_label: "A card for printing or passing to the doctor — none of your personal data beyond your name and active situation.",
-    share1: "Copy link",
-    share2: "Send by email",
-    share3: "Save PDF",
-    share_foot: "Private link valid for 7 days. Documents encrypted at rest.",
-
-    search_ph: "Find a sanatorium",
-    filter_lbl: "Filter by situation",
-
-    profile_situ_l: "Your situation",
-    profile_goals_l: "Goals",
-    profile_goals_v: "Sleep recovery, lower load",
-    profile_docs_l: "Documents",
-    profile_docs_empty: "No documents",
-    profile_doc_add: "Add a discharge note or labs",
-    profile_docs_note: "Optional upload. Encrypted at rest.",
-    edit: "Edit",
-
-    nav_home: "Home",
-    nav_search: "Browse",
-    nav_saved: "Saved",
-    nav_profile: "Profile",
+    profile_title:    "Profile",
+    profile_situ_l:   "Your situation",
+    profile_goals_l:  "Goals",
+    profile_goals_v:  "Sleep recovery, lower load",
+    profile_med_l:    "Medical information",
+    profile_med_sub:  "Summarize important medical facts — Dr. Healthman will factor them into recommendations.",
+    profile_about:    "About this prototype",
+    edit:             "Edit",
+    context_pill: "Card",
   },
 };
 
 // ---------------- App ----------------
 function App() {
-  const [lang, setLang]   = useState("ru");
-  const [screen, setScreen] = useState("home");
-  const [situation, setSituation] = useState("sleep");
-  const [activeVenue, setActiveVenue] = useState(null);
-  const [saved, setSaved] = useState(false);
+  const [lang, setLang]                   = useState("ru");
+  const [situation, setSituation]         = useState("sleep");
+  const [activeVenueId, setActiveVenueId] = useState(null);
+  const [profileOpen, setProfileOpen]     = useState(false);
   const t = COPY[lang];
 
   useEffect(() => {
-    const html = document.getElementById("root-html") || document.documentElement;
-    html.setAttribute("lang", lang);
+    document.documentElement.setAttribute("lang", lang);
   }, [lang]);
 
-  const reset = () => { setScreen("home"); setSituation("sleep"); setActiveVenue(null); setSaved(false); };
-  const openVenue = (v) => { setActiveVenue(v); setScreen("detail"); };
-  const goHome = () => setScreen("home");
-  const goSaved = () => { setSaved(true); setScreen("saved"); };
+  const openVenue  = (v) => setActiveVenueId(v.id);
+  const closeVenue = ()  => setActiveVenueId(null);
 
-  const matched = useMemo(
-    () => VENUES.filter(v => Object.prototype.hasOwnProperty.call(v.rationale, situation)),
-    [situation]
-  );
-
-  return (
-    <div className="page">
-      <header className="page-head">
-        <div>
-          <div className="brand">
-            <div className="brand-mark">W</div>
-            <div>
-              <div className="brand-name">WellHealth</div>
-              <div className="brand-sub">{t.brand_sub}</div>
-            </div>
-          </div>
-          <div className="page-meta" style={{ marginTop: 14 }}>{t.meta}</div>
-        </div>
-        <div className="lang-toggle" role="tablist">
-          <button type="button" className={lang === "ru" ? "is-active" : ""} onClick={() => setLang("ru")}>RU</button>
-          <button type="button" className={lang === "en" ? "is-active" : ""} onClick={() => setLang("en")}>EN</button>
-        </div>
-      </header>
-
-      <div className="legend">
-        <b>{t.legend_palette}</b> {t.legend_palette_v}{" "}
-        <b>{t.legend_type}</b> {t.legend_type_v}{" "}
-        <b>{t.legend_inter}</b> {t.legend_inter_v}
-      </div>
-
-      <div className="stage">
-        <div className="phone-wrap">
-          <div className="phone">
-            <div className="screen">
-              {screen === "home"    && <Home    t={t} lang={lang} situation={situation} setSituation={setSituation} matched={matched} openVenue={openVenue} goBrowse={() => setScreen("browse")} setScreen={setScreen}/>}
-              {screen === "detail"  && <Detail  t={t} lang={lang} venue={activeVenue} situation={situation} goBack={goHome} goSaved={goSaved} setScreen={setScreen}/>}
-              {screen === "saved"   && <Saved   t={t} lang={lang} venue={activeVenue} goBack={() => setScreen("detail")} setScreen={setScreen}/>}
-              {screen === "browse"  && <Browse  t={t} lang={lang} situation={situation} setSituation={setSituation} openVenue={openVenue} setScreen={setScreen}/>}
-              {screen === "profile" && <Profile t={t} lang={lang} situation={situation} setScreen={setScreen}/>}
-            </div>
-          </div>
-        </div>
-
-        <Annotations t={t} screen={screen} reset={reset}/>
-      </div>
-
-      <FootNotes t={t}/>
-    </div>
-  );
-}
-
-// ---------------- Phone shells ----------------
-function StatusBar() {
-  return (
-    <div className="status-bar">
-      <span>9:41</span>
-      <span className="right"><span className="dot"/><span className="dot"/><span className="dot"/></span>
-    </div>
-  );
-}
-function NavTop({ left, title, right }) {
-  return (
-    <div className="nav-top">
-      <div className="icon-btn" onClick={left && left.onClick} style={{ visibility: left ? "visible" : "hidden" }}>{left ? left.glyph : "≡"}</div>
-      <div className="title">{title}</div>
-      <div className="icon-btn" onClick={right && right.onClick} style={{ visibility: right ? "visible" : "hidden" }}>{right ? right.glyph : "⌕"}</div>
-    </div>
-  );
-}
-function NavBottom({ t, screen, setScreen }) {
-  const items = [
-    { id: "home",    glyph: "⌂", lbl: t.nav_home,    target: "home" },
-    { id: "browse",  glyph: "⌕", lbl: t.nav_search,  target: "browse" },
-    { id: "saved",   glyph: "♥", lbl: t.nav_saved,   target: "saved" },
-    { id: "profile", glyph: "◯", lbl: t.nav_profile, target: "profile" },
-  ];
-  return (
-    <div className="nav-bottom">
-      {items.map(it => (
-        <div
-          key={it.id}
-          className={"nb-item" + ((screen === it.target || (it.id === "home" && screen === "detail")) ? " is-active" : "")}
-          onClick={() => setScreen(it.target)}
-        >
-          <div className="nb-glyph">{it.glyph}</div>
-          <span>{it.lbl}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ---------------- HOME / matcher ----------------
-function Home({ t, lang, situation, setSituation, matched, openVenue, goBrowse, setScreen }) {
-  const top = matched.slice(0, 3);
-  const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
-  const [didMatch, setDidMatch] = useState(false);
-
-  // Stubbed backend call: send query, infer a situation, mark searched.
-  const handleSubmit = (e) => {
-    if (e && e.preventDefault) e.preventDefault();
-    if (!query.trim() || loading) return;
-    setLoading(true);
-    setTimeout(() => {
-      const inferred = inferSituation(query);
-      if (inferred) {
-        setSituation(inferred);
-        setDidMatch(true);
-      } else {
-        setDidMatch(false);
-      }
-      setSearched(true);
-      setLoading(false);
-    }, 900);
+  const openNotes = () => {
+    if (typeof window !== "undefined" && window.open) {
+      window.open("notes_ru.html", "_blank", "noopener");
+    }
   };
 
-  const showResults = searched && didMatch && !loading;
-  const showNoMatch = searched && !didMatch && !loading;
+  return (
+    <div className="app">
+      <Stage
+        t={t} lang={lang}
+        situation={situation} setSituation={setSituation}
+        activeVenueId={activeVenueId}
+        openVenue={openVenue} closeVenue={closeVenue}
+        openProfile={() => setProfileOpen(true)}
+      />
+      {profileOpen && (
+        <ProfileSheet
+          t={t} lang={lang} setLang={setLang}
+          situation={situation} setSituation={setSituation}
+          onClose={() => setProfileOpen(false)}
+          openNotes={openNotes}
+        />
+      )}
+    </div>
+  );
+}
+
+// ---------------- Stage: chat thread + dock + venue overlay ----------------
+function Stage({ t, lang, situation, setSituation, activeVenueId, openVenue, closeVenue, openProfile }) {
+  const initialThread = () => ([
+    { id: 1, role: "a", kind: "text",  body: t.chat_welcome },
+    { id: 2, role: "a", kind: "chips", group: "situation", chips: t.chat_situ_chips },
+  ]);
+  const [thread,    setThread]    = useState(initialThread);
+  const [phase,     setPhase]     = useState("await_situation");
+  const [query,     setQuery]     = useState("");
+  const [pending,   setPending]   = useState(false);
+  const [topVenues, setTopVenues] = useState([]);
+  const idRef = useRef(2);
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [thread, pending]);
+
+  useEffect(() => {
+    setThread(initialThread());
+    setPhase("await_situation");
+    setTopVenues([]);
+    setQuery("");
+    setPending(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
+  const nextId = () => { idRef.current += 1; return idRef.current; };
+  const stripChips = (msgs) => msgs.filter(m => m.kind !== "chips");
+  const append = (msgs, ...newOnes) => [...msgs, ...newOnes.map(m => ({ id: nextId(), ...m }))];
+
+  const userTurn = (text, replyFn) => {
+    setThread(prev => append(stripChips(prev), { role: "u", kind: "text", body: text }));
+    setPending(true);
+    setTimeout(() => {
+      setPending(false);
+      setThread(prev => replyFn(prev));
+    }, 700);
+  };
+
+  // ----- Conversation handlers -----
+  const onSituation = (text) => {
+    const inferred = inferSituation(text);
+    if (inferred) {
+      setSituation(inferred);
+      setPhase("await_length");
+    }
+    userTurn(text, (prev) => {
+      if (!inferred) {
+        return append(prev,
+          { role: "a", kind: "text",  body: t.chat_no_match },
+          { role: "a", kind: "chips", group: "situation", chips: t.chat_situ_chips },
+        );
+      }
+      const label = SITUATIONS.find(s => s.id === inferred)[lang].toLowerCase();
+      return append(prev,
+        { role: "a", kind: "text",  body: t.chat_ack(label) },
+        { role: "a", kind: "text",  body: t.chat_q_length },
+        { role: "a", kind: "chips", group: "length", chips: t.chat_length_chips },
+      );
+    });
+  };
+
+  const onLength = (text) => {
+    setPhase("await_region");
+    userTurn(text, (prev) => append(prev,
+      { role: "a", kind: "text",  body: t.chat_q_region },
+      { role: "a", kind: "chips", group: "region", chips: t.chat_region_chips },
+    ));
+  };
+
+  const onRegion = (text) => {
+    const top = VENUES
+      .filter(v => Object.prototype.hasOwnProperty.call(v.rationale, situation))
+      .slice(0, 3);
+    setTopVenues(top);
+    setPhase("qa");
+    userTurn(text, (prev) => append(prev,
+      { role: "a", kind: "text",   body: t.chat_recommend_intro },
+      { role: "a", kind: "venues", venues: top },
+      { role: "a", kind: "chips",  group: "qa", chips: buildQaChips() },
+    ));
+  };
+
+  const buildQaChips = () => ([
+    { label: t.qa_prices_l, kind: "qa", id: "prices" },
+    { label: t.qa_lang_l,   kind: "qa", id: "lang" },
+    { label: t.qa_when_l,   kind: "qa", id: "when" },
+    { label: t.qa_food_l,   kind: "qa", id: "food" },
+    { label: t.qa_diff_l,   kind: "qa", id: "diff" },
+  ]);
+
+  const qaAnswer = (id, top) => {
+    if (id === "prices") {
+      const list = top.map(v => `${v.name[lang]} — ${t.from} €${v.price.toLocaleString(lang === "ru" ? "ru-RU" : "en-US")}`).join("; ");
+      return `${t.qa_prices_intro}: ${list}.`;
+    }
+    if (id === "lang") {
+      const list = top.map(v => {
+        const det = VENUE_DETAIL[v.id];
+        const ls  = det && det.lang ? det.lang[lang] : "—";
+        return `${v.name[lang]}: ${ls}`;
+      }).join(" · ");
+      return `${t.qa_lang_intro}. ${list}.`;
+    }
+    if (id === "when") return t.qa_when_a;
+    if (id === "food") return t.qa_food_a;
+    if (id === "diff") {
+      const list = top.map(v => {
+        const firstKey = Object.keys(v.rationale)[0];
+        return `${v.name[lang]} — ${v.rationale[firstKey][lang]}`;
+      }).join(" ");
+      return `${t.qa_diff_intro}. ${list}`;
+    }
+    return t.qa_default;
+  };
+
+  const onQA = (chip) => {
+    userTurn(chip.label, (prev) => append(prev,
+      { role: "a", kind: "text",  body: qaAnswer(chip.id, topVenues) },
+      { role: "a", kind: "chips", group: "qa", chips: buildQaChips() },
+    ));
+  };
+
+  const onReserveStart = (venue) => {
+    setPhase("reserve_form");
+    closeVenue();
+    userTurn(t.chat_reserve_user(venue.name[lang]), (prev) => append(prev,
+      { role: "a", kind: "text", body: t.chat_reserve_intro(venue.name[lang]) },
+      { role: "a", kind: "form", venue },
+    ));
+  };
+
+  const onReserveSubmit = (venue, dates, people) => {
+    const slug = venue.id.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4) || "WELL";
+    const ref  = `WH-20260504-${slug}`;
+    setPhase("confirmed");
+    userTurn(t.chat_reserve_confirmed_user(dates, people), (prev) => append(prev,
+      { role: "a", kind: "text",    body: t.chat_reservation_done },
+      { role: "a", kind: "confirm", venue, dates, people, ref },
+      { role: "a", kind: "text",    body: t.chat_post_done },
+    ));
+  };
+
+  const handleChip = (chip, group) => {
+    if (pending) return;
+    if (group === "situation")    onSituation(chip.text);
+    else if (group === "length")  onLength(chip.text);
+    else if (group === "region")  onRegion(chip.text);
+    else if (group === "qa")      onQA(chip);
+  };
+
+  const handleSubmit = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!query.trim() || pending) return;
+    const text = query.trim();
+    setQuery("");
+    if (phase === "await_situation")     onSituation(text);
+    else if (phase === "await_length")   onLength(text);
+    else if (phase === "await_region")   onRegion(text);
+    else if (phase === "qa") {
+      userTurn(text, (prev) => append(prev,
+        { role: "a", kind: "text",  body: t.qa_default },
+        { role: "a", kind: "chips", group: "qa", chips: buildQaChips() },
+      ));
+    } else {
+      userTurn(text, (prev) => append(prev,
+        { role: "a", kind: "text", body: t.chat_post_done },
+      ));
+    }
+  };
+
+  const activeVenue = activeVenueId ? VENUES.find(v => v.id === activeVenueId) : null;
+  const composerPh  = activeVenue ? t.input_ph_card(activeVenue.name[lang]) : t.input_ph;
 
   return (
     <React.Fragment>
-      <StatusBar/>
-      <NavTop title={t.home_title}/>
-      <div className="scroll">
-        <div className="greet-block">
-          <div className="greet">{t.greet} <span className="nm">{t.user_first}</span></div>
-          <div className="greet-sub">{t.greet_sub}</div>
-        </div>
-
-        <div className="matcher-card">
-          <div className="matcher-q">{t.matcher_q}</div>
-          <form className="text-input-row" onSubmit={handleSubmit}>
-            <input
-              type="text"
-              className="text-input"
-              placeholder={t.input_ph}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              disabled={loading}
-            />
-            <button
-              type="submit"
-              className="submit-btn submit-btn--text"
-              disabled={loading || !query.trim()}
-            >
-              {loading ? <span className="loader-dot"/> : t.submit_a}
-            </button>
-          </form>
-          {loading && <div className="loading-line">{t.loading}</div>}
-          {showNoMatch && <div className="no-match">{t.no_match}</div>}
-        </div>
-
-        {showResults && (
-          <React.Fragment>
-            <div className="section-h">
-              <span className="lbl">{SITUATIONS.find(s => s.id === situation)[lang]} · {top.length}</span>
-              <a onClick={goBrowse}>{t.show_all}</a>
-            </div>
-            {top.map(v => (
-              <div className="match-card" key={v.id} onClick={() => openVenue(v)}>
-                <div className={"thumb " + v.thumb}>{v.name[lang].charAt(0)}</div>
-                <div>
-                  <div className="name">{v.name[lang]}</div>
-                  <div className="why">{v.rationale[situation][lang]}</div>
-                  <div className="price-row">
-                    <span className="loc">{v.loc[lang]}</span>
-                    <span className="price">{t.from} €{v.price.toLocaleString(lang === "ru" ? "ru-RU" : "en-US")}</span>
+      <div className="stage">
+        <div className="chat-scroll" ref={scrollRef}>
+          <div className="chat-thread">
+            {thread.map((m) => {
+              if (m.kind === "text") {
+                return <div key={m.id} className={"bubble " + (m.role === "u" ? "user" : "assistant")}>{m.body}</div>;
+              }
+              if (m.kind === "chips") {
+                return (
+                  <div key={m.id} className="suggest-row">
+                    {m.chips.map((c, j) => (
+                      <button
+                        key={j}
+                        type="button"
+                        className="suggest-chip"
+                        onClick={() => handleChip(c, m.group)}
+                        disabled={pending}
+                      >
+                        {c.label}
+                      </button>
+                    ))}
                   </div>
-                </div>
-              </div>
-            ))}
-          </React.Fragment>
+                );
+              }
+              if (m.kind === "venues") {
+                return (
+                  <div key={m.id} className="chat-venue-stack">
+                    {m.venues.map(v => (
+                      <div className="chat-venue-card" key={v.id} onClick={() => openVenue(v)}>
+                        <div className={"thumb " + v.thumb}>{v.name[lang].charAt(0)}</div>
+                        <div>
+                          <div className="name">{v.name[lang]}</div>
+                          <div className="why">{v.rationale[situation] ? v.rationale[situation][lang] : v.rationale[Object.keys(v.rationale)[0]][lang]}</div>
+                          <div className="meta">
+                            <span>{v.loc[lang]}</span>
+                            <span className="price">{t.from} €{v.price.toLocaleString(lang === "ru" ? "ru-RU" : "en-US")}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+              if (m.kind === "form") {
+                return (
+                  <ReservationForm
+                    key={m.id}
+                    t={t} lang={lang}
+                    venue={m.venue}
+                    disabled={phase !== "reserve_form" || pending}
+                    onSubmit={(dates, people) => onReserveSubmit(m.venue, dates, people)}
+                  />
+                );
+              }
+              if (m.kind === "confirm") {
+                return (
+                  <div key={m.id} className="confirm-card">
+                    <span className="badge">✓ {t.confirm_badge}</span>
+                    <div className="ttl">{m.venue.name[lang]}</div>
+                    <div className="row">{t.confirm_dates}: <b>{m.dates}</b></div>
+                    <div className="row">{t.confirm_people}: <b>{m.people}</b></div>
+                    <div className="ref">{t.confirm_ref}: {m.ref}</div>
+                  </div>
+                );
+              }
+              return null;
+            })}
+            {pending && (
+              <div className="typing-bubble"><span/><span/><span/></div>
+            )}
+          </div>
+        </div>
+
+        {/* Floating venue overlay — chat keeps working underneath. */}
+        {activeVenue && (
+          <div className="venue-overlay-wrap">
+            <div className="venue-overlay-backdrop"/>
+            <VenueOverlay
+              t={t} lang={lang}
+              venue={activeVenue}
+              onClose={closeVenue}
+              onReserve={() => onReserveStart(activeVenue)}
+            />
+          </div>
         )}
       </div>
-      <NavBottom t={t} screen="home" setScreen={setScreen}/>
+
+      <Dock
+        t={t} lang={lang}
+        query={query} setQuery={setQuery}
+        pending={pending}
+        onSubmit={handleSubmit}
+        onProfile={openProfile}
+        composerPh={composerPh}
+      />
     </React.Fragment>
   );
 }
 
-// ---------------- DETAIL ----------------
-function Detail({ t, lang, venue, situation, goBack, goSaved, setScreen }) {
-  if (!venue) return null;
+// ---------------- Floating venue card ----------------
+function VenueOverlay({ t, lang, venue, onClose, onReserve }) {
   const det = VENUE_DETAIL[venue.id] || {};
   const ratKeys = Object.keys(venue.rationale);
   return (
-    <React.Fragment>
-      <div className={"det-hero thumb " + venue.thumb}>
-        <div className="nav left" onClick={goBack}>←</div>
-        <div className="nav right" onClick={goSaved}>♥</div>
-      </div>
-      <div className="det-title-block">
-        <div className="name">{venue.name[lang]}</div>
-        <div className="loc">{venue.loc[lang]}</div>
+    <article className="venue-overlay" role="dialog" aria-label={venue.name[lang]}>
+      <header className="venue-head">
+        <div className={"venue-head-thumb thumb " + venue.thumb}>{venue.name[lang].charAt(0)}</div>
+        <div className="venue-head-text">
+          <div className="card-name">{venue.name[lang]}</div>
+          <div className="card-loc">{venue.loc[lang]}</div>
+        </div>
+        <button type="button" className="card-close" onClick={onClose} aria-label={t.card_close} title={t.card_close}>×</button>
+      </header>
+      <div className="card-body">
         <div className="fact-table">
           <div className="fact-row"><div className="k">{t.fact_stay}</div>    <div className="v">{(det.stay && det.stay[lang]) || "—"}</div></div>
           <div className="fact-row"><div className="k">{t.fact_therapy}</div> <div className="v">{(det.therapy && det.therapy[lang]) || "—"}</div></div>
           <div className="fact-row"><div className="k">{t.fact_price}</div>   <div className="v">{t.from} €{venue.price.toLocaleString(lang === "ru" ? "ru-RU" : "en-US")} · {t.per}</div></div>
           <div className="fact-row"><div className="k">{t.fact_lang}</div>    <div className="v">{(det.lang && det.lang[lang]) || "—"}</div></div>
         </div>
-      </div>
-      <div className="scroll">
         <div className="why-panel">
           <div className="eyebrow">{t.why_eb}</div>
-          <h4>{t.why_h}</h4>
           <ul className="why-list">
             {ratKeys.map(k => (
               <li key={k}><b>{SITUATIONS.find(s => s.id === k)[lang]}.</b> {venue.rationale[k][lang]}</li>
@@ -1030,184 +1459,163 @@ function Detail({ t, lang, venue, situation, goBack, goSaved, setScreen }) {
           </ul>
           {det.cons && <div className="why-cons">{det.cons[lang]}</div>}
         </div>
-        <div className="cta-stack">
-          <button className="btn" onClick={goSaved}>{t.cta_save}</button>
-          <button className="btn ghost">{t.cta_open}</button>
+        <div className="reserve-cta">
+          <button type="button" onClick={onReserve}>{t.cta_reserve}</button>
         </div>
       </div>
-      <NavBottom t={t} screen="detail" setScreen={setScreen}/>
-    </React.Fragment>
+    </article>
   );
 }
 
-// ---------------- SAVED ----------------
-function Saved({ t, lang, venue, goBack, setScreen }) {
+// ---------------- Reservation form ----------------
+function ReservationForm({ t, lang, venue, disabled, onSubmit }) {
+  const [dates,  setDates]  = useState(t.reserve_dates_ph);
+  const [people, setPeople] = useState(1);
+  const submit = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (disabled || !dates.trim()) return;
+    onSubmit(dates.trim(), people);
+  };
   return (
-    <React.Fragment>
-      <StatusBar/>
-      <NavTop title={t.saved_title} left={{ glyph: "←", onClick: goBack }}/>
-      <div className="scroll">
-        <div className="saved-frame">
-          <div className="saved-banner">
-            <div className="ttl">{t.saved_t}</div>
-            <div className="sub">{t.saved_sub} {venue ? "· " + venue.name[lang] : ""}</div>
-          </div>
-          <div className="pdf-mock">
-            <div className="pdf-line s40"/>
-            <div className="pdf-line s90"/>
-            <div className="pdf-line s60"/>
-            <div className="pdf-line s75"/>
-            <div className="pdf-line s90"/>
-            <div className="pdf-line s30"/>
-            <div className="pdf-line s60"/>
-          </div>
-          <div style={{ fontSize: 12, color: "var(--ink-soft)", marginBottom: 12, lineHeight: 1.55 }}>{t.pdf_label}</div>
-          <div className="share-list">
-            <div className="share-row"><div className="ic">⎘</div><div className="nm">{t.share1}</div></div>
-            <div className="share-row"><div className="ic">✉</div><div className="nm">{t.share2}</div></div>
-            <div className="share-row"><div className="ic">⤓</div><div className="nm">{t.share3}</div></div>
-          </div>
-          <div className="share-foot">{t.share_foot}</div>
+    <form className="reserve-form" onSubmit={submit}>
+      <div className="ttl">{t.reserve_title(venue.name[lang])}</div>
+      <div>
+        <label>{t.reserve_dates_l}</label>
+        <input type="text" className="reserve-field" value={dates} onChange={(e) => setDates(e.target.value)} placeholder={t.reserve_dates_ph} disabled={disabled}/>
+      </div>
+      <div>
+        <label>{t.reserve_people_l}</label>
+        <div className="people-row">
+          <button type="button" onClick={() => setPeople(p => Math.max(1, p - 1))} disabled={disabled || people <= 1}>−</button>
+          <span className="count">{people}</span>
+          <button type="button" onClick={() => setPeople(p => Math.min(6, p + 1))} disabled={disabled || people >= 6}>+</button>
         </div>
       </div>
-      <NavBottom t={t} screen="saved" setScreen={setScreen}/>
-    </React.Fragment>
+      <button type="submit" className="reserve-submit" disabled={disabled || !dates.trim()}>{t.reserve_submit}</button>
+    </form>
   );
 }
 
-// ---------------- BROWSE ----------------
-function Browse({ t, lang, situation, setSituation, openVenue, setScreen }) {
-  const filtered = situation
-    ? VENUES.filter(v => Object.prototype.hasOwnProperty.call(v.rationale, situation))
-    : VENUES;
+// ---------------- Bottom dock: doctor avatar · composer · user avatar ----------------
+function Dock({ t, lang, query, setQuery, pending, onSubmit, onProfile, composerPh }) {
   return (
-    <React.Fragment>
-      <StatusBar/>
-      <NavTop title={t.browse_title}/>
-      <div className="scroll">
-        <div className="search-bar">
-          <span className="ic">⌕</span>
-          <span className="input">{t.search_ph}</span>
-        </div>
-        <div className="filter-row">
-          {SITUATIONS.map(s => (
-            <button
-              type="button"
-              key={s.id}
-              className={"s-chip" + (s.id === situation ? " is-active" : "")}
-              onClick={() => setSituation(s.id)}
-            >
-              {s[lang]}
-            </button>
-          ))}
-        </div>
-        {filtered.map(v => {
-          const conds = Object.keys(v.rationale).map(k => SITUATIONS.find(s => s.id === k));
-          return (
-            <div className="browse-card" key={v.id} onClick={() => openVenue(v)}>
-              <div className={"thumb " + v.thumb}>{v.name[lang].charAt(0)}</div>
-              <div>
-                <div className="name">{v.name[lang]}</div>
-                <div className="loc">{v.loc[lang]}</div>
-                <div className="price">{t.from} €{v.price.toLocaleString(lang === "ru" ? "ru-RU" : "en-US")}</div>
-                <div className="tags">
-                  {conds.map(c => <span key={c.id} className="tag">{c[lang]}</span>)}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <NavBottom t={t} screen="browse" setScreen={setScreen}/>
-    </React.Fragment>
-  );
-}
+    <div className="dock">
+      <button
+        type="button"
+        className="avatar doctor"
+        title={t.doctor_name}
+        aria-label={t.doctor_name}
+      >
+        <DoctorGlyph/>
+      </button>
 
-// ---------------- PROFILE ----------------
-function Profile({ t, lang, situation, setScreen }) {
-  const cur = SITUATIONS.find(s => s.id === situation);
-  return (
-    <React.Fragment>
-      <StatusBar/>
-      <NavTop title={t.profile_title}/>
-      <div className="scroll">
-        <div className="profile-card">
-          <div className="profile-row">
-            <div>
-              <div className="lbl">{t.profile_situ_l}</div>
-              <div className="v tags">
-                <span className="tag s-chip is-active" style={{ fontSize: 11, padding: "4px 11px" }}>{cur[lang]}</span>
-              </div>
-            </div>
-            <span className="edit">{t.edit}</span>
-          </div>
-        </div>
+      <form className="composer-bubble" onSubmit={onSubmit}>
+        <input
+          type="text"
+          className="text-input"
+          placeholder={composerPh}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          disabled={pending}
+        />
+        <button type="submit" className="send-btn" disabled={pending || !query.trim()} aria-label="Send">
+          {pending ? <span className="loader-dot"/> : <ArrowUpGlyph/>}
+        </button>
+      </form>
 
-        <div className="profile-card">
-          <div className="profile-row">
-            <div>
-              <div className="lbl">{t.profile_goals_l}</div>
-              <div className="v">{t.profile_goals_v}</div>
-            </div>
-            <span className="edit">{t.edit}</span>
-          </div>
-        </div>
-
-        <div className="profile-card">
-          <div className="lbl">{t.profile_docs_l}</div>
-          <div className="v" style={{ fontSize: 13, color: "var(--ink-soft)", marginTop: 6 }}>{t.profile_docs_empty}</div>
-          <div className="doc-add" style={{ marginTop: 10 }}>+ {t.profile_doc_add}</div>
-          <div style={{ fontSize: 11, color: "var(--ink-soft)", marginTop: 8 }}>{t.profile_docs_note}</div>
-        </div>
-      </div>
-      <NavBottom t={t} screen="profile" setScreen={setScreen}/>
-    </React.Fragment>
-  );
-}
-
-// ---------------- Annotations panel ----------------
-function Annotations({ t, screen, reset }) {
-  const steps = [
-    { id: "home",    b: t.annot_step1_b, m: t.annot_step1_m, screens: ["home"] },
-    { id: "detail",  b: t.annot_step2_b, m: t.annot_step2_m, screens: ["detail"] },
-    { id: "saved",   b: t.annot_step3_b, m: t.annot_step3_m, screens: ["saved"] },
-    { id: "browse",  b: t.annot_step4_b, m: t.annot_step4_m, screens: ["browse"] },
-    { id: "profile", b: t.annot_step5_b, m: t.annot_step5_m, screens: ["profile"] },
-  ];
-  return (
-    <div className="annot">
-      <h2>{t.annot_title}</h2>
-      <div className="sub">{t.annot_sub}</div>
-      <div className="step-list">
-        {steps.map((s, i) => (
-          <div key={s.id} className={"step" + (s.screens.includes(screen) ? " is-active" : "")}>
-            <div className="num">{["I","II","III","IV","V"][i]}</div>
-            <div>
-              <div className="b">{s.b}</div>
-              <div className="m">{s.m}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-      <a className="reset" onClick={reset}>{t.reset}</a>
+      <button
+        type="button"
+        className="avatar user"
+        onClick={onProfile}
+        title={t.user_first}
+        aria-label={t.profile_title}
+      >
+        {t.user_initial}
+      </button>
     </div>
   );
 }
 
-// ---------------- Foot notes ----------------
-function FootNotes({ t }) {
+// ---------------- Profile sheet (slides up from bottom) ----------------
+function ProfileSheet({ t, lang, setLang, situation, setSituation, onClose, openNotes }) {
+  const cur = SITUATIONS.find(s => s.id === situation) || SITUATIONS[0];
+
   return (
-    <section className="foot-notes">
-      <h3>{t.foot_h}</h3>
-      <div className="grid">
-        <div><h4>{t.foot_old_h}</h4><p>{t.foot_old_p}</p></div>
-        <div><h4>{t.foot_situ_h}</h4><p>{t.foot_situ_p}</p></div>
-        <div><h4>{t.foot_browse_h}</h4><p>{t.foot_browse_p}</p></div>
-        <div><h4>{t.foot_doc_h}</h4><p>{t.foot_doc_p}</p></div>
-        <div><h4>{t.foot_no_passport_h}</h4><p>{t.foot_no_passport_p}</p></div>
-        <div><h4>{t.foot_endpoint_h}</h4><p>{t.foot_endpoint_p}</p></div>
-      </div>
-    </section>
+    <React.Fragment>
+      <div className="sheet-scrim" onClick={onClose}/>
+      <aside className="profile-sheet" role="dialog" aria-label={t.profile_title}>
+        <div className="sheet-handle"/>
+        <div className="sheet-head">
+          <div className="avatar user">{t.user_initial}</div>
+          <div className="id-block">
+            <div className="id-name">{t.user_first}</div>
+            <div className="id-sub">{t.profile_title}</div>
+          </div>
+          <button type="button" className="sheet-close" onClick={onClose} aria-label={t.card_close}>×</button>
+        </div>
+
+        <div className="sheet-scroll">
+          <div className="profile-card">
+            <div className="profile-row">
+              <div>
+                <div className="lbl">{t.profile_situ_l}</div>
+                <div className="v tags">
+                  <span className="s-chip is-active" style={{ fontSize: 12, padding: "5px 12px" }}>{cur[lang]}</span>
+                </div>
+              </div>
+              <span className="edit">{t.edit}</span>
+            </div>
+          </div>
+
+          <div className="profile-card">
+            <div className="profile-row">
+              <div>
+                <div className="lbl">{t.profile_goals_l}</div>
+                <div className="v">{t.profile_goals_v}</div>
+              </div>
+              <span className="edit">{t.edit}</span>
+            </div>
+          </div>
+
+          <div className="profile-card">
+            <div className="lbl">{t.profile_med_l}</div>
+            <div className="v" style={{ fontSize: 12.5, color: "var(--ink-soft)", fontWeight: 400, marginTop: 4 }}>
+              {t.profile_med_sub}
+            </div>
+          </div>
+
+          <div className="sheet-foot">
+            <div className="lang-toggle" role="tablist">
+              <button type="button" className={lang === "ru" ? "is-active" : ""} onClick={() => setLang("ru")}>RU</button>
+              <button type="button" className={lang === "en" ? "is-active" : ""} onClick={() => setLang("en")}>EN</button>
+            </div>
+            <a onClick={openNotes}>{t.profile_about}</a>
+          </div>
+        </div>
+      </aside>
+    </React.Fragment>
+  );
+}
+
+// ---------------- Glyphs ----------------
+function DoctorGlyph() {
+  // Stethoscope mark — minimal, friendly, paired with the teal avatar.
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 3v6a4 4 0 0 0 8 0V3"/>
+      <path d="M5 3h2"/>
+      <path d="M11 3h2"/>
+      <path d="M9 13v2.5a4.5 4.5 0 0 0 9 0V13"/>
+      <circle cx="18" cy="11" r="2"/>
+    </svg>
+  );
+}
+function ArrowUpGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 19V5"/>
+      <path d="M5 12l7-7 7 7"/>
+    </svg>
   );
 }
 
