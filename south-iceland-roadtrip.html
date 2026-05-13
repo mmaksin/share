@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iceland: South, Reykjanes & Reykjavík – All Destinations Map</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1923; color: #e8edf2; height: 100vh; display: flex; flex-direction: column; }
+.header { text-align: center; padding: 10px 20px 4px; flex-shrink: 0; }
+h1 { font-size: 1.3rem; color: #fff; margin-bottom: 2px; }
+.subtitle { font-size: 0.72rem; color: #7a9bb5; }
+.search-wrap { padding: 6px 14px 2px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.search-inner { position: relative; width: 100%; max-width: 480px; }
+#map-count { font-size: 0.72rem; color: #7a9bb5; white-space: nowrap; flex-shrink: 0; }
+#search { width: 100%; padding: 6px 32px 6px 14px; border-radius: 20px; border: 1.5px solid #2a4a6a; background: #141f2e; color: #e8edf2; font-size: 0.8rem; outline: none; transition: border-color 0.2s; }
+#search::placeholder { color: #4a7090; }
+#search:focus { border-color: #4a9abb; background: #1a2a3d; }
+#search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #4a7090; font-size: 1rem; cursor: pointer; line-height: 1; padding: 2px 4px; display: none; transition: color 0.15s; }
+#search-clear:hover { color: #e8edf2; }
+.controls { padding: 5px 14px 4px; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; flex-shrink: 0; }
+#toggle-all { padding: 4px 12px; border-radius: 20px; border: 1.5px solid #4a7090; background: transparent; color: #7a9bb5; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: color 0.15s, border-color 0.15s; flex-shrink: 0; }
+#toggle-all:hover { color: #e8edf2; border-color: #e8edf2; }
+.filter-btn { padding: 4px 10px; border-radius: 20px; border: 1.5px solid transparent; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; gap: 4px; background: transparent; }
+.filter-btn.active { opacity: 1; }
+.filter-btn.inactive { opacity: 0.25; }
+#fav-chip { padding: 4px 12px; border-radius: 20px; border: 1.5px solid #c0406080; background: transparent; color: #e07090; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s; flex-shrink: 0; }
+#fav-chip.fav-active { background: #c04060; color: #fff; border-color: #c04060; }
+#fav-chip.fav-inactive { opacity: 0.55; }
+.io-btn { padding: 4px 10px; border-radius: 20px; border: 1.5px solid #4a7090; background: transparent; color: #7a9bb5; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: color 0.15s, border-color 0.15s; flex-shrink: 0; }
+.io-btn:hover { color: #e8edf2; border-color: #e8edf2; }
+.io-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.badge { font-size: 0.6rem; background: rgba(255,255,255,0.18); padding: 1px 4px; border-radius: 8px; }
+#map { flex: 1; width: 100%; min-height: 0; }
+.footer { text-align: center; color: #3a6080; font-size: 0.65rem; padding: 4px 20px; flex-shrink: 0; }
+.star-row { padding: 2px 14px 4px; display: flex; align-items: center; gap: 6px; justify-content: center; flex-shrink: 0; }
+.star-label { font-size: 0.65rem; color: #4a7090; }
+.star-btn { padding: 3px 10px; border-radius: 20px; border: 1.5px solid #2a4a6a; background: transparent; color: #7a9bb5; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s; }
+.star-btn.star-active { background: #b8860b; color: #fff; border-color: #b8860b; }
+.star-btn:hover:not(.star-active) { border-color: #f5c842; color: #f5c842; }
+#rating-loading { font-size: 0.62rem; color: #4a7090; margin-left: 4px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🗺 Iceland — South, Reykjanes &amp; Reykjavík</h1>
+  <p class="subtitle">All destinations from south.is · visitreykjanes.is · visitreykjavik.is · click any marker for details</p>
+</div>
+<div class="search-wrap">
+  <div class="search-inner">
+    <input type="text" id="search" placeholder="🔍 Search destinations by name or description…" autocomplete="off">
+    <button id="search-clear" title="Clear search">✕</button>
+  </div>
+  <span id="map-count"></span>
+</div>
+<div class="controls" id="filters">
+  <button id="toggle-all">Deselect all</button>
+  <button id="fav-chip">❤️ Favorites</button>
+  <button id="export-favs" class="io-btn" title="Download your favorites as a JSON file">📤 Export</button>
+  <button id="import-favs" class="io-btn" title="Import favorites from a JSON file (appends to current)">📥 Import</button>
+  <input type="file" id="import-favs-file" accept="application/json,.json" style="display:none">
+</div>
+<div class="star-row">
+  <span class="star-label">Min rating:</span>
+  <button class="star-btn star-active" data-min="0">All</button>
+  <button class="star-btn" data-min="4.5">⭐ 4.5+</button>
+  <button class="star-btn" data-min="4.6">⭐ 4.6+</button>
+  <button class="star-btn" data-min="4.7">⭐ 4.7+</button>
+  <button class="star-btn" data-min="4.8">⭐ 4.8+</button>
+  <button class="star-btn" data-min="4.9">⭐ 4.9+</button>
+  <span id="rating-loading"></span>
+  <button id="rating-retry" title="Clear cached ratings and re-fetch" style="background:none;border:none;color:#4a7090;font-size:.65rem;cursor:pointer;padding:0 4px;">↺ reload</button>
+</div>
+<div id="map"></div>
+<p class="footer" id="stats"></p>
+<script>
+const BASE = 'https://www.south.is';
+const CATS = [
+  { id:'waterfall',  label:'Waterfalls',           color:'#4a9abb', emoji:'💧' },
+  { id:'glacier',    label:'Glaciers & Ice',        color:'#90d8f5', emoji:'🧊' },
+  { id:'volcano',    label:'Volcanoes',             color:'#f05050', emoji:'🌋' },
+  { id:'mountain',   label:'Mountains & Highlands', color:'#e88040', emoji:'⛰️' },
+  { id:'nature',     label:'Nature & Parks',        color:'#6de868', emoji:'🌿' },
+  { id:'geothermal', label:'Geothermal Areas',      color:'#f09840', emoji:'♨️' },
+  { id:'geopark',    label:'Geopark',               color:'#c8a860', emoji:'🪨' },
+  { id:'lighthouse', label:'Lighthouses',           color:'#f5e878', emoji:'🔦' },
+  { id:'heritage',   label:'History & Heritage',    color:'#c078e8', emoji:'🏛️' },
+  { id:'church',     label:'Churches',              color:'#a888f0', emoji:'⛪' },
+  { id:'museum',     label:'Museums & Centres',     color:'#9060c8', emoji:'📚' },
+  { id:'hotspring',  label:'Geothermal Baths',      color:'#f078c8', emoji:'🛁' },
+  { id:'pool',       label:'Swimming Pools',        color:'#50d8c8', emoji:'🏊' },
+  { id:'town',       label:'Towns & Villages',      color:'#7090c0', emoji:'🏘️' },
+];
+
+const PLACES = [
+  // ── WATERFALLS ──────────────────────────────────────────────────────────────
+  {name:'Seljalandsfoss',      cat:'waterfall', lat:63.6156, lng:-19.9886, url:'/en/destinations/nature/geopark/seljalandsfoss-waterfall',                desc:'Walk behind the 60m curtain of water. One of Iceland\'s most iconic falls.'},
+  {name:'Gljúfrabúi',          cat:'waterfall', lat:63.6195, lng:-19.9820, url:'/en/destinations/nature/waterfalls/gljufrabui',                            desc:'A hidden waterfall tucked inside a narrow gorge, 500m from Seljalandsfoss.'},
+  {name:'Skógafoss',           cat:'waterfall', lat:63.5322, lng:-19.5118, url:'/en/destinations/nature/waterfalls/skogafoss-waterfall',                   desc:'Massive 62m-wide waterfall. Climb the staircase for panoramic views.'},
+  {name:'Svartifoss',          cat:'waterfall', lat:64.0274, lng:-16.9757, url:'/en/destinations/nature/waterfalls/svartifoss-waterfall',                  desc:'"Black Waterfall" — framed by dramatic dark basalt columns in Skaftafell.'},
+  {name:'Háifoss',             cat:'waterfall', lat:64.0754, lng:-19.9736, url:'/en/destinations/nature/the-highlands/haifoss-waterfall',                  desc:'One of Iceland\'s tallest falls (122m) in the Fossá river canyon.'},
+  {name:'Ófærufoss',           cat:'waterfall', lat:64.0050, lng:-18.6100, url:'/en/destinations/nature/waterfalls/ofaerufoss-nyrdri-ofaera-river',        desc:'Waterfall inside the Eldgjá volcanic canyon, accessible in summer by 4WD.'},
+  {name:'Gluggafoss',          cat:'waterfall', lat:63.7530, lng:-20.2170, url:'/en/destinations/nature/waterfalls/gluggafoss-waterfall',                  desc:'Tiered waterfall nicknamed "Window Falls" in Fljótshlíð valley.'},
+  {name:'Hjálparfoss',         cat:'waterfall', lat:64.1024, lng:-19.8738, url:'/en/destinations/nature/waterfalls/hjalparfoss-waterfall',                 desc:'Twin-channel waterfall in Þjórsárdalur, named "Help Falls" by early settlers.'},
+  {name:'Reykjafoss (Hveragerði)', cat:'waterfall', lat:64.0035, lng:-21.1920, url:'/en/destinations/nature/waterfalls/reykjafoss-in-the-botanical-garden-in-hveragerdi', desc:'Waterfall in the Botanical Garden of Hveragerði, town of flowers and hot springs.'},
+  {name:'Urriðafoss',          cat:'waterfall', lat:63.8718, lng:-20.8478, url:'/en/destinations/nature/waterfalls/urridafoss-waterfall',                  desc:'Iceland\'s highest-volume waterfall by flow rate, on the Þjórsá river.'},
+  {name:'Þjófafoss',           cat:'waterfall', lat:64.0950, lng:-19.9210, url:'/en/destinations/nature/waterfalls/thjofafoss-waterfall',                  desc:'"Thief Falls" — a powerful waterfall in Þjórsárdalur valley.'},
+  {name:'Fagrifoss',           cat:'waterfall', lat:63.9790, lng:-18.4080, url:'/en/destinations/nature/the-highlands/fagrifoss-waterfall',                desc:'"Beautiful Falls" — a remote highland waterfall near Eldgjá.'},
+  {name:'Fossabrekkur',        cat:'waterfall', lat:63.6170, lng:-19.9830, url:'/en/destinations/nature/waterfalls/fossabrekkur',                          desc:'A cluster of smaller falls in the Seljalandsfoss area.'},
+  {name:'Gullfoss',            cat:'waterfall', lat:64.3270, lng:-20.1210, url:'/en/destinations/nature/waterfalls/gullfoss-waterfall',                   desc:'The "Golden Falls" — Iceland\'s most iconic waterfall, a thundering double cascade on the Hvítá river. Golden Circle highlight.'},
+  {name:'Kvernufoss',          cat:'waterfall', lat:63.5340, lng:-19.5170, url:'/en/destinations/nature/waterfalls/kvernufoss-waterfall',                 desc:'A hidden 30m waterfall behind the Skógar Museum — far fewer visitors than Skógafoss next door.'},
+  {name:'Foss á Síðu',         cat:'waterfall', lat:63.7300, lng:-17.8900, url:'/en/destinations/nature/waterfalls/foss-a-sidu',                         desc:'A famous waterfall that blows upward in strong coastal winds — a surreal and unforgettable sight.'},
+  {name:'Systra Waterfall',    cat:'waterfall', lat:63.7844, lng:-18.0534, url:'/en/destinations/nature/waterfalls/systrastapi-and-systra-waterfall',     desc:'Waterfall and crater lake near Kirkjubæjarklaustur, steeped in legend of the medieval nuns\' convent.'},
+  {name:'Dynkur',              cat:'waterfall', lat:64.0570, lng:-20.0160, url:'/en/destinations/nature/waterfalls/dynkur-in-thjorsa-river',              desc:'Powerful waterfall and gorge on the Þjórsá river, Iceland\'s longest river.'},
+  {name:'Brúará',              cat:'waterfall', lat:64.2920, lng:-20.4860, url:'/en/destinations/nature/waterfalls/bruara',                              desc:'Scenic waterfall on the Brúará river near Gullfoss — a quieter Golden Circle gem.'},
+  {name:'Ægissíðufoss',        cat:'waterfall', lat:63.7400, lng:-17.9000, url:'/en/destinations/nature/waterfalls/aegissidufoss-waterfall',             desc:'A beautiful waterfall in the Síða region of southeast Iceland.'},
+  {name:'Gjáin Valley',        cat:'waterfall', lat:64.1040, lng:-19.8700, url:'/en/destinations/nature/waterfalls/gjain-in-thjorsardalur-valley',       desc:'A hidden fairytale valley in Þjórsárdalur with twisting lava, pools and cascading waterfalls — magical.'},
+  {name:'Faxi (Faxafoss)',     cat:'waterfall', lat:64.2186, lng:-20.3242, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'A wide 7m waterfall on the Tungufljót river — a quieter Golden Circle stop between Geysir and Gullfoss with a salmon ladder.'},
+  {name:'Glymur',              cat:'waterfall', lat:64.3925, lng:-21.2419, url:'https://guidetoiceland.is/travel-iceland/drive/glymur',                  desc:'Iceland\'s second-tallest waterfall (198m), at the head of Hvalfjörður — a scenic 3-hour hike through canyons and a river crossing.'},
+
+  // ── GLACIERS & ICE ──────────────────────────────────────────────────────────
+  {name:'Jökulsárlón Glacier Lagoon', searchName:'Jokulsarlon', cat:'glacier', lat:64.0784, lng:-16.2306, url:'/en/destinations/nature/glaciers/jokulsarlon-glacier-lagoon',        desc:'Stunning glacial lake filled with floating icebergs calved from Breiðamerkurjökull. Boat tours available.'},
+  {name:'Fjallsárlón Glacial Lagoon', searchName:'Fjallsarlon', cat:'glacier', lat:63.9983, lng:-16.4250, url:'/en/destinations/nature/glaciers/fjallsarlon-glacial-lagoon',        desc:'Quieter sister lagoon to Jökulsárlón with zodiac boat tours.'},
+  {name:'Sólheimajökull',      cat:'glacier', lat:63.5422, lng:-19.3564, url:'/en/destinations/nature/glaciers/solheimajokull',                           desc:'Accessible glacier tongue — one of Iceland\'s most popular glacier hike destinations.'},
+  {name:'Vatnajökull Glacier', cat:'glacier', lat:64.4167, lng:-16.9500, url:'/en/destinations/nature/glaciers/vatnajokull-glacier',                      desc:'Europe\'s largest glacier by volume, covering ~8% of Iceland.'},
+  {name:'Langjökull Glacier',  cat:'glacier', lat:64.6333, lng:-20.5167, url:'/en/destinations/nature/glaciers/langjokull-glacier',                       desc:'Iceland\'s second-largest glacier, accessible via snowmobile tours.'},
+  {name:'Fláajökull',          cat:'glacier', lat:64.1550, lng:-15.6240, url:'/en/destinations/nature/glaciers/flaajokull-glacier',                       desc:'Remote outlet glacier east of Vatnajökull with a small lagoon.'},
+  {name:'Heinaberg',           cat:'glacier', lat:64.0740, lng:-15.6800, url:'/en/destinations/nature/glaciers/heinaberg',                                desc:'Glacier tongue accessible by kayak across a glacial lake.'},
+  {name:'Hoffell',             cat:'glacier', lat:64.2860, lng:-15.2740, url:'/en/destinations/nature/glaciers/hoffell',                                  desc:'Small glacier lagoon near Höfn, perfect for a peaceful glacier walk.'},
+
+  // ── VOLCANOES ───────────────────────────────────────────────────────────────
+  {name:'Hekla',               cat:'volcano', lat:63.9823, lng:-19.6617, url:'/en/destinations/nature/mountains/hekla-volcano',                           desc:'One of Iceland\'s most active volcanoes, once called the "Gateway to Hell."'},
+  {name:'Eyjafjallajökull',    cat:'volcano', lat:63.6293, lng:-19.6086, url:'/en/destinations/nature/glaciers/eyjafjallajokull-glacier',                 desc:'Famous for its 2010 eruption that grounded European air traffic.'},
+  {name:'Mýrdalsjökull & Katla', cat:'volcano', lat:63.6500, lng:-19.0500, url:'/en/destinations/nature/glaciers/myrdalsjokull-glacier-and-katla',       desc:'Glacier cap hiding the powerful Katla volcano. Year-round snowmobile tours.'},
+  {name:'Eldfell',             cat:'volcano', lat:63.4372, lng:-20.2440, url:'/en/destinations/nature/mountains/eldfell',                                 desc:'Cinder cone volcano that erupted in 1973, partially burying Vestmannaeyjar town.'},
+  {name:'Öræfajökull',         cat:'volcano', lat:63.9800, lng:-16.6500, url:'/en/destinations/nature/glaciers/oraefajokull-glacier',                     desc:'Iceland\'s highest peak (2110m) — a stratovolcano beneath Vatnajökull.'},
+  {name:'Eldgjá Canyon',       cat:'volcano', lat:63.9840, lng:-18.6180, url:'/en/destinations/nature/the-highlands/eldgja-canyon',                       desc:'Earth\'s largest volcanic canyon (270m deep), created in a massive 939 AD eruption.'},
+
+  // ── MOUNTAINS & HIGHLANDS ───────────────────────────────────────────────────
+  {name:'Bláhnúkur',           cat:'mountain', lat:63.9970, lng:-19.0620, url:'/en/destinations/nature/mountains/blahnukur-in-landmannalaugar',           desc:'Blue Peak — iconic rhyolite summit in Landmannalaugar, a rewarding day hike.'},
+  {name:'Hjörleifshöfði',      cat:'mountain', lat:63.4143, lng:-18.7863, url:'/en/destinations/nature/mountains/hjorleifshofdi',                         desc:'Lone headland rising from black sands — burial site of Hjörleifur Hróðmarsson.'},
+  {name:'Hrafntinnusker',      cat:'mountain', lat:63.9340, lng:-19.2060, url:'/en/destinations/nature/mountains/hrafntinnusker',                         desc:'Obsidian plateau and mountain hut on the Laugavegur hiking trail.'},
+  {name:'Lómagnúpur',          cat:'mountain', lat:63.7620, lng:-17.9640, url:'/en/destinations/nature/mountains/lomagnupur',                             desc:'A striking 767m sea cliff rising dramatically above the Skeiðarársandur plain.'},
+  {name:'Hafursey',            cat:'mountain', lat:63.7360, lng:-19.4660, url:'/en/destinations/nature/mountains/hafursey',                               desc:'Flat-topped table mountain near Þórsmörk with panoramic views.'},
+  {name:'Reynisfjall',         cat:'mountain', lat:63.4130, lng:-19.0440, url:'/en/destinations/nature/mountains/reynisfjara-reynisfjall-og-reynisdrangar', desc:'Cliffs and sea stacks of Reynisfjall — nesting seabirds and puffins in summer.'},
+  {name:'Ingólfsfjall',        cat:'mountain', lat:63.9638, lng:-21.1283, url:'/en/destinations/nature/mountains/ingolfsfjall-mountain',                   desc:'Mountain overlooking Selfoss, legendary resting place of Iceland\'s first settler.'},
+  {name:'Langisjór',           cat:'mountain', lat:64.1000, lng:-18.8200, url:'/en/destinations/nature/mountains/langisjor-lake-fogrufjoll-graenifjallgardur', desc:'Remote highland lake with surrounding mountains — only reachable by 4WD.'},
+  {name:'Kerlingarfjöll',      cat:'mountain', lat:64.6350, lng:-19.2390, url:'/en/destinations/nature/the-highlands/kerlingarfjoll-mountains',           desc:'Dramatic highland rhyolite mountains with geothermal activity, trails and a mountain lodge.'},
+  {name:'Fimmvörðuháls',       cat:'mountain', lat:63.7220, lng:-19.4670, url:'/en/destinations/nature/the-highlands/fimmvorduhals',                     desc:'Spectacular highland pass between Eyjafjallajökull and Mýrdalsjökull.'},
+  {name:'Landmannahellir',     cat:'mountain', lat:63.9300, lng:-19.2530, url:'/en/destinations/nature/the-highlands/landmannahellir',                    desc:'Large lava tube cave in the Landmannalaugar highlands.'},
+  {name:'Þórsmörk (Thorsmork)', cat:'mountain', lat:63.7001, lng:-19.5130, url:'/en/destinations/nature/nature/thorsmork',                               desc:'Valley of Thor — magical highland oasis between three glaciers, birch forests and dramatic peaks.'},
+  {name:'Álftavatn Lake',      cat:'mountain', lat:63.9450, lng:-19.1800, url:'/en/destinations/nature/the-highlands/alftavatn-in-rangarvallaafrettur',   desc:'Serene highland lake on the Laugavegur hiking trail, midway between Landmannalaugar and Þórsmörk.'},
+  {name:'Veiðivötn Lakes',     cat:'mountain', lat:64.0500, lng:-18.9000, url:'/en/destinations/nature/the-highlands/veidivotn-lakes',                   desc:'Remote highland fishing lakes in a colourful volcanic landscape — 4WD required.'},
+  {name:'Stóri Dímon',         cat:'mountain', lat:63.8040, lng:-18.1440, url:'/en/destinations/nature/geopark/stori-dimon',                            desc:'A distinctive pyramid-shaped hill in the Katla Geopark with sweeping views across Síða.'},
+
+  // ── NATURE & PARKS ──────────────────────────────────────────────────────────
+  {name:'Þingvellir',          cat:'nature', lat:64.2557, lng:-21.1299, url:'/en/destinations/nature/national-parks-and-nature-reserves/national-parks/thingvellir', desc:'UNESCO World Heritage Site — where tectonic plates meet and Iceland\'s parliament was founded in 930.'},
+  {name:'Þingvallavatn Lake',  cat:'nature', lat:64.1833, lng:-21.0760, url:'/en/destinations/nature/national-parks-and-nature-reserves/national-parks/thingvallavatn-lake', desc:'Iceland\'s largest natural lake, with crystal-clear water and unique diving spots.'},
+  {name:'Skaftafell',          cat:'nature', lat:64.0170, lng:-16.9760, url:'/en/destinations/nature/national-parks-and-nature-reserves/national-parks/skaftafell', desc:'Green oasis beneath Vatnajökull — popular hiking area with glacier tongues and waterfalls.'},
+  {name:'Landmannalaugar',     cat:'nature', lat:63.9942, lng:-19.0693, url:'/en/destinations/nature/national-parks-and-nature-reserves/national-parks/landmannalaugar-nature-reserve', desc:'Colourful rhyolite mountains, natural hot springs and the start of the Laugavegur Trail.'},
+  {name:'Lakagígar / Laki',    cat:'nature', lat:64.0620, lng:-18.2310, url:'/en/destinations/nature/national-parks-and-nature-reserves/national-parks/lakagigar-and-laki', desc:'130-crater row from the catastrophic 1783 eruption — one of history\'s most deadly volcanic events.'},
+  {name:'Skalafell / Hjallanes', cat:'nature', lat:64.0490, lng:-15.9920, url:'/en/destinations/nature/national-parks-and-nature-reserves/national-parks/skalafell-hjallanes', desc:'Remote nature area at the edge of Vatnajökull with glacier views and hiking.'},
+  {name:'Friðland að Fjallabaki', cat:'nature', lat:63.9940, lng:-19.0690, url:'/en/destinations/nature/the-highlands/fridland-ad-fjallabaki-nature-reserve', desc:'Nature reserve encompassing Landmannalaugar — vivid rhyolite, obsidian and green valleys.'},
+  {name:'Dyrhólaey',           cat:'nature', lat:63.4058, lng:-19.1310, url:'/en/destinations/nature/nature/dyrholaey',                                  desc:'Dramatic rock arch peninsula with a lighthouse, puffin colony and sweeping coastal views.'},
+  {name:'Ljótipollur',         cat:'nature', lat:63.9320, lng:-19.1270, url:'/en/destinations/nature/nature/ljotipollur',                                desc:'Vivid red-orange crater lake in the Landmannalaugar highlands — stunning contrast of colours.'},
+  {name:'Froststaðavatn Lake', cat:'nature', lat:63.9740, lng:-19.0690, url:'/en/destinations/nature/nature/frostastadavatn',                            desc:'Highland lake near Landmannalaugar surrounded by lava fields.'},
+  {name:'Ytri-Ranga River',    cat:'nature', lat:63.8100, lng:-20.2340, url:'/en/destinations/nature/nature/ytri-ranga-river',                           desc:'World-class salmon fishing river in South Iceland\'s Rangárþing.'},
+  {name:'Mýrdalssandur',       cat:'nature', lat:63.4950, lng:-18.7600, url:'/en/destinations/nature/nature/myrdalssandur',                              desc:'Vast black sand plain east of Vík, formed by glacial floods from Katla\'s eruptions.'},
+  {name:'Þjórsárhraun',        cat:'nature', lat:64.1680, lng:-19.9800, url:'/en/destinations/nature/nature/thjorsarhraun',                              desc:'Ancient lava field in Þjórsárdalur — one of Iceland\'s largest in the lowlands.'},
+  {name:'Tímburhóll Grove',    cat:'nature', lat:63.9400, lng:-21.0950, url:'/en/destinations/nature/nature/timburholl-grove',                           desc:'Small native birch woodland near Selfoss — a peaceful natural retreat.'},
+  {name:'Ingólfshhöfði Cape',  cat:'nature', lat:63.8030, lng:-16.6369, url:'/en/destinations/landmarks-historical-places/history-and-culture/ingolfshofdi', desc:'Remote tidal headland with puffins and a lighthouse — reached by tractor tour across black sands.'},
+  {name:'Kerið Crater',        cat:'nature', lat:64.0412, lng:-20.8851, url:'/en/destinations/nature/nature/kerid-crater',                              desc:'Vivid volcanic crater lake with deep blue water and rust-red walls — a striking Golden Circle stop.'},
+  {name:'Westman Islands',     cat:'nature', lat:63.4400, lng:-20.2800, url:'/en/destinations/nature/nature/the-westman-islands',                       desc:'Volcanic archipelago with dramatic cliffs, puffin colonies, and the site of the 1973 Eldfell eruption.'},
+  {name:'Sólheimasandur',      cat:'nature', lat:63.4840, lng:-19.3620, url:'/en/destinations/nature/geopark/solheimasandur',                           desc:'Black sand plain with a famous US Navy DC-3 plane wreck — an otherworldly and iconic sight.'},
+  {name:'Fjaðrárgljúfur Canyon', cat:'nature', lat:63.7730, lng:-18.1720, url:'/en/destinations/nature/geopark/fjadrargljufur-canyon',                 desc:'A stunning 100m-deep winding canyon carved by glacial meltwater — one of Iceland\'s most photogenic spots.'},
+  {name:'Múlagljúfur Canyon',  cat:'nature', lat:63.9700, lng:-16.3900, url:'https://guidetoiceland.is/travel-iceland/drive/mulagljufur-canyon-1',     desc:'A hidden moss-green canyon in SE Iceland near Fjallsárlón — 3.8km hike to Hangandifoss (120m) and Múlafoss with views of Vatnajökull.'},
+  {name:'Skeiðarársandur',     cat:'nature', lat:63.9500, lng:-17.2500, url:'/en/destinations/nature/nature/skeidararsandur',                           desc:'Europe\'s largest outwash plain, stretching from Vatnajökull to the sea — formed by catastrophic floods.'},
+  {name:'Diamond Beach',       cat:'nature', lat:64.0430, lng:-16.1800, url:'/en/destinations/nature/nature/breidamerkursandur',                        desc:'Black sand beach at Jökulsárlón strewn with ice blocks from the glacier — the "Diamond Beach."'},
+  {name:'Flói Bird Reserve',   cat:'nature', lat:63.9000, lng:-21.2500, url:'/en/destinations/nature/recreation-areas/the-floi-bird-reserve',           desc:'Important wetland bird reserve near Selfoss — home to Arctic terns, golden plovers and more.'},
+  {name:'Surtsey Island',      cat:'nature', lat:63.3032, lng:-20.6050, url:'/en/destinations/nature/national-parks-and-nature-reserves/nature-reserves/surtsey-island', desc:'UNESCO World Heritage Site — volcanic island born in 1963, a living laboratory for how life colonises new land.'},
+  {name:'Þakgil',              cat:'nature', lat:63.5700, lng:-18.9300, url:'/en/destinations/nature/recreation-areas/hofdabrekkuheidi-thakgil',        desc:'A hidden canyon paradise near Vík — sheltered camping, dramatic rock formations and green birch slopes.'},
+  {name:'Lónsorœfi',           cat:'nature', lat:64.3700, lng:-14.8000, url:'/en/destinations/nature/the-highlands/lonsoraefi',                         desc:'Remote wilderness east of Vatnajökull with dramatic gorges, hot springs and pristine untouched nature.'},
+  {name:'Þjórsá River',        cat:'nature', lat:63.8500, lng:-20.5000, url:'/en/destinations/nature/nature/tjorsa-river',                              desc:'Iceland\'s longest river (230 km) — a powerful glacial river renowned for salmon fishing.'},
+  {name:'Brúarhlöð Gorge',     cat:'nature', lat:64.0920, lng:-19.7700, url:'/en/destinations/nature/nature/bruarhlod',                                 desc:'Spectacular river gorge carved by the Þjórsá river, featuring dramatic cliffs and powerful rapids.'},
+  {name:'Núpstaðarskógur',     cat:'nature', lat:63.7450, lng:-17.9890, url:'/en/destinations/nature/nature/nupsstadur-forrest',                        desc:'One of Iceland\'s few natural forests, sheltered beneath the towering basalt cliffs of Núpstaður.'},
+
+  // ── GEOTHERMAL AREAS ────────────────────────────────────────────────────────
+  {name:'Geysir',              cat:'geothermal', lat:64.3117, lng:-20.3022, url:'/en/destinations/nature/geothermal-areas/geysir-geothermal-area',        desc:'The Great Geysir gave all geysers their name. Strokkur erupts 20–30m every 5–10 minutes.'},
+  {name:'Reykjadalur Valley',  cat:'geothermal', lat:64.0294, lng:-21.1578, url:'/en/destinations/nature/geothermal-areas/reykjadalur-valley',            desc:'Geothermal valley with a hot river you can bathe in — 3km hike from Hveragerði.'},
+
+  // ── GEOPARK SITES ───────────────────────────────────────────────────────────
+  {name:'Landbrotshólar',      cat:'geopark', lat:63.7650, lng:-18.1850, url:'/en/destinations/nature/geopark/landbrotsholar',                           desc:'Pseudocrater cluster by Lake Landbrot — formed by steam explosions in ancient lava flows.'},
+  {name:'Skaftareldahraun Lava Field', cat:'geopark', lat:63.7000, lng:-18.1000, url:'/en/destinations/nature/geopark/skaftareldahraun-lava-field',      desc:'Vast lava field formed by the 1783 Laki eruption, one of the largest in recorded history.'},
+  {name:'Þykkvabæjarklaustur', cat:'geopark', lat:63.7870, lng:-17.9000, url:'/en/destinations/nature/geopark/thykkvabaejarklaustur',                   desc:'Historic monastic site and Katla Geopark location in southeast Iceland.'},
+  {name:'Laufskálavörður',     cat:'geopark', lat:63.4840, lng:-18.7180, url:'/en/destinations/nature/geopark/laufskalavarda',                           desc:'Ancient cairn site on the Mýrdalssandur — travellers have stacked stones here for centuries.'},
+  {name:'Efra-Hvols Caves',    cat:'geopark', lat:63.8320, lng:-20.3940, url:'/en/destinations/nature/geopark/efra-hvolshellar-caves',                   desc:'Lava caves in the Hella area — part of the Katla UNESCO Global Geopark.'},
+  {name:'Reynisfjara & Reynisdrangar', cat:'geopark', lat:63.4048, lng:-19.0438, url:'/en/destinations/nature/geopark/reynisfjara-reynisfjall-og-reynisdrangar', desc:'Iconic black sand beach with basalt columns and sea stacks. Beware rogue waves.'},
+  {name:'Dverghamrar',         cat:'geopark', lat:63.7960, lng:-18.1000, url:'/en/destinations/nature/geopark/dverghamrar-dwarf-rocks',                 desc:'"Dwarf Rocks" — a stunning cluster of hexagonal basalt columns near Kirkjubæjarklaustur.'},
+  {name:'Rútshellir',          cat:'geopark', lat:63.7560, lng:-20.1900, url:'/en/destinations/nature/geopark/rutshellir',                              desc:'Ancient man-made lava cave near Hella, used as shelter and sheep fold for centuries.'},
+  {name:'Álftaversgigar',      cat:'geopark', lat:63.7200, lng:-18.0700, url:'/en/destinations/nature/national-parks-and-nature-reserves/nature-reserves/alftaversgigar', desc:'Pseudocrater cluster in southeast Iceland, formed by steam explosions when lava flowed over wetlands.'},
+
+  // ── LIGHTHOUSES ─────────────────────────────────────────────────────────────
+  {name:'Hvalnes Lighthouse',    cat:'lighthouse', lat:64.3950, lng:-14.5720, url:'/en/destinations/landmarks-historical-places/lighthouses/hvalnes',       desc:'Remote lighthouse on a black sand spit at the edge of the East Fjords.'},
+  {name:'Knarrarós Lighthouse',  cat:'lighthouse', lat:63.8510, lng:-21.4480, url:'/en/destinations/landmarks-historical-places/lighthouses/knarrarosviti-lighthouse', desc:'Lighthouse near Þorlákshöfn, marking the Ölfusá river mouth.'},
+  {name:'Selvogsviti Lighthouse', cat:'lighthouse', lat:63.8300, lng:-21.8540, url:'/en/destinations/landmarks-historical-places/lighthouses/selvogsviti-lighthouse', desc:'Old lighthouse on the Selvogi coast, west of Þorlákshöfn.'},
+
+  // ── HISTORY & HERITAGE ──────────────────────────────────────────────────────
+  {name:'Skálholt',             cat:'heritage', lat:64.1293, lng:-20.5263, url:'/en/destinations/landmarks-historical-places/history-and-culture/skalholt-church', desc:'Seat of Iceland\'s bishop for 700 years. Cathedral, summer concerts and archaeological finds.'},
+  {name:'Oddi',                 cat:'heritage', lat:63.7570, lng:-20.0180, url:'/en/destinations/landmarks-historical-places/history-and-culture/oddi-church', desc:'Historic farm and church — home of Snorri Sturluson and centre of 12th-century Icelandic culture.'},
+  {name:'Þjóðveldisbærinn (Medieval Farmhouse)', cat:'heritage', lat:64.0950, lng:-19.8830, url:'/en/destinations/landmarks-historical-places/history-and-culture/medieval-farmhouse', desc:'Reconstruction of the Viking Age farm Stöng, buried by Hekla\'s 1104 eruption.'},
+  {name:'Ásavegur Trail',       cat:'heritage', lat:64.2557, lng:-21.1299, url:'/en/destinations/landmarks-historical-places/history-and-culture/asavegur-trail', desc:'Historic walking trail at Þingvellir following the ancient assembly paths.'},
+  {name:'Baugstaðir Creamery',  cat:'heritage', lat:63.8670, lng:-20.8430, url:'/en/destinations/landmarks-historical-places/history-and-culture/baugstadir-creamery', desc:'Historic dairy farm turned cultural heritage site near Eyrarbakki.'},
+  {name:'Systrastapi',          cat:'heritage', lat:63.7860, lng:-18.0560, url:'/en/destinations/landmarks-historical-places/history-and-culture/systrastapi', desc:'Sacred rock in Kirkjubæjarklaustur said to mark the graves of two nuns from a medieval convent.'},
+  {name:'Ölfusárbrú',           cat:'heritage', lat:63.9780, lng:-21.0900, url:'/en/destinations/landmarks-historical-places/history-and-culture/olfusarbru-suspension-bridge', desc:'Iceland\'s oldest suspension bridge over the Ölfusá river — opened 1891, now a cherished landmark.'},
+  {name:'Ferjunes',             cat:'heritage', lat:63.8980, lng:-21.2730, url:'/en/destinations/landmarks-historical-places/history-and-culture/ferjunes',  desc:'Historic ferry landing site on the Ölfusá river, used for centuries before the age of bridges.'},
+
+  // ── CHURCHES ────────────────────────────────────────────────────────────────
+  {name:'Skálholt Church',       cat:'church', lat:64.1293, lng:-20.5270, url:'/en/destinations/landmarks-historical-places/churches/skalholt-church',      desc:'Iceland\'s most historic church site, consecrated 1056. Annual summer concerts.'},
+  {name:'Eyrarbakkakirkja',      cat:'church', lat:63.8710, lng:-21.1500, url:'/en/destinations/landmarks-historical-places/churches/eyrarbakkakirkja-church', desc:'Historic church in the old fishing village of Eyrarbakki.'},
+  {name:'Jón Steingrímsson Chapel', cat:'church', lat:63.7844, lng:-18.0534, url:'/en/destinations/landmarks-historical-places/churches/reverend-jon-steingrimsson-chapel', desc:'Chapel in Kirkjubæjarklaustur honouring the "Fire Priest" of the 1783 Laki eruption.'},
+  {name:'Selfoss Church',        cat:'church', lat:63.9311, lng:-21.0044, url:'/en/destinations/landmarks-historical-places/churches/selfosskirkja-church',  desc:'Modern church in Selfoss, the largest town in South Iceland.'},
+  {name:'Gaulverjabær Church',   cat:'church', lat:63.8940, lng:-20.9210, url:'/en/destinations/landmarks-historical-places/churches/gaulverjabaer-church',  desc:'Historic rural church in the Flói wetlands area west of Selfoss.'},
+  {name:'Prestsbakkakirkja',     cat:'church', lat:63.7950, lng:-17.8160, url:'/en/destinations/landmarks-historical-places/churches/prestsbakkakirkja-a-sidu', desc:'Turf church in Síða, southeast Iceland — a striking and well-preserved example.'},
+  {name:'Hraungerði Church',     cat:'church', lat:63.9510, lng:-20.9350, url:'/en/destinations/landmarks-historical-places/churches/hraungerdi-church',      desc:'Small rural church near Selfoss in the Árnes district.'},
+  {name:'Skógar Church',         cat:'church', lat:63.5290, lng:-19.5100, url:'/en/destinations/landmarks-historical-places/churches/skogar-church',          desc:'Historic church in Skógar village at the foot of Skógafoss waterfall.'},
+  {name:'Oddi Church',           cat:'church', lat:63.7570, lng:-20.0190, url:'/en/destinations/landmarks-historical-places/churches/oddi-church',            desc:'Church at the ancient seat of learning at Oddi farm.'},
+  {name:'Villingaholt Church',   cat:'church', lat:63.8600, lng:-20.3200, url:'/en/destinations/landmarks-historical-places/churches/villingaholt-church',    desc:'A historic rural church at Villingaholt in the Rangárþing district of South Iceland.'},
+
+  // ── MUSEUMS & VISITOR CENTRES ───────────────────────────────────────────────
+  {name:'Stöng Viking Longhouse', cat:'museum', lat:64.0950, lng:-19.8830, url:'/en/experiences/culture-heritage/museums/stong-viking-era-long-house',     desc:'Excavated Viking Age longhouse buried by Hekla\'s 1104 eruption — one of Iceland\'s best archaeological sites.'},
+  {name:'Sagnheimar Folk Museum', cat:'museum', lat:63.4390, lng:-20.2760, url:'/en/experiences/culture-heritage/museums/sagnheimar-folk-museum',           desc:'Folk museum on the Westman Islands telling the story of life there across the centuries.'},
+  {name:'Eyrarbakki Maritime Museum', cat:'museum', lat:63.8710, lng:-21.1500, url:'/en/experiences/culture-heritage/museums/eyrarbakki-maritime-museum',   desc:'Maritime heritage museum in historic Eyrarbakki, once Iceland\'s main trading harbour.'},
+  {name:'Geothermal Park Hveragerði', cat:'museum', lat:64.0035, lng:-21.1920, url:'/en/experiences/culture-heritage/museums/geothermal-park',             desc:'Open-air geothermal park in the middle of town where you can see boiling springs and fumaroles.'},
+  {name:'Eldheimar Museum',       cat:'museum', lat:63.4400, lng:-20.2770, url:'/en/experiences/culture-heritage/museums/eldheimar',                        desc:'"Pompeii of the North" — museum built over a house buried by the 1973 Eldfell eruption.'},
+  {name:'Caves of Hella',         cat:'museum', lat:63.8320, lng:-20.3940, url:'/en/experiences/culture-heritage/museums/caves-of-hella',                   desc:'Guided tours of man-made caves near Hella, dating back to the settlement era.'},
+  {name:'Árnessýsla Heritage Museum', cat:'museum', lat:63.8710, lng:-21.1520, url:'/en/experiences/culture-heritage/museums/arnessysla-heritage-museum-in-eyrarbakki', desc:'Regional heritage museum in Eyrarbakki\'s oldest surviving house (1765).'},
+  {name:'Þórbergssetur',          cat:'museum', lat:63.8920, lng:-16.8030, url:'/en/experiences/culture-heritage/visitor-centres/thorbergssetur',            desc:'Cultural centre dedicated to Icelandic author Þórbergur Þórðarson, born in Hali (1888–1974).'},
+  {name:'Katla Center',           cat:'museum', lat:63.4190, lng:-18.9990, url:'/en/experiences/culture-heritage/visitor-centres/katla-center',              desc:'Visitor centre in Vík covering Katla volcano and its influence on the south coast.'},
+  {name:'Skaftafell Visitor Centre', cat:'museum', lat:64.0170, lng:-16.9760, url:'/en/experiences/culture-heritage/visitor-centres/skaftafell-visitor-centre-skaftafell', desc:'National park visitor centre for the Skaftafell area of Vatnajökull NP.'},
+  {name:'Skaftárstofa',           cat:'museum', lat:63.7844, lng:-18.0534, url:'/en/experiences/culture-heritage/visitor-centres/skaftarstofa-visitor-centre-kirkjubaejarklaustur', desc:'Vatnajökull National Park visitor centre in Kirkjubæjarklaustur.'},
+  {name:'Ölverk Pizza & Brewery', cat:'museum', lat:64.0035, lng:-21.1921, url:'/en/experiences/culture-heritage/visitor-centres/olverk-pizza-brewery',      desc:'Hveragerði\'s geothermally-powered pizza and craft beer destination.'},
+  {name:'Powering the Future',    cat:'museum', lat:64.0500, lng:-21.4000, url:'/en/experiences/culture-heritage/visitor-centres/powering-the-future',       desc:'Exhibition at Hellisheiðarvirkjun geothermal power plant on Iceland\'s clean energy.'},
+  {name:'Lava Centre',            cat:'museum', lat:63.7528, lng:-20.2444, url:'/en/experiences/culture-heritage/museums/lava-centre',                    desc:'State-of-the-art interactive volcano and earthquake exhibition in Hvolsvöllur — one of Iceland\'s best museums.'},
+  {name:'Icelandic Lava Show',    cat:'museum', lat:63.4190, lng:-18.9990, url:'/en/experiences/culture-heritage/museums/icelandic-lava-show',            desc:'Watch real molten lava being poured in a live show in Vík — a truly unique Icelandic experience.'},
+  {name:'Keldur Turf Farmhouse',  cat:'museum', lat:63.8520, lng:-20.0930, url:'/en/experiences/culture-heritage/museums/keldur-rangarvellir',            desc:'One of Iceland\'s oldest structures — a Viking Age turf farmhouse complete with an escape tunnel.'},
+  {name:'Bobby Fischer Center',   cat:'museum', lat:63.9311, lng:-21.0090, url:'/en/experiences/culture-heritage/museums/the-bobby-fischer-center',       desc:'Museum in Selfoss dedicated to chess champion Bobby Fischer, who spent his final years in Iceland.'},
+  {name:'Hornafjörður Cultural Center', cat:'museum', lat:64.2530, lng:-15.2120, url:'/en/experiences/culture-heritage/museums/hornafjordur-cultural-center', desc:'Cultural centre in Höfn covering the history, heritage and nature of the Hornafjörður region.'},
+  {name:'Skógar Museum',          cat:'museum', lat:63.5290, lng:-19.5100, url:'/en/experiences/culture-heritage/museums/skogar-museum',                  desc:'One of Iceland\'s best folk museums — 6,000+ artefacts in a complex including turf houses and a church.'},
+  {name:'Þuríðarbúð Folk Museum', cat:'museum', lat:63.8340, lng:-21.0520, url:'/en/experiences/culture-heritage/museums/thuridarbud-folk-museum',        desc:'Folk museum in Stokkseyri celebrating the legend of the ghost-wife Þuríður Einarsdóttir.'},
+  {name:'Sesseljuhús',            cat:'museum', lat:63.7520, lng:-20.2440, url:'/en/experiences/culture-heritage/museums/sesseljuhus-environmental-center', desc:'Environmental centre near Hvolsvöllur focused on ecology and the natural environment.'},
+
+  // ── GEOTHERMAL BATHS ────────────────────────────────────────────────────────
+  {name:'Laugarvatn Fontana',    cat:'hotspring', lat:64.2130, lng:-20.7270, url:'/en/experiences/bathing-wellness/geothermal-baths/laugarvatn-fontana',   desc:'Geothermal baths on the shore of Lake Laugarvatn, naturally fed by underground springs.'},
+  {name:'GlacierWorld',          cat:'hotspring', lat:63.5422, lng:-19.3564, url:'/en/experiences/bathing-wellness/geothermal-baths/glacierworld',          desc:'Geothermal bathing experience near Sólheimajökull glacier.'},
+  {name:'Highland Base Kerlingarfjöll', cat:'hotspring', lat:64.6350, lng:-19.2390, url:'/en/experiences/bathing-wellness/geothermal-baths/highland-base-kerlingarfjoll', desc:'Geothermal baths fed by natural highland hot springs in dramatic Kerlingarfjöll.'},
+  {name:'Laugarás Lagoon',       cat:'hotspring', lat:64.1520, lng:-20.4640, url:'/en/experiences/bathing-wellness/geothermal-baths/laugaras-lagoon',       desc:'Geothermal lagoon near Laugarás village, a quiet local alternative to busier baths.'},
+  {name:'Reykjadalur Hot River', cat:'hotspring', lat:64.0294, lng:-21.1578, url:'/en/destinations/nature/geothermal-areas/reykjadalur-valley',             desc:'Naturally hot river you can bathe in — a 3km hike from Hveragerði.'},
+
+  // ── SWIMMING POOLS ──────────────────────────────────────────────────────────
+  {name:'Hvolsvöllur Pool',      cat:'pool', lat:63.7528, lng:-20.2444, url:'/en/experiences/bathing-wellness/swimming-pools/hvolsvollur-swimming-pool',   desc:'Community pool in Hvolsvöllur — geothermally heated outdoor pools.'},
+  {name:'Hella Pool',            cat:'pool', lat:63.8321, lng:-20.3949, url:'/en/experiences/bathing-wellness/swimming-pools/hella-swimming-pool',         desc:'Outdoor geothermal pool in Hella, great stop on the south coast.'},
+  {name:'Flúðir Pool',           cat:'pool', lat:64.1329, lng:-20.3192, url:'/en/experiences/bathing-wellness/swimming-pools/fludir-swimming-pool',        desc:'Small village pool in Flúðir, near the Secret Lagoon.'},
+  {name:'Stokkseyri Pool',       cat:'pool', lat:63.8340, lng:-21.0520, url:'/en/experiences/bathing-wellness/swimming-pools/stokkseyri-swimming-pool',    desc:'Local pool in the coastal village of Stokkseyri.'},
+  {name:'Laugarvatn Pool',       cat:'pool', lat:64.2130, lng:-20.7280, url:'/en/experiences/bathing-wellness/swimming-pools/laugarvatn-swimming-pool',    desc:'Geothermal pool on the Golden Circle at lake Laugarvatn.'},
+  {name:'Vestmannaeyjar Pool',   cat:'pool', lat:63.4390, lng:-20.2760, url:'/en/experiences/bathing-wellness/swimming-pools/vestmannaeyjar-swimmingpool', desc:'Pool on the Westman Islands with ocean views and geothermal hot pots.'},
+  {name:'Árnes Pool',            cat:'pool', lat:63.9190, lng:-20.8040, url:'/en/experiences/bathing-wellness/swimming-pools/arnes-swimming-pool',         desc:'Riverside geothermal pool in Árnes, a quiet gem near Selfoss.'},
+  {name:'Vík Swimming Pool',     cat:'pool', lat:63.4190, lng:-18.9990, url:'/en/experiences/bathing-wellness/swimming-pools/vik-swimming-pool',           desc:'Outdoor pool in Vík í Mýrdal — geothermally heated with glacier views.'},
+  {name:'Höfn Swimming Pool',    cat:'pool', lat:64.2534, lng:-15.2096, url:'/en/experiences/bathing-wellness/swimming-pools/hofn-swimming-pool',          desc:'Geothermal pool in Höfn — perfect after exploring the Vatnajökull area.'},
+  {name:'Sports Center Borg',    cat:'pool', lat:63.8700, lng:-21.1550, url:'/en/experiences/bathing-wellness/swimming-pools/sports-center-borg',          desc:'Sports and swimming facility near Eyrarbakki on the south coast.'},
+  {name:'Selfoss Swimming Pool', cat:'pool', lat:63.9320, lng:-21.0100, url:'/en/experiences/bathing-wellness/swimming-pools/selfoss-swimming-pool',       desc:'Main outdoor geothermal pool in Selfoss, South Iceland\'s largest town.'},
+  {name:'Reykholt Pool',         cat:'pool', lat:64.0740, lng:-20.8870, url:'/en/experiences/bathing-wellness/swimming-pools/reykholt-swimming-pool',      desc:'Outdoor geothermal pool in the village of Reykholt, a peaceful local favourite.'},
+  {name:'Kirkjubæjarklaustur Pool', cat:'pool', lat:63.7800, lng:-18.0590, url:'/en/experiences/bathing-wellness/swimming-pools/kirkjubaejarklaustur-swimming-pool', desc:'Small geothermal pool in the village of Kirkjubæjarklaustur — a welcome rest on the Ring Road.'},
+  {name:'Brautarholt Pool',      cat:'pool', lat:63.9900, lng:-21.2400, url:'/en/experiences/bathing-wellness/swimming-pools/brautarholt-swimming-pool',   desc:'Outdoor geothermal pool at Brautarholt, west of Selfoss.'},
+  {name:'Laugaland',             cat:'pool', lat:64.0850, lng:-20.7640, url:'/en/experiences/bathing-wellness/swimming-pools/laugaland',                   desc:'Geothermal swimming facility at Laugaland near Laugarvatn on the Golden Circle.'},
+  {name:'Seljavallalaug',        cat:'pool', lat:63.5559, lng:-19.5797, url:'/en/experiences/bathing-wellness/swimming-pools/seljavallalaug',              desc:'One of Iceland\'s oldest pools (1923), naturally heated, nestled in a remote mountain valley.'},
+
+  // ── REYKJANES PENINSULA — GEOTHERMAL & WELLNESS ─────────────────────────────
+  {name:'Blue Lagoon',           cat:'hotspring', lat:63.8800, lng:-22.4450, url:'https://www.visitreykjanes.is/en/experiences/swimming-and-geothermal-areas/wellness-spa/the-blue-lagoon', desc:'Iceland\'s most famous geothermal spa — milky-blue waters rich in silica set in a dramatic lava field.'},
+  {name:'The Retreat at Blue Lagoon', cat:'hotspring', lat:63.8820, lng:-22.4470, url:'https://www.visitreykjanes.is/en/experiences/swimming-and-geothermal-areas/wellness-spa/the-retreat-spa', desc:'Luxury spa hotel at Blue Lagoon — private lagoon access, lava cave bar and world-class wellness.'},
+  {name:'Northern Light Inn',    cat:'hotspring', lat:63.8850, lng:-22.4480, url:'https://www.visitreykjanes.is/en/experiences/swimming-and-geothermal-areas/wellness-spa/northern-light-inn', desc:'Hotel and spa next to the Blue Lagoon with private geothermal bathing and northern lights viewing.'},
+  {name:'Gunnuhver Hot Springs', cat:'geothermal', lat:63.8320, lng:-22.6860, url:'https://www.visitreykjanes.is/en/place/gunnuhver', desc:'Iceland\'s largest mud pool — a boiling, hissing geothermal area named after a troublesome ghost.'},
+  {name:'Svartsengi Geothermal', cat:'geothermal', lat:63.8790, lng:-22.4320, url:'https://www.visitreykjanes.is/en/place/svartsengi', desc:'Geothermal power station that feeds the Blue Lagoon — set amid eerie lava fields and steam vents.'},
+  {name:'Seltún (Krýsuvík)',     cat:'geothermal', lat:63.9040, lng:-22.0570, url:'https://www.visitreykjanes.is/en/place/seltjorn', desc:'Vivid geothermal area with boiling mud pots, sulphur vents and colourful mineral deposits.'},
+
+  // ── REYKJANES PENINSULA — VOLCANOES & ERUPTION SITES ────────────────────────
+  {name:'Fagradalsfjall',        cat:'volcano', lat:63.8940, lng:-22.2730, url:'https://www.visitreykjanes.is/en/destinations/landmarks-historic-places/history-and-culture/mt-fagradalsfjall', desc:'The volcano that erupted 2021–2023, creating dramatic new lava fields — one of the most visited sites in Iceland.'},
+  {name:'Sundhnúkagígar Craters', cat:'volcano', lat:63.8780, lng:-22.4390, url:'https://www.visitreykjanes.is/en/place/sundhnuksrodin', desc:'Active crater row near Grindavík, site of eruptions since 2023 — a raw and evolving volcanic landscape.'},
+  {name:'Keilir',                cat:'volcano', lat:63.8770, lng:-22.0040, url:'https://www.visitreykjanes.is/en/place/keilir', desc:'Perfectly cone-shaped hyaloclastite mountain — Reykjanes Peninsula\'s most iconic peak.'},
+  {name:'Mt. Þórbjörn',         cat:'volcano', lat:63.8780, lng:-22.4560, url:'https://www.visitreykjanes.is/en/place/mt-thorbjorn', desc:'Small volcanic mountain with a seismometer network tracking Reykjanes unrest — great panoramic hike.'},
+  {name:'Eldey Island',          cat:'volcano', lat:63.7360, lng:-22.9510, url:'https://www.visitreykjanes.is/en/place/eldey', desc:'Remote volcanic stack 14km offshore — the site where the last Great Auk was killed in 1844. Seabird colony.'},
+  {name:'Stóri Eldborg',         cat:'volcano', lat:63.9700, lng:-22.3500, url:'https://www.visitreykjanes.is/en/place/stora-eldborg-next-to-geitahlid', desc:'Well-preserved volcanic crater — one of the most striking on the peninsula, easy to hike around.'},
+  {name:'Hrútagjardyngja',       cat:'volcano', lat:63.9800, lng:-22.4500, url:'https://www.visitreykjanes.is/en/place/hrutagjardyngja-shield', desc:'A shield volcano with a broad lava dome — part of the active volcanic systems of Reykjanes.'},
+  {name:'Eldborg at Hoskuldarvellir', cat:'volcano', lat:63.8500, lng:-21.9800, url:'https://www.visitreykjanes.is/en/place/eldborg-at-hoskuldarvellir', desc:'A smaller volcanic crater in the eastern Reykjanes lava fields.'},
+  {name:'Ögmundarhraun Lava Field', cat:'volcano', lat:63.8750, lng:-22.4800, url:'https://www.visitreykjanes.is/en/place/ogmundarhraun', desc:'Fresh lava field from a medieval eruption — part of the same volcanic system as Fagradalsfjall.'},
+  {name:'Arnarsetur',            cat:'volcano', lat:63.8700, lng:-22.3500, url:'https://www.visitreykjanes.is/en/place/arnarsetur', desc:'Scoria and spatter craters from a 13th-century eruption — a rugged lava field with tubes and ancient ruins.'},
+
+  // ── REYKJANES PENINSULA — NATURE & GEOPARK ──────────────────────────────────
+  {name:'Bridge Between Continents', cat:'geopark', lat:63.8700, lng:-22.6680, url:'https://www.visitreykjanes.is/en/place/bridge-between-continents', desc:'A small bridge spanning the Eurasian and North American tectonic plates — walk between continents.'},
+  {name:'Kleifarvatn Lake',      cat:'nature', lat:63.9500, lng:-22.0600, url:'https://www.visitreykjanes.is/en/place/kleifarvatn', desc:'Iceland\'s largest lake on the peninsula — dark, mysterious, surrounded by volcanic ridges and geothermal vents.'},
+  {name:'Brimketill',            cat:'nature', lat:63.8180, lng:-22.6650, url:'https://www.visitreykjanes.is/en/place/brimketill', desc:'A dramatic natural lava pool carved by the sea — waves crash in around a sheltered bathing pool.'},
+  {name:'Valahnúkamöl',         cat:'geopark', lat:63.8150, lng:-22.7190, url:'https://www.visitreykjanes.is/en/place/valahnukamol', desc:'Rocky shoreline at the tip of the peninsula with bird cliffs, lighthouse views and crashing Atlantic surf.'},
+  {name:'Selatangar',            cat:'geopark', lat:63.8110, lng:-22.5470, url:'https://www.visitreykjanes.is/en/place/selatangar', desc:'Haunting ruins of a centuries-old fishing camp on the black lava shore — Iceland\'s oldest preserved.'},
+  {name:'Stampar Craters',       cat:'geopark', lat:63.8360, lng:-22.7320, url:'https://www.visitreykjanes.is/en/place/stampar', desc:'A row of craters at the tip of Reykjanes, formed in a medieval eruption by the sea.'},
+  {name:'Hrafnagjá Rift',        cat:'geopark', lat:63.8760, lng:-22.5500, url:'https://www.visitreykjanes.is/en/place/hrafnagja', desc:'A dramatic rift valley — a visible crack between the tectonic plates cutting across the lava.'},
+  {name:'Eldvörp Crater Row',    cat:'geopark', lat:63.8570, lng:-22.5780, url:'https://www.visitreykjanes.is/en/place/eldvorp', desc:'A row of explosion craters stretching across the lava field near the Reykjanes tip.'},
+  {name:'Djúpavatn Lakes',       cat:'nature', lat:63.9700, lng:-22.0200, url:'https://www.visitreykjanes.is/en/place/djupavatn-spakonuvatn-and-arnarvatn', desc:'Three highland lakes — Djúpavatn, Spákonuvatn and Arnarvatn — in the volcanic interior of the peninsula.'},
+  {name:'Brennisteinsfjöll',     cat:'nature', lat:63.9500, lng:-22.0000, url:'https://www.visitreykjanes.is/en/place/brennisteinsfjoll', desc:'Sulphur mountains in the heart of the peninsula — an active geothermal highland ridge.'},
+  {name:'Sveifluhálls',          cat:'nature', lat:63.9300, lng:-22.0800, url:'https://www.visitreykjanes.is/en/place/sveifluhals', desc:'A long volcanic ridge above Kleifarvatn — excellent hiking with views across the peninsula.'},
+  {name:'Festarfjall',           cat:'nature', lat:63.9000, lng:-22.4000, url:'https://www.visitreykjanes.is/en/place/festarfjall', desc:'A striking mountain in central Reykjanes, its name meaning "Fastening Mountain" in Icelandic.'},
+  {name:'Hafnarberg Sea Cliffs',  cat:'nature', lat:63.8150, lng:-22.7200, url:'https://www.visitreykjanes.is/en/place/hafnarberg-sea-cliffs', desc:'Dramatic sea cliffs near the Reykjanes lighthouse — home to large colonies of nesting seabirds.'},
+  {name:'Garðskagi',             cat:'lighthouse', lat:64.0820, lng:-22.6960, url:'https://www.visitreykjanes.is/en/place/the-lighthouse-on-gardskagi', desc:'Two lighthouses at the northernmost tip of the peninsula — one old, one new — with a bird museum.'},
+  {name:'Reykjanes Lighthouse',  cat:'lighthouse', lat:63.8166, lng:-22.7063, url:'https://www.visitreykjanes.is/en/place/reykjanes-lighthouse', desc:'Iceland\'s oldest operating lighthouse (rebuilt 1908) at the westernmost point of the peninsula.'},
+  {name:'Rosmhvalanes',          cat:'nature', lat:63.8100, lng:-22.6000, url:'https://www.visitreykjanes.is/en/place/rosmhvalanes', desc:'A remote headland on the south coast of the peninsula with dramatic lava formations and bird cliffs.'},
+
+  // ── REYKJANES PENINSULA — MUSEUMS & CULTURE ──────────────────────────────────
+  {name:'Viking World (Víkingaheimar)', cat:'museum', lat:64.0000, lng:-22.5700, url:'https://www.visitreykjanes.is/en/experiences/culture-heritage/museums/viking-world', desc:'Museum housing a full-size Viking ship replica (Íslendingur) — exhibitions on Norse mythology and seafaring.'},
+  {name:'Icelandic Museum of Rock \'n\' Roll', cat:'museum', lat:64.0100, lng:-22.5600, url:'https://www.visitreykjanes.is/en/experiences/culture-heritage/museums/the-icelandic-museum-of-rock-n-roll', desc:'Celebrates Iceland\'s surprisingly rich rock and pop music heritage — interactive and fun for all ages.'},
+  {name:'Kvikan House of Culture', cat:'museum', lat:63.8420, lng:-22.4350, url:'https://www.visitreykjanes.is/en/experiences/culture-heritage/museums/kvikan-house-of-culture-and-natural-resources', desc:'Grindavík\'s cultural centre covering the town\'s fishing heritage and natural resources of Reykjanes.'},
+  {name:'Duus Museum',           cat:'museum', lat:64.0100, lng:-22.5700, url:'https://www.visitreykjanes.is/en/experiences/culture-heritage/museums/duus-museum-cultural-center', desc:'Art and cultural centre in Keflavík — gallery exhibitions and cultural events in a harbourside building.'},
+  {name:'Reykjanes Heritage Museum', cat:'museum', lat:64.0000, lng:-22.5500, url:'https://www.visitreykjanes.is/en/experiences/culture-heritage/museums/reykjanes-museum-of-heritage', desc:'Regional heritage museum in the historic Harbor House in Reykjanesbær — art, history and nature exhibitions.'},
+  {name:'Suðurnes Science Center', cat:'museum', lat:64.0100, lng:-22.5500, url:'https://www.visitreykjanes.is/en/experiences/culture-heritage/museums/sudurnes-science-and-learning-center', desc:'Interactive science and learning centre for families in the Reykjanes area.'},
+  {name:'Garður Folk Museum & Lighthouses', cat:'museum', lat:64.0820, lng:-22.6960, url:'https://www.visitreykjanes.is/en/experiences/culture-heritage/museums/folk-museum-in-gardur-lighthouses', desc:'Folk museum at Garðskagi with exhibits on local fishing life, plus two historic lighthouses.'},
+  {name:'Southwest Iceland Nature Research Centre', cat:'museum', lat:64.0700, lng:-22.6900, url:'https://www.visitreykjanes.is/en/experiences/culture-heritage/museums/southwest-iceland-nature-research-centre', desc:'Research and visitor centre for the natural environment of southwest Iceland and the Reykjanes Peninsula.'},
+
+  // ── REYKJANES PENINSULA — HISTORY & HERITAGE ────────────────────────────────
+  {name:'Skálanes / Stóri Hlíðargarður', cat:'heritage', lat:63.8750, lng:-22.4200, url:'https://www.visitreykjanes.is/en/place/skalafell', desc:'An ancient landscape of low hills and lava fields with remnants of historical settlement in Reykjanes.'},
+  {name:'Gallow Cliffs at Stafnes', cat:'heritage', lat:63.8450, lng:-22.7200, url:'https://www.visitreykjanes.is/en/place/gallow-cliffs-in-stafnes', desc:'Historic sea cliffs where criminals were once executed — a haunting reminder of medieval Icelandic justice.'},
+  {name:'The Great Auk Memorial', cat:'heritage', lat:63.8200, lng:-22.6900, url:'https://www.visitreykjanes.is/en/destinations/landmarks-historic-places/history-and-culture/the-great-auk', desc:'Memorial marking where the last pair of Great Auks was killed in 1844 — the bird\'s final resting place.'},
+  {name:'Skagagarður – The Great Wall', cat:'heritage', lat:63.8700, lng:-22.6100, url:'https://www.visitreykjanes.is/en/place/skagagardur-the-great-wall', desc:'The remains of a centuries-old boundary wall stretching across the Reykjanes lava field.'},
+  {name:'Eldvörp Ruins',         cat:'heritage', lat:63.8580, lng:-22.5800, url:'https://www.visitreykjanes.is/en/place/eldvorp-remnants-of-ancent-settlement', desc:'Remnants of an ancient fishing settlement buried by lava — one of Reykjanes\'s most evocative historic sites.'},
+  {name:'Hrólfsvík Xenolithes',  cat:'heritage', lat:63.8100, lng:-22.7100, url:'https://www.visitreykjanes.is/en/place/hrolfsvik-xenolithes', desc:'Unusual beach with xenolith rocks — mantle fragments brought to the surface by volcanic activity.'},
+
+  // ── REYKJANES PENINSULA — CHURCHES ───────────────────────────────────────────
+  {name:'Hvalsnes Church',       cat:'church', lat:63.9780, lng:-22.6820, url:'https://www.visitreykjanes.is/en/place/the-church-at-hvalsnes', desc:'A small historic church by the shore — one of the most photographed churches on the peninsula.'},
+  {name:'Krýsuvík Church',       cat:'church', lat:63.9020, lng:-22.0620, url:'https://www.visitreykjanes.is/en/destinations/landmarks-historic-places/churches/krysuvik-church', desc:'A lone red-roofed church in the geothermal wilderness of Krýsuvík — eerily picturesque.'},
+  {name:'Keflavík Church',       cat:'church', lat:64.0050, lng:-22.5540, url:'https://www.visitreykjanes.is/en/destinations/landmarks-historic-places/churches/keflavikurkirkja-keflavik-church', desc:'The main church of Keflavík, serving the largest town on the Reykjanes Peninsula.'},
+  {name:'Sandgerðiskirkja',      cat:'church', lat:64.0400, lng:-22.7120, url:'https://www.visitreykjanes.is/en/destinations/landmarks-historic-places/churches/sandgerdiskirkja-sandgerdi-church', desc:'The historic church of Sandgerði village on the western shore of the peninsula.'},
+  {name:'Kalfatjarnarkirkja',    cat:'church', lat:63.9700, lng:-22.8000, url:'https://www.visitreykjanes.is/en/destinations/landmarks-historic-places/churches/kalfatjarnakirkja', desc:'An old turf church ruin at Kalfatjörn on the tip of the Vatnsleysa peninsula.'},
+
+  // ── REYKJANES PENINSULA — SWIMMING POOLS ────────────────────────────────────
+  {name:'Waterworld Keflavík',   cat:'pool', lat:64.0100, lng:-22.5500, url:'https://www.visitreykjanes.is/en/experiences/swimming-and-geothermal-areas/swimming-pools/waterworld', desc:'Modern geothermal water park in Keflavík — slides, hot pots and indoor/outdoor pools for all ages.'},
+  {name:'Garður Swimming Pool',  cat:'pool', lat:64.0817, lng:-22.6900, url:'https://www.visitreykjanes.is/en/experiences/swimming-and-geothermal-areas/swimming-pools/gardur-swimming-pool', desc:'Outdoor geothermal pool in the fishing village of Garður at the tip of the peninsula.'},
+  {name:'Sandgerði Pool',        cat:'pool', lat:64.0400, lng:-22.7120, url:'https://www.visitreykjanes.is/en/experiences/swimming-and-geothermal-areas/swimming-pools/sandgerdi-swimming-pool', desc:'Community geothermal pool in the village of Sandgerði on the western Reykjanes coast.'},
+  {name:'Njárðvík Pool',         cat:'pool', lat:64.0200, lng:-22.6800, url:'https://www.visitreykjanes.is/en/experiences/swimming-and-geothermal-areas/swimming-pools/njardvik-swimming-pool', desc:'Geothermal swimming pool in Njárðvík (part of Reykjanesbær).'},
+  {name:'Vogar Swimming Pool',   cat:'pool', lat:63.9500, lng:-22.3200, url:'https://www.visitreykjanes.is/en/experiences/swimming-and-geothermal-areas/swimming-pools/vogar-swimming-pool', desc:'Community geothermal pool in the small village of Vogar, Reykjanes Peninsula.'},
+
+  // ── REYKJAVÍK — GEOTHERMAL SPAS & POOLS ──────────────────────────────────────
+  {name:'Sky Lagoon',            cat:'hotspring', lat:64.1072, lng:-21.9755, url:'https://visitreykjavik.is/service/sky-lagoon',               desc:'A stunning infinity-edge geothermal lagoon in Kópavogur overlooking the ocean — the new iconic Reykjavík spa.'},
+  {name:'Hvammsvík Hot Springs', cat:'hotspring', lat:64.3100, lng:-21.5200, url:'https://visitreykjavik.is/service/hvammsvik',                desc:'Geothermal pools on the shores of Hvalfjörður — an authentic Icelandic bathing experience with mountain views.'},
+  {name:'Nauthólsvík Beach',     cat:'hotspring', lat:64.1252, lng:-21.9343, url:'https://visitreykjavik.is/service/nautholsvik-geothermal-beach', desc:'A golden-sand geothermal beach in Reykjavík — heated seawater lagoon with hot tubs, unique in Iceland.'},
+  {name:'Laugardalslaug',        cat:'pool', lat:64.1442, lng:-21.8850, url:'https://visitreykjavik.is/service/laugardalslaug-pool',            desc:'Reykjavík\'s largest pool complex — 50m pool, hot pots, steam bath and waterslide in Laugardalur.'},
+  {name:'Sundhöll Reykjavíkur',  cat:'pool', lat:64.1475, lng:-21.9381, url:'https://visitreykjavik.is/service/sundholl-reykjavikur-pool',      desc:'The city\'s oldest pool (1937) — indoor 25m heated pool in central Reykjavík.'},
+  {name:'Vesturbæjarlaug',       cat:'pool', lat:64.1516, lng:-21.9522, url:'https://visitreykjavik.is/service/vesturbaejarlaug-pool',          desc:'Beloved outdoor pool in the Westfjords neighbourhood — hot pots and great local atmosphere.'},
+  {name:'Árbæjarlaug',           cat:'pool', lat:64.1097, lng:-21.8476, url:'https://visitreykjavik.is/service/arbaejarlaug-pool',              desc:'Family-friendly outdoor pool in East Reykjavík with 25m pool and hot tubs.'},
+  {name:'Breiðholtslaug',        cat:'pool', lat:64.1170, lng:-21.8570, url:'https://visitreykjavik.is/service/breidholtslaug-pool',            desc:'Outdoor geothermal pool in the Breiðholt suburb of Reykjavík.'},
+  {name:'Grafarvogslaug',        cat:'pool', lat:64.1640, lng:-21.8680, url:'https://visitreykjavik.is/service/grafarvogslaug-pool',            desc:'Modern pool complex in North Reykjavík — 50m pool, hot tubs and steam room.'},
+  {name:'Kópavogslaug',          cat:'pool', lat:64.1072, lng:-21.9058, url:'https://visitreykjavik.is/service/kopavogslaug-pool',              desc:'Kópavogur\'s main outdoor geothermal pool — 50m lanes and hot pots.'},
+  {name:'Lágafellslaug',         cat:'pool', lat:64.0960, lng:-21.7900, url:'https://visitreykjavik.is/service/lagafellslaug-pool',             desc:'Modern geothermal pool in Mosfellsbær — outdoor slides and children\'s area.'},
+  {name:'Sundhöll Hafnarfjarðar', cat:'pool', lat:64.0660, lng:-21.9575, url:'https://visitreykjavik.is/service/sundholl-hafnarfjardar',        desc:'Geothermal pool in Hafnarfjörður — friendly local pool open year-round.'},
+  {name:'Ásgarðslaug',           cat:'pool', lat:64.0680, lng:-21.9500, url:'https://visitreykjavik.is/service/asgardslaug-pool',               desc:'Outdoor geothermal pool in Hafnarfjörður — great for families.'},
+  {name:'Suðurbæjarlaug',        cat:'pool', lat:64.1201, lng:-21.9344, url:'https://visitreykjavik.is/service/sudurbaejarlaug-pool',           desc:'Outdoor pool in the Suðurbær area of Reykjavík with hot tubs.'},
+  {name:'Dalslaug',              cat:'pool', lat:64.1550, lng:-21.8970, url:'https://visitreykjavik.is/service/dalslaug',                       desc:'The newest addition to Reykjavík\'s pool network — modern facilities in Grafarvogur.'},
+
+  // ── REYKJAVÍK — MUSEUMS ───────────────────────────────────────────────────────
+  {name:'Perlan – Wonders of Iceland', cat:'museum', lat:64.1268, lng:-21.9259, url:'https://visitreykjavik.is/service/perlan-wonders-iceland', desc:'Immersive museum inside Reykjavík\'s iconic dome — ice cave, northern lights show, real glacier and 360° views.'},
+  {name:'National Museum of Iceland', cat:'museum', lat:64.1388, lng:-21.9499, url:'https://visitreykjavik.is/service/national-museum-iceland', desc:'Iceland\'s premier history museum — from the Viking age to modern times, with the original parliament door.'},
+  {name:'Settlement Exhibition',cat:'museum', lat:64.1469, lng:-21.9418, url:'https://visitreykjavik.is/service/adalstraeti-settlement-exhibition', desc:'A 9th-century Viking longhouse excavated in downtown Reykjavík — the oldest human structure found in Iceland.'},
+  {name:'Harpa Concert Hall',    cat:'museum', lat:64.1497, lng:-21.9326, url:'https://visitreykjavik.is/service/harpa-concert-hall-and-conference-centre', desc:'Reykjavík\'s spectacular glass concert hall on the harbour — designed with Ólafur Elíasson\'s honeycomb façade.'},
+  {name:'Reykjavík Art Museum – Hafnarhús', cat:'museum', lat:64.1495, lng:-21.9412, url:'https://visitreykjavik.is/service/reykjavik-art-museum-hafnarhus', desc:'Contemporary art museum in a converted harbour warehouse — home to the permanent Erró collection.'},
+  {name:'Reykjavík Art Museum – Kjarvalsstaðir', cat:'museum', lat:64.1420, lng:-21.9100, url:'https://visitreykjavik.is/service/reykjavik-art-museum-kjarvalsstadir', desc:'Art museum in Klambratún park featuring work by Iceland\'s most celebrated painter, Jóhannes S. Kjarval.'},
+  {name:'Reykjavík Art Museum – Ásmundarsafn', cat:'museum', lat:64.1484, lng:-21.8777, url:'https://visitreykjavik.is/service/reykjavik-art-museum-asmundarsafn', desc:'Striking dome-shaped studio and garden museum of sculptor Ásmundur Sveinsson.'},
+  {name:'National Gallery of Iceland', cat:'museum', lat:64.1430, lng:-21.9410, url:'https://visitreykjavik.is/service/national-gallery-iceland', desc:'Iceland\'s main art gallery — an extensive collection of Icelandic and international fine art.'},
+  {name:'Einar Jónsson Sculpture Museum', cat:'museum', lat:64.1416, lng:-21.9268, url:'https://visitreykjavik.is/service/einar-jonsson-sculpture-museum', desc:'Iceland\'s first sculpture museum — symbolist works by Einar Jónsson in a building he designed himself.'},
+  {name:'Reykjavík Maritime Museum', cat:'museum', lat:64.1513, lng:-21.9485, url:'https://visitreykjavik.is/service/reykjavik-maritime-museum-stories-sea-and-land', desc:'Maritime heritage museum at the Old Harbour — includes a real Coast Guard vessel you can board.'},
+  {name:'Whales of Iceland',     cat:'museum', lat:64.1508, lng:-21.9487, url:'https://visitreykjavik.is/service/whales-iceland',               desc:'Life-size models of 23 whale species found in Icelandic waters — the largest whale exhibition in the world.'},
+  {name:'Aurora Reykjavík',      cat:'museum', lat:64.1502, lng:-21.9541, url:'https://visitreykjavik.is/service/aurora-reykjavik-northern-lights-center', desc:'Northern lights centre at Grandi — immersive show about the science and mythology of the aurora borealis.'},
+  {name:'Saga Museum',           cat:'museum', lat:64.1508, lng:-21.9477, url:'https://visitreykjavik.is/service/saga-museum',                  desc:'Hyper-realistic silicone figures recreating pivotal scenes from the Icelandic Sagas — dramatic and atmospheric.'},
+  {name:'FlyOver Iceland',       cat:'museum', lat:64.1510, lng:-21.9480, url:'https://visitreykjavik.is/service/flyover-iceland',              desc:'A breathtaking flight simulation over Iceland\'s volcanoes, glaciers and northern lights — at Grandi Harbour.'},
+  {name:'Reykjavík Museum of Photography', cat:'museum', lat:64.1470, lng:-21.9413, url:'https://visitreykjavik.is/service/reykjavik-museum-photography', desc:'Extensive photographic archive of Reykjavík\'s history, plus changing exhibitions of contemporary photography.'},
+  {name:'Icelandic Phallological Museum', cat:'museum', lat:64.1476, lng:-21.9330, url:'https://visitreykjavik.is/service/icelandic-phallological-museum', desc:'The world\'s only museum dedicated to phallic specimens — over 280 specimens from Icelandic animals and beyond.'},
+  {name:'Árbær Open Air Museum', cat:'museum', lat:64.1097, lng:-21.8476, url:'https://visitreykjavik.is/service/arbaer-open-air-museum',       desc:'Open-air museum with 20+ historic buildings — recreates Reykjavík life from the 18th to the 20th century.'},
+  {name:'Gljúfrasteinn – Laxness Museum', cat:'museum', lat:64.1640, lng:-21.7750, url:'https://visitreykjavik.is/service/gljufrasteinn',       desc:'Home of Nobel laureate Halldór Laxness — preserved exactly as when he lived here, with fascinating personal artifacts.'},
+  {name:'Nordic House',          cat:'museum', lat:64.1393, lng:-21.9536, url:'https://visitreykjavik.is/service/nordic-house',                 desc:'Alvar Aalto-designed cultural centre for Nordic co-operation — exhibitions, concerts and a celebrated restaurant.'},
+  {name:'Sigurjón Ólafsson Museum', cat:'museum', lat:64.1566, lng:-21.9057, url:'https://visitreykjavik.is/service/sigurjon-olafsson-museum', desc:'Sculptor\'s studio and museum by the shore of Kollafjörður — summer concerts in a beautiful setting.'},
+  {name:'Gerðarsafn Art Museum', cat:'museum', lat:64.1072, lng:-21.9058, url:'https://visitreykjavik.is/service/gerdarsafn-art-museum',        desc:'Kópavogur\'s art museum celebrating Icelandic painter Gerður Helgadóttir — glass art and paintings.'},
+  {name:'Hafnarborg',            cat:'museum', lat:64.0660, lng:-21.9608, url:'https://visitreykjavik.is/service/hafnarborg-hafnarfjordur-centre-culture-and-fine-art', desc:'Hafnarfjörður\'s centre for culture and fine art — changing exhibitions of Icelandic and international work.'},
+  {name:'Lava Show Reykjavík',   cat:'museum', lat:64.1474, lng:-21.9357, url:'https://visitreykjavik.is/service/lava-show',                    desc:'Watch real molten lava being poured live — a spectacular and educational show in the heart of Reykjavík.'},
+  {name:'Mink – Viking Experience', cat:'museum', lat:64.1470, lng:-21.9340, url:'https://visitreykjavik.is/service/mink-viking-experience',    desc:'An immersive Viking history experience combining theatre, storytelling and traditional food.'},
+
+  // ── REYKJAVÍK — NATURE & PARKS ────────────────────────────────────────────────
+  {name:'Viðey Island',          cat:'nature', lat:64.1722, lng:-21.9086, url:'https://visitreykjavik.is/service/videy-island',                 desc:'A small island 5 min by ferry from Reykjavík — Yoko Ono\'s Imagine Peace Tower, Viking ruins and birdlife.'},
+  {name:'Elliðaárdalur Valley',  cat:'nature', lat:64.1328, lng:-21.8571, url:'https://visitreykjavik.is/service/ellidaardalur',                desc:'A green river valley inside the city — salmon river, birch woods and Iceland\'s best urban hiking.'},
+  {name:'Grótta Island',         cat:'nature', lat:64.1654, lng:-22.0122, url:'https://visitreykjavik.is/service/island-grotta-and-grotta-lighthouse', desc:'Tidal island at Seltjarnarnes with a lighthouse — excellent birdwatching and northern lights viewing spot.'},
+  {name:'Laugardalur Park',      cat:'nature', lat:64.1447, lng:-21.8897, url:'https://visitreykjavik.is/service/laugardalur-valley-and-park',   desc:'Reykjavík\'s main park and sports hub — botanical garden, zoo, pool, skating rink and walking paths.'},
+  {name:'Reykjavík Botanical Garden', cat:'nature', lat:64.1380, lng:-21.8930, url:'https://visitreykjavik.is/service/reykjavik-botanical-garden', desc:'5,000+ plant species thriving in the Subarctic — a peaceful green oasis in the city.'},
+  {name:'Reykjavík Family Park & Zoo', cat:'nature', lat:64.1421, lng:-21.8920, url:'https://visitreykjavik.is/service/reykjavik-family-park-and-zoo', desc:'Zoo with Arctic foxes, seals and farm animals, plus rides and activities for families.'},
+  {name:'Öskjuhlíð Hill',        cat:'nature', lat:64.1260, lng:-21.9295, url:'https://visitreykjavik.is/service/oskjuhlid',                    desc:'A forested hill in the middle of Reykjavík — walking trails, Perlan dome on top and panoramic views.'},
+  {name:'Elliðavatn Lake',       cat:'nature', lat:64.0950, lng:-21.8390, url:'https://visitreykjavik.is/service/ellidavatn-lake',               desc:'A peaceful lake on the edge of Reykjavík — popular for fishing, bird watching and lakeside walks.'},
+  {name:'Hvaleyrarvatn Lake',    cat:'nature', lat:64.0620, lng:-21.9150, url:'https://visitreykjavik.is/service/hvaleyrarvatn-lake',            desc:'A serene lake near Hafnarfjörður — good birdwatching and a pleasant escape from the city.'},
+  {name:'Bláfjöll Ski Resort',   cat:'nature', lat:64.0360, lng:-21.7420, url:'https://visitreykjavik.is/service/blafjoll-ski-resort',            desc:'Iceland\'s main ski area — 15 slopes and the longest ski season in the Reykjavík area.'},
+  {name:'Mount Helgafell',       cat:'volcano', lat:64.0140, lng:-22.0040, url:'https://visitreykjavik.is/service/mount-helgafell',              desc:'A small volcanic mountain near Hafnarfjörður — an easy hike with sweeping views of the capital area.'},
+
+  // ── REYKJAVÍK — HERITAGE & LANDMARKS ─────────────────────────────────────────
+  {name:'Sun Voyager',           cat:'heritage', lat:64.1487, lng:-21.9325, url:'https://visitreykjavik.is/service/sun-voyager',                 desc:'Jón Gunnar Árnason\'s iconic steel sculpture on the Reykjavík waterfront — an ode to the sun and the sea.'},
+  {name:'Alþingi – Parliament',  cat:'heritage', lat:64.1474, lng:-21.9436, url:'https://visitreykjavik.is/service/althingi-parliament-house',   desc:'Iceland\'s parliament, founded at Þingvellir in 930 AD — the current building dates from 1881.'},
+  {name:'Höfði House',           cat:'heritage', lat:64.1516, lng:-21.9051, url:'https://visitreykjavik.is/service/hofdi-house',                 desc:'Where Reagan and Gorbachev met in 1986 to negotiate the end of the Cold War — a significant historic building.'},
+  {name:'Old Harbour Reykjavík', cat:'heritage', lat:64.1510, lng:-21.9490, url:'https://visitreykjavik.is/service/old-harbour',                 desc:'Reykjavík\'s historic harbour — whale watching tours, museums, restaurants and the Grandi district.'},
+  {name:'Austurvöllur Square',   cat:'heritage', lat:64.1474, lng:-21.9430, url:'https://visitreykjavik.is/service/austurvollur-square-and-public-park', desc:'The heart of Reykjavík — the old parliament square with a statue of Jón Sigurðsson, father of independence.'},
+  {name:'Elliðaárstöð',          cat:'heritage', lat:64.1303, lng:-21.8616, url:'https://visitreykjavik.is/service/ellidaarstod',                desc:'Historic Reykjavík hydroelectric power station (1921) now a heritage museum in Elliðaárdalur valley.'},
+  {name:'Grandi Harbour District', cat:'heritage', lat:64.1519, lng:-21.9570, url:'https://visitreykjavik.is/service/grandi-district',           desc:'Reykjavík\'s hip waterfront district — museums, street food, the Whales of Iceland and FlyOver Iceland.'},
+
+  // ── REYKJAVÍK — CHURCHES ──────────────────────────────────────────────────────
+  {name:'Hallgrímskirkja',       cat:'church', lat:64.1419, lng:-21.9262, url:'https://visitreykjavik.is/service/hallgrimskirkja-church',        desc:'Iceland\'s largest and most iconic church — 74m tower with panoramic views over Reykjavík, modelled on basalt columns.'},
+  {name:'Kópavogskirkja',        cat:'church', lat:64.1072, lng:-21.9020, url:'https://visitreykjavik.is/service/kopavogskirkja-church',         desc:'The striking geometric church in Kópavogur — a distinctive landmark with a sculptural concrete tower.'},
+
+  // ── TOWNS & VILLAGES (from guidetoiceland.is/travel-iceland/drive) ──────────
+  {name:'Reykjavík',              cat:'town', lat:64.1466, lng:-21.9426, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'The world\'s northernmost capital — population ~143,000 — and the cultural, political and culinary heart of Iceland.'},
+  {name:'Kópavogur',              cat:'town', lat:64.1108, lng:-21.9094, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Iceland\'s second-largest town, just south of Reykjavík — home to Smáralind mall and Gerðarsafn art museum.'},
+  {name:'Hafnarfjörður',          cat:'town', lat:64.0671, lng:-21.9519, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Picturesque lava-town south of Reykjavík — colourful harbour, Viking heritage and the famed hidden-folk (huldufólk) trails.'},
+  {name:'Garðabær',               cat:'town', lat:64.0833, lng:-21.9333, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Capital-region town between Reykjavík and Hafnarfjörður — leafy suburbs, design museum and Vífilsstaðavatn lake.'},
+  {name:'Mosfellsbær',            cat:'town', lat:64.1697, lng:-21.6967, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Capital-region town in a green valley — home of Nobel laureate Halldór Laxness and gateway to Mosfellsdalur.'},
+  {name:'Seltjarnarnes',          cat:'town', lat:64.1547, lng:-22.0094, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Small coastal town at the very tip of the Reykjavík peninsula — Grótta lighthouse and great northern lights views.'},
+  {name:'Keflavík',               cat:'town', lat:64.0049, lng:-22.5644, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Largest town on the Reykjanes Peninsula and home to Iceland\'s main international airport — part of Reykjanesbær.'},
+  {name:'Njarðvík',               cat:'town', lat:64.0033, lng:-22.5417, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Reykjanes town merged with Keflavík to form Reykjanesbær — Viking World museum and a Viking-ship replica.'},
+  {name:'Hafnir',                 cat:'town', lat:63.9333, lng:-22.6833, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Tiny fishing village on the Reykjanes Peninsula — fishing heritage and the nearby Hafnaberg sea cliffs.'},
+  {name:'Hveragerði',             cat:'town', lat:64.0064, lng:-21.1858, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'"Town of flowers and hot springs" — geothermal greenhouses, the Geothermal Park and the Reykjadalur hot-river hike.'},
+  {name:'Þorlákshöfn',            cat:'town', lat:63.8567, lng:-21.3919, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'South Coast harbour town — ferry port to the Westman Islands and surfing beaches on the open Atlantic.'},
+  {name:'Eyrarbakki',             cat:'town', lat:63.8636, lng:-21.1481, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Historic fishing village with colourful timber houses — the 1765 Húsið heritage centre and a maritime museum.'},
+  {name:'Stokkseyri',             cat:'town', lat:63.8333, lng:-21.0667, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Coastal village just east of Eyrarbakki — famous for lobster restaurants, the Ghost Centre and folklore museums.'},
+  {name:'Selfoss',                cat:'town', lat:63.9333, lng:-20.9978, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Largest town in South Iceland — a hub on the Ring Road set on the powerful Ölfusá river, with Bobby Fischer\'s grave.'},
+  {name:'Hella',                  cat:'town', lat:63.8333, lng:-20.4000, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'South Iceland town on the Rangá river — gateway to Landmannalaugar, with man-made caves and horse-riding country.'},
+  {name:'Hvolsvöllur',            cat:'town', lat:63.7531, lng:-20.2342, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'South Coast town in the heart of Njál\'s-Saga country — home to the LAVA Centre interactive volcano exhibition.'},
+  {name:'Flúðir',                 cat:'town', lat:64.1378, lng:-20.3147, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Small geothermal village in South Iceland — home to the Secret Lagoon (Gamla Laugin) and rows of greenhouses.'},
+  {name:'Laugarvatn',             cat:'town', lat:64.2117, lng:-20.7297, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Lakeside village between Þingvellir and Geysir — geothermal Fontana baths, steam saunas and rye-bread baked in the ground.'},
+  {name:'Reykholt (Biskupstungur)', cat:'town', lat:64.2667, lng:-20.4000, url:'https://guidetoiceland.is/travel-iceland/drive',                        desc:'Small geothermal Golden-Circle village — greenhouses, swimming pool and the Sólheimar eco-village nearby.'},
+  {name:'Vík í Mýrdal',           cat:'town', lat:63.4194, lng:-19.0064, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Iceland\'s southernmost village — Reyniskirkja church on the hill, black-sand beaches and the Reynisdrangar sea stacks.'},
+  {name:'Kirkjubæjarklaustur',    cat:'town', lat:63.7894, lng:-18.0644, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'South-east village at the edge of the Lakagígar lava fields — historic medieval convent site and a stop on the Ring Road.'},
+  {name:'Höfn í Hornafirði',      cat:'town', lat:64.2526, lng:-15.2092, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'South-east fishing town at the foot of Vatnajökull — famed for langoustine and the annual Lobster Festival.'},
+  {name:'Skógar Village',         cat:'town', lat:63.5260, lng:-19.4960, url:'https://guidetoiceland.is/travel-iceland/drive/skogar',                  desc:'Tiny South Coast village beneath Skógafoss — home to the Skógar Folk Museum and the start of the Fimmvörðuháls hike to Þórsmörk.'},
+
+  // ── ADDITIONAL DRIVE-GUIDE DESTINATIONS (Golden Circle & Þingvellir) ────────
+  {name:'Silfra Fissure',         cat:'nature', lat:64.2562, lng:-21.1182, url:'https://guidetoiceland.is/travel-iceland/drive/silfra',                desc:'Crystal-clear glacial rift between the North American and Eurasian plates in Þingvellir — world-class snorkelling and diving in 2°C water.'},
+  {name:'Öxarárfoss',             cat:'waterfall', lat:64.2649, lng:-21.1232, url:'https://guidetoiceland.is/travel-iceland/drive/oxararfoss',         desc:'Waterfall cascading into the Almannagjá gorge of Þingvellir — diverted into the rift by early Icelanders to serve the parliament.'},
+  {name:'Friðheimar Tomato Farm', cat:'heritage', lat:64.1442, lng:-20.4047, url:'https://guidetoiceland.is/travel-iceland/drive/fridheimar',          desc:'Famous geothermal tomato greenhouse near Reykholt — dine among the vines on tomato soup, meet the Icelandic horses outside.'},
+  {name:'Sólheimar Ecovillage',   cat:'heritage', lat:64.0838, lng:-20.6537, url:'https://guidetoiceland.is/travel-iceland/drive/solheimar-ecovillage',desc:'Iceland\'s pioneering eco-community (1930) in Grímsnes — organic farming, sustainable design, a craft shop and a renowned arts centre.'},
+  {name:'Laugarvatnshellir Caves',cat:'heritage', lat:64.2200, lng:-20.8400, url:'https://guidetoiceland.is/travel-iceland/drive/laugarvatnshellir',   desc:'Man-made caves once inhabited by families and traders near Laugarvatn — guided tours show life as it was a century ago.'},
+  {name:'Secret Lagoon',          cat:'hotspring', lat:64.1378, lng:-20.3094, url:'https://guidetoiceland.is/travel-iceland/drive/secret-lagoon',     desc:'Gamla Laugin — Iceland\'s oldest swimming pool (1891) in Flúðir, set in a steaming geothermal field with bubbling hot springs alongside.'},
+
+  // ── ADDITIONAL DRIVE-GUIDE DESTINATIONS (South Coast & SE Iceland) ──────────
+  {name:'Reyniskirkja (Vík)',     cat:'church', lat:63.4197, lng:-19.0556, url:'https://guidetoiceland.is/travel-iceland/drive/vik-i-myrdal-church',  desc:'The red-roofed little church on the hill above Vík í Mýrdal — iconic photo spot with sweeping South Coast views.'},
+  {name:'Víkurfjara Beach',       cat:'nature', lat:63.4119, lng:-19.0008, url:'https://guidetoiceland.is/travel-iceland/drive/vikurfjara-black-sand-beach', desc:'The black-sand beach right in front of Vík village — Reynisdrangar sea stacks rise dramatically just offshore.'},
+  {name:'Raufarhólshellir Lava Tunnel', cat:'nature', lat:63.9342, lng:-21.4400, url:'https://guidetoiceland.is/travel-iceland/drive/raufarholshellir', desc:'One of Iceland\'s longest and most accessible lava tubes (1,360m) — guided walks through neon-coloured volcanic chambers near Þrengsli.'},
+  {name:'Vestrahorn',             cat:'mountain', lat:64.2528, lng:-14.9978, url:'https://guidetoiceland.is/travel-iceland/drive/vestrahorn',         desc:'The striking 454m black-gabbro massif on Stokksnes — black-sand dunes and tidal lagoon make it one of Iceland\'s most photographed peaks.'},
+  {name:'Stokksnes',              cat:'nature', lat:64.2447, lng:-14.9897, url:'https://guidetoiceland.is/travel-iceland/drive/stokksnes',           desc:'Dramatic black-sand peninsula east of Höfn beneath Vestrahorn — sweeping beach, lagoon reflections and a Viking-village film set.'},
+  {name:'Breiðamerkurjökull',     cat:'glacier', lat:64.0500, lng:-16.4500, url:'https://guidetoiceland.is/travel-iceland/drive/breidamerkurjokull',  desc:'The huge outlet glacier of Vatnajökull that feeds Jökulsárlón — calving icebergs into the lagoon and onto the Diamond Beach.'},
+  {name:'Svínafellsjökull',       cat:'glacier', lat:64.0083, lng:-16.8819, url:'https://guidetoiceland.is/travel-iceland/drive/svinafellsjokull',   desc:'A spectacular outlet glacier of Vatnajökull in Skaftafell — used as a filming location for Interstellar, Batman Begins and Game of Thrones.'},
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+let map, infoWindow;
+const markers = [];
+const activeFilters = new Set(CATS.map(c => c.id));
+let showFavsOnly = false;
+
+// ── Cookie helpers ─────────────────────────────────────────────────────────
+function getFavorites() {
+  const m = document.cookie.match(/(?:^|; )favorites=([^;]*)/);
+  return m ? new Set(decodeURIComponent(m[1]).split(',').filter(Boolean)) : new Set();
+}
+function saveFavorites(set) {
+  document.cookie = `favorites=${encodeURIComponent([...set].join(','))};max-age=31536000;path=/`;
+}
+function isFav(name) { return getFavorites().has(name); }
+function toggleFav(name) {
+  const favs = getFavorites();
+  favs.has(name) ? favs.delete(name) : favs.add(name);
+  saveFavorites(favs);
+  return favs.has(name);
+}
+
+// ── Export / Import favorites ──────────────────────────────────────────────
+function exportFavorites() {
+  const favs = [...getFavorites()];
+  if (!favs.length) { alert('No favorites to export. Click the ❤️ on a marker to add some first.'); return; }
+  const payload = {
+    version: 1,
+    source: 'iceland-south-map',
+    exportedAt: new Date().toISOString(),
+    count: favs.length,
+    favorites: favs
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `iceland-favorites-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function importFavoritesFromFile(file) {
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const incoming = Array.isArray(data) ? data : (data && Array.isArray(data.favorites) ? data.favorites : null);
+    if (!incoming) { alert('Invalid favorites file: expected a JSON array or {"favorites":[...]}'); return; }
+    const validNames = new Set(PLACES.map(p => p.name));
+    const favs = getFavorites();
+    let added = 0, alreadyHad = 0, unknown = 0;
+    for (const name of incoming) {
+      if (typeof name !== 'string') { unknown++; continue; }
+      if (!validNames.has(name)) { unknown++; continue; }
+      if (favs.has(name)) { alreadyHad++; continue; }
+      favs.add(name); added++;
+    }
+    saveFavorites(favs);
+    PLACES.forEach(p => { if (p._marker) p._marker.setIcon(makeIcon(p.cat, favs.has(p.name))); });
+    updateFavChip();
+    updateVisibility();
+    const parts = [`Imported ${added} new favorite${added===1?'':'s'}.`];
+    if (alreadyHad) parts.push(`${alreadyHad} already in your list.`);
+    if (unknown) parts.push(`${unknown} skipped (not on this map).`);
+    alert(parts.join(' '));
+  } catch (e) {
+    alert('Could not read favorites file: ' + e.message);
+  }
+}
+
+// ── Popup builder ──────────────────────────────────────────────────────────
+let _openPlace = null, _openMarker = null;
+
+function ratingLineHtml(place) {
+  if (place.rating) return starsHtml(place.rating, place.ratingCount, place.placeId);
+  return `<div id="rating-placeholder" style="font-size:.72rem;color:#4a7090;margin-bottom:6px;">⭐ fetching rating…</div>`;
+}
+
+function openPopup(place, marker) {
+  _openPlace = place; _openMarker = marker;
+  const cat = catFor(place.cat);
+  const fav = isFav(place.name);
+  const link = place.url.startsWith('http') ? place.url : BASE + place.url;
+  infoWindow.setContent(`
+    <div style="background:#1a2a3d;color:#e8edf2;padding:13px 15px;border-radius:10px;max-width:270px;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.5);">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:5px;">
+        <div style="font-size:.95rem;font-weight:700;color:#fff;">${place.name}</div>
+        <button id="fav-toggle" title="${fav ? 'Remove from favorites' : 'Add to favorites'}"
+          style="background:none;border:none;cursor:pointer;font-size:1.2rem;line-height:1;padding:0;flex-shrink:0;
+          filter:${fav ? 'none' : 'grayscale(1) opacity(0.45)'};transition:filter .15s;">❤️</button>
+      </div>
+      <span style="display:inline-block;background:${cat.color}25;color:${cat.color};border:1px solid ${cat.color}60;
+        padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:600;margin-bottom:8px;">${cat.emoji} ${cat.label}</span>
+      ${ratingLineHtml(place)}
+      <div style="font-size:.8rem;color:#b0c8d8;line-height:1.5;margin-bottom:10px;">${place.desc}</div>
+      <a href="${link}" target="_blank"
+        style="display:inline-block;background:${cat.color}30;color:${cat.color};border:1px solid ${cat.color}70;
+        padding:4px 12px;border-radius:8px;font-size:.72rem;font-weight:600;text-decoration:none;">
+        → Visit page
+      </a>
+    </div>`);
+  infoWindow.open(map, marker);
+  google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
+    document.getElementById('fav-toggle').addEventListener('click', () => {
+      const nowFav = toggleFav(place.name);
+      document.getElementById('fav-toggle').style.filter = nowFav ? 'none' : 'grayscale(1) opacity(0.45)';
+      document.getElementById('fav-toggle').title = nowFav ? 'Remove from favorites' : 'Add to favorites';
+      marker.setIcon(makeIcon(place.cat, nowFav));
+      updateFavChip();
+      if (showFavsOnly) updateVisibility();
+    });
+  });
+}
+
+function refreshOpenPopupRating() {
+  if (!_openPlace || !_openPlace.rating) return;
+  const el = document.getElementById('rating-placeholder');
+  if (el) el.outerHTML = starsHtml(_openPlace.rating, _openPlace.ratingCount, _openPlace.placeId);
+}
+
+function catFor(id) { return CATS.find(c => c.id === id); }
+
+function makeIcon(catId, fav) {
+  const cat = catFor(catId);
+  const heart = fav ? `<text x="23" y="9" font-size="10" text-anchor="middle">❤️</text>` : '';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="38" viewBox="0 0 30 38">
+    <path d="M15 0C6.72 0 0 6.72 0 15c0 11.25 15 23 15 23S30 26.25 30 15C30 6.72 23.28 0 15 0z"
+      fill="${cat.color}" stroke="rgba(255,255,255,0.65)" stroke-width="1.5"/>
+    <circle cx="15" cy="15" r="8.5" fill="rgba(0,0,0,0.2)"/>
+    <text x="15" y="19.5" font-size="10" text-anchor="middle" fill="white">${cat.emoji}</text>
+    ${heart}
+  </svg>`;
+  return {
+    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
+    scaledSize: new google.maps.Size(30, 38),
+    anchor: new google.maps.Point(15, 38)
+  };
+}
+
+function initMap() {
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: { lat: 64.05, lng: -20.8 },
+    zoom: 7,
+    mapTypeId: 'terrain',
+    mapTypeControl: true,
+    mapTypeControlOptions: { position: google.maps.ControlPosition.TOP_RIGHT, style: google.maps.MapTypeControlStyle.DROPDOWN_MENU },
+    fullscreenControl: true,
+    streetViewControl: false,
+    styles: [
+      { elementType:'geometry', stylers:[{color:'#1a2535'}] },
+      { elementType:'labels.text.stroke', stylers:[{color:'#0f1923'}] },
+      { elementType:'labels.text.fill', stylers:[{color:'#90a8c0'}] },
+      { featureType:'water', elementType:'geometry', stylers:[{color:'#0d2a3e'}] },
+      { featureType:'water', elementType:'labels.text.fill', stylers:[{color:'#4a8aaa'}] },
+      { featureType:'landscape.natural', elementType:'geometry', stylers:[{color:'#1e3347'}] },
+      { featureType:'landscape.natural.terrain', elementType:'geometry', stylers:[{color:'#243d50'}] },
+      { featureType:'road', elementType:'geometry', stylers:[{color:'#2a4a6a'}] },
+      { featureType:'road.arterial', elementType:'geometry', stylers:[{color:'#2a5a7a'}] },
+      { featureType:'road', elementType:'labels.text.fill', stylers:[{color:'#6a9ab0'}] },
+      { featureType:'administrative', elementType:'geometry.stroke', stylers:[{color:'#1e4060'}] },
+      { featureType:'administrative', elementType:'labels.text.fill', stylers:[{color:'#8ab0c8'}] },
+      { featureType:'poi', stylers:[{visibility:'off'}] },
+    ]
+  });
+
+  infoWindow = new google.maps.InfoWindow({ pixelOffset: new google.maps.Size(0,-4) });
+  infoWindow.addListener('closeclick', () => { _openPlace = null; _openMarker = null; });
+
+  PLACES.forEach(place => {
+    const marker = new google.maps.Marker({
+      position: { lat: place.lat, lng: place.lng },
+      map, title: place.name, icon: makeIcon(place.cat, isFav(place.name)), visible: true
+    });
+    marker.addListener('click', () => openPopup(place, marker));
+    place._marker = marker;
+    markers.push({ place, marker });
+  });
+
+  buildFilters();
+  buildStarFilter();
+  updateStats();
+  fetchAllRatings();
+}
+
+function getSearchQuery() {
+  return document.getElementById('search').value.toLowerCase().trim();
+}
+
+function updateVisibility() {
+  const q = getSearchQuery();
+  const favs = getFavorites();
+  let visible = 0;
+  markers.forEach(({place, marker}) => {
+    const inCat = activeFilters.has(place.cat);
+    const inSearch = !q || place.name.toLowerCase().includes(q) || place.desc.toLowerCase().includes(q);
+    const inFavs = !showFavsOnly || favs.has(place.name);
+    const inRating = minRating === 0 || (place.rating && place.rating >= minRating);
+    const show = inCat && inSearch && inFavs && inRating;
+    marker.setVisible(show);
+    if (show) visible++;
+  });
+  const q2 = q ? ` matching "${q}"` : '';
+  document.getElementById('stats').textContent = `Showing ${visible} of ${PLACES.length} destinations${q2} · Click any marker for details`;
+  document.getElementById('map-count').textContent = `${visible} / ${PLACES.length}`;
+}
+
+function updateFavChip() {
+  const count = getFavorites().size;
+  const chip = document.getElementById('fav-chip');
+  chip.textContent = count ? `❤️ Favorites (${count})` : '❤️ Favorites';
+  chip.className = showFavsOnly ? 'fav-active' : (count ? '' : 'fav-inactive');
+}
+
+// ── Star ratings ───────────────────────────────────────────────────────────
+let minRating = 0;
+const RATINGS_KEY = 'iceland_map_ratings_v2';
+const CACHE_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+function starsHtml(rating, count, placeId) {
+  if (!rating) return '';
+  const full = Math.floor(rating);
+  const half = (rating - full) >= 0.3 ? 1 : 0;
+  const empty = 5 - full - half;
+  const stars = '★'.repeat(full) + (half ? '⯨' : '') + '☆'.repeat(empty);
+  const cnt = count ? ` <span style="opacity:.55">(${count >= 1000 ? (count/1000).toFixed(1)+'k' : count})</span>` : '';
+  const href = placeId ? `https://www.google.com/maps/place/?q=place_id:${placeId}` : `https://www.google.com/maps/search/${encodeURIComponent(stars)}`;
+  return `<a href="${href}" target="_blank" style="display:block;color:#f5c842;font-size:.8rem;margin-bottom:6px;text-decoration:none;cursor:pointer;" title="View on Google Maps">${stars} <span style="color:#c8a820">${rating.toFixed(1)}</span>${cnt} <span style="font-size:.6rem;color:#4a9abb">↗</span></a>`;
+}
+
+function loadRatingsCache() {
+  try {
+    const raw = localStorage.getItem(RATINGS_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (Date.now() - obj.ts > CACHE_TTL) return null;
+    if (Object.keys(obj.data).length === 0) return null; // don't re-use empty cache
+    return obj.data;
+  } catch(e) { return null; }
+}
+
+function applyRatings(data) {
+  PLACES.forEach(p => {
+    if (data[p.name]) { p.rating = data[p.name].r; p.ratingCount = data[p.name].c; p.placeId = data[p.name].id; }
+  });
+}
+
+function saveRatingsCache() {
+  const data = {};
+  PLACES.forEach(p => { if (p.rating) data[p.name] = { r: p.rating, c: p.ratingCount || 0, id: p.placeId || null }; });
+  if (Object.keys(data).length === 0) return; // don't cache empty results
+  try { localStorage.setItem(RATINGS_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
+}
+
+function normalizeQuery(name) {
+  return name
+    .replace(/[áàâ]/gi, 'a').replace(/[éèê]/gi, 'e').replace(/[íìî]/gi, 'i')
+    .replace(/[óòô]/gi, 'o').replace(/[úùû]/gi, 'u').replace(/[ý]/gi, 'y')
+    .replace(/[ä]/gi, 'ae').replace(/[ö]/gi, 'o').replace(/[ü]/gi, 'u')
+    .replace(/[ð]/gi, 'd').replace(/[þ]/gi, 'th').replace(/[æ]/gi, 'ae')
+    .replace(/[ø]/gi, 'o');
+}
+
+async function fetchPlaceRating(place, service) {
+  const trySearch = (query) => new Promise(resolve => {
+    service.textSearch({
+      query,
+      location: new google.maps.LatLng(place.lat, place.lng),
+      radius: 1000
+    }, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results?.[0]?.rating) {
+        resolve({ r: results[0].rating, c: results[0].user_ratings_total || 0, id: results[0].place_id || null });
+      } else resolve(null);
+    });
+  });
+
+  // Try original name first, then ASCII-normalized fallback
+  const searchName = place.searchName || place.name;
+  const result = await trySearch(`${searchName} Iceland`);
+  if (result) return result;
+  const normalized = normalizeQuery(searchName);
+  if (normalized !== searchName) return await trySearch(`${normalized} Iceland`);
+  return null;
+}
+
+async function fetchAllRatings() {
+  const cached = loadRatingsCache();
+  if (cached) { applyRatings(cached); updateVisibility(); return; }
+
+  if (!google.maps.places) {
+    document.getElementById('rating-loading').textContent = '(Places API unavailable)';
+    return;
+  }
+
+  const service = new google.maps.places.PlacesService(map);
+  const loading = document.getElementById('rating-loading');
+
+  // Probe first place to check API is working before running all 267
+  loading.textContent = 'Checking ratings API…';
+  const probe = await fetchPlaceRating(PLACES[0], service);
+  if (!probe) {
+    loading.textContent = '⚠ Ratings unavailable — enable Places API for this key';
+    return;
+  }
+  PLACES[0].rating = probe.r; PLACES[0].ratingCount = probe.c; PLACES[0].placeId = probe.id;
+
+  const BATCH = 4;
+  let done = 1;
+  const remaining = PLACES.slice(1);
+
+  for (let i = 0; i < remaining.length; i += BATCH) {
+    const batch = remaining.slice(i, i + BATCH);
+    await Promise.all(batch.map(async p => {
+      const res = await fetchPlaceRating(p, service);
+      if (res) { p.rating = res.r; p.ratingCount = res.c; p.placeId = res.id; }
+      done++;
+    }));
+    loading.textContent = `Fetching ratings… ${Math.round(done / PLACES.length * 100)}%`;
+    refreshOpenPopupRating();
+    await new Promise(r => setTimeout(r, 300));
+  }
+  loading.textContent = '';
+  saveRatingsCache();
+  updateVisibility();
+  const rated = PLACES.filter(p => p.rating).length;
+  if (rated > 0) {
+    document.getElementById('rating-loading').textContent = `${rated} ratings loaded`;
+    setTimeout(() => { document.getElementById('rating-loading').textContent = ''; }, 3000);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('rating-retry').addEventListener('click', () => {
+    localStorage.removeItem(RATINGS_KEY);
+    PLACES.forEach(p => { delete p.rating; delete p.ratingCount; delete p.placeId; });
+    document.getElementById('rating-retry').style.display = 'none';
+    fetchAllRatings();
+  });
+});
+
+function buildStarFilter() {
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      minRating = parseFloat(btn.dataset.min);
+      document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('star-active'));
+      btn.classList.add('star-active');
+      updateVisibility();
+    });
+  });
+}
+
+function buildFilters() {
+  const el = document.getElementById('filters');
+  CATS.forEach(cat => {
+    const count = PLACES.filter(p => p.cat === cat.id).length;
+    if (!count) return;
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn active';
+    btn.style.color = cat.color;
+    btn.style.borderColor = cat.color + '60';
+    btn.style.background = cat.color + '18';
+    btn.innerHTML = `<span class="dot" style="background:${cat.color}"></span>${cat.label}<span class="badge">${count}</span>`;
+    btn.addEventListener('click', () => {
+      if (activeFilters.has(cat.id)) { activeFilters.delete(cat.id); btn.classList.replace('active','inactive'); }
+      else { activeFilters.add(cat.id); btn.classList.replace('inactive','active'); }
+      updateVisibility();
+    });
+    el.appendChild(btn);
+  });
+
+  const toggleAllBtn = document.getElementById('toggle-all');
+  function allActive() { return CATS.every(c => activeFilters.has(c.id)); }
+  function syncToggleLabel() { toggleAllBtn.textContent = allActive() ? 'Deselect all' : 'Select all'; }
+  toggleAllBtn.addEventListener('click', () => {
+    const chipBtns = el.querySelectorAll('.filter-btn');
+    if (allActive()) {
+      CATS.forEach(c => activeFilters.delete(c.id));
+      chipBtns.forEach(b => b.classList.replace('active', 'inactive'));
+    } else {
+      CATS.forEach(c => activeFilters.add(c.id));
+      chipBtns.forEach(b => b.classList.replace('inactive', 'active'));
+    }
+    syncToggleLabel();
+    updateVisibility();
+  });
+  el.querySelectorAll('.filter-btn').forEach(b => {
+    b.addEventListener('click', syncToggleLabel, true);
+  });
+
+  const favChip = document.getElementById('fav-chip');
+  favChip.addEventListener('click', () => {
+    showFavsOnly = !showFavsOnly;
+    updateFavChip();
+    updateVisibility();
+  });
+  updateFavChip();
+
+  document.getElementById('export-favs').addEventListener('click', exportFavorites);
+  const importInput = document.getElementById('import-favs-file');
+  document.getElementById('import-favs').addEventListener('click', () => importInput.click());
+  importInput.addEventListener('change', e => {
+    const file = e.target.files && e.target.files[0];
+    if (file) importFavoritesFromFile(file);
+    e.target.value = '';
+  });
+
+  const searchEl = document.getElementById('search');
+  const clearBtn = document.getElementById('search-clear');
+  searchEl.addEventListener('input', () => {
+    clearBtn.style.display = searchEl.value ? 'block' : 'none';
+    updateVisibility();
+  });
+  clearBtn.addEventListener('click', () => {
+    searchEl.value = '';
+    clearBtn.style.display = 'none';
+    searchEl.focus();
+    updateVisibility();
+  });
+}
+
+function updateStats() { updateVisibility(); }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJEs-ueLaREIRJVaa2hmCb5qHHzBnWYUY&libraries=places&callback=initMap" async defer></script>
+<style>
+#schedule-panel {
+  position: fixed; top: 0; right: 0; width: 370px; height: 100vh;
+  background: #0f1923; color: #dde4ee; overflow-y: auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 13px; z-index: 9999; border-left: 2px solid #243548;
+  transform: translateX(100%); transition: transform .3s ease;
+  box-shadow: -4px 0 20px rgba(0,0,0,.6);
+}
+#schedule-panel.open { transform: translateX(0); }
+#sched-toggle {
+  position: fixed; top: 50%; right: 0; transform: translateY(-50%);
+  background: #1a2b3c; color: #5bc4f5; border: 1px solid #243548;
+  border-right: none; border-radius: 8px 0 0 8px; padding: 12px 6px;
+  cursor: pointer; z-index: 10000; font-size: 11px; font-weight: 700;
+  writing-mode: vertical-rl; letter-spacing: 1px; transition: background .2s;
+}
+#sched-toggle:hover { background: #243548; }
+#schedule-panel h2 { font-size: 14px; font-weight: 800; color: #fff;
+  padding: 14px 16px 4px; border-bottom: 1px solid #243548; margin: 0; }
+#schedule-panel .sub { color: #7a90a8; font-size: 11px; padding: 4px 16px 10px; border-bottom: 1px solid #1e2e3e; }
+.itinerary-actions { display: flex; gap: 6px; padding: 8px 16px; border-bottom: 1px solid #1e2e3e; }
+.sched-io-btn { padding: 4px 10px; border-radius: 16px; border: 1px solid #35516a;
+  background: transparent; color: #8fb4cf; font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: color .15s, border-color .15s, background .15s; }
+.sched-io-btn:hover { color: #e8edf2; border-color: #5bc4f5; background: rgba(91,196,245,.08); }
+.sday { padding: 10px 16px 4px; }
+.sday-hdr { font-weight: 700; color: #fff; font-size: 12.5px; margin-bottom: 1px; }
+.sday-sub { color: #7a90a8; font-size: 10.5px; margin-bottom: 6px; }
+.srow { display: flex; gap: 6px; padding: 3px 0; border-bottom: 1px solid #1a2a38; align-items: baseline; }
+.srow:last-child { border-bottom: none; }
+.stime { color: #8faac4; font-variant-numeric: tabular-nums; min-width: 36px; font-weight: 600; font-size: 11.5px; }
+.sico { min-width: 16px; text-align: center; font-size: 12px; }
+.slbl { color: #cdd8e8; line-height: 1.4; }
+a.vlink { color: #5bc4f5; text-decoration: none; font-weight: 600; }
+a.vlink:hover { text-decoration: underline; color: #82d8ff; }
+.sdrive { color: #586e85; font-style: italic; font-size: 11px; }
+.sovn { color: #a0c878; font-weight: 600; }
+.snote { color: #c8a84a; font-size: 10.5px; margin: 4px 0 6px;
+  padding: 5px 8px; background: rgba(200,168,74,.1); border-radius: 4px;
+  border-left: 2px solid #c8a84a; }
+</style>
+
+<button id="sched-toggle" onclick="document.getElementById('schedule-panel').classList.toggle('open')">ITINERARY</button>
+<div id="schedule-panel">
+<h2>🗓 Iceland — May 14–20, 2026</h2>
+<div class="sub" id="itinerary-subtitle">Click any venue to open on map</div>
+<div class="itinerary-actions">
+  <button id="export-itinerary" class="sched-io-btn" title="Download itinerary as a JSON file">📤 Export</button>
+  <button id="import-itinerary" class="sched-io-btn" title="Import itinerary from a JSON file">📥 Import</button>
+  <input type="file" id="import-itinerary-file" accept="application/json,.json" style="display:none">
+</div>
+
+<div class="sday">
+<div class="sday-hdr">Day 1 — Wed May 14 · Arrival</div>
+<div class="sday-sub">Depart Keflavík 10:00 · Overnight: Selfoss</div>
+<div class="srow"><span class="stime">10:00</span><span class="sico">✈️</span><span class="slbl">Depart Keflavík Airport</span></div>
+<div class="srow"><span class="stime">11:00</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Raufarhólshellir Lava Tunnel');return false;" class="vlink">Raufarhólshellir Lava Tunnel</a> <span class="sdrive">56 min</span></span></div>
+<div class="srow"><span class="stime">12:30</span><span class="sico">✅</span><span class="slbl">Leave Raufarhólshellir</span></div>
+<div class="srow"><span class="stime">13:00</span><span class="sico">🍽️</span><span class="slbl">Lunch in Selfoss <span class="sdrive">21 min</span></span></div>
+<div class="srow"><span class="stime">15:00</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Gjáin Valley');return false;" class="vlink">Gjáin Valley</a> <span class="sdrive">57 min</span></span></div>
+<div class="srow"><span class="stime">17:00</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Hjálparfoss');return false;" class="vlink">Hjálparfoss</a> <span class="sdrive">7 min</span></span></div>
+<div class="srow"><span class="stime">17:30</span><span class="sico">✅</span><span class="slbl">Leave Hjálparfoss</span></div>
+<div class="srow"><span class="stime">18:30</span><span class="sico">🏨</span><span class="slbl"><span class="sovn">Selfoss — Check in</span> <span class="sdrive">50 min</span></span></div>
+</div>
+
+<div class="sday">
+<div class="sday-hdr">Day 2 — Thu May 15 · Golden Circle</div>
+<div class="sday-sub">Depart 07:00 · Overnight: Selfoss</div>
+<div class="srow"><span class="stime">08:00</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Geysir');return false;" class="vlink">Geysir</a> <span class="sdrive">53 min</span></span></div>
+<div class="srow"><span class="stime">09:30</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Gullfoss');return false;" class="vlink">Gullfoss</a> <span class="sdrive">9 min</span></span></div>
+<div class="srow"><span class="stime">11:00</span><span class="sico">🍽️</span><span class="slbl">Lunch near Gullfoss</span></div>
+<div class="srow"><span class="stime">12:30</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Reykjadalur Hot River');return false;" class="vlink">Reykjadalur Hot River</a> <span class="sdrive">59 min</span></span></div>
+<div class="srow"><span class="stime">16:00</span><span class="sico">🏨</span><span class="slbl"><span class="sovn">Selfoss — Check in</span> <span class="sdrive">13 min</span></span></div>
+</div>
+
+<div class="sday">
+<div class="sday-hdr">Day 3 — Fri May 16 · South Coast West</div>
+<div class="sday-sub">Depart 07:00 · Overnight: Vík</div>
+<div class="srow"><span class="stime">07:30</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Gluggafoss');return false;" class="vlink">Gluggafoss</a> <span class="sdrive">42 min</span></span></div>
+<div class="srow"><span class="stime">08:30</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Seljalandsfoss');return false;" class="vlink">Seljalandsfoss</a> <span class="sdrive">19 min</span></span></div>
+<div class="srow"><span class="stime">09:30</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Gljúfrabúi');return false;" class="vlink">Gljúfrabúi</a> <span class="sdrive">1 min</span></span></div>
+<div class="srow"><span class="stime">10:00</span><span class="sico">🍽️</span><span class="slbl">Lunch near Skógafoss</span></div>
+<div class="srow"><span class="stime">11:00</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('GlacierWorld');return false;" class="vlink">GlacierWorld</a> <span class="sdrive">31 min</span></span></div>
+<div class="srow"><span class="stime">13:30</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Víkurfjara Beach');return false;" class="vlink">Víkurfjara Beach</a> <span class="sdrive">22 min</span></span></div>
+<div class="srow"><span class="stime">14:30</span><span class="sico">🏨</span><span class="slbl"><span class="sovn">Vík — Check in</span></span></div>
+</div>
+
+<div class="sday">
+<div class="sday-hdr">Day 4 — Sat May 17 · Canyons</div>
+<div class="sday-sub">Depart 07:00 · Overnight: Kirkjubæjarklaustur</div>
+<div class="srow"><span class="stime">07:30</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Þakgil');return false;" class="vlink">Þakgil</a> <span class="sdrive">17 min</span></span></div>
+<div class="srow"><span class="stime">09:30</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Fjaðrárgljúfur Canyon');return false;" class="vlink">Fjaðrárgljúfur Canyon</a> <span class="sdrive">43 min</span></span></div>
+<div class="srow"><span class="stime">11:30</span><span class="sico">🍽️</span><span class="slbl">Lunch near Klaustur</span></div>
+<div class="srow"><span class="stime">12:00</span><span class="sico">🏨</span><span class="slbl"><span class="sovn">Kirkjubæjarklaustur — Check in</span></span></div>
+<div class="snote">⚠️ Bláhnúkur: F-road status TBC for May — see options</div>
+</div>
+
+<div class="sday">
+<div class="sday-hdr">Day 5 — Sun May 18 · Glacier Country</div>
+<div class="sday-sub">Depart 07:00 · Overnight: near Skaftafell</div>
+<div class="srow"><span class="stime">07:00</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Systra Waterfall');return false;" class="vlink">Systra Waterfall</a> <span class="sdrive">in village</span></span></div>
+<div class="srow"><span class="stime">07:30</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Foss á Síðu');return false;" class="vlink">Foss á Síðu</a> <span class="sdrive">10 min</span></span></div>
+<div class="srow"><span class="stime">08:00</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Núpstaðarskógur');return false;" class="vlink">Núpstaðarskógur</a> <span class="sdrive">5 min</span></span></div>
+<div class="srow"><span class="stime">09:00</span><span class="sico">🍽️</span><span class="slbl">Lunch (packed)</span></div>
+<div class="srow"><span class="stime">10:30</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Svartifoss');return false;" class="vlink">Svartifoss</a> — Skaftafell <span class="sdrive">57 min</span></span></div>
+<div class="srow"><span class="stime">12:00</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Vatnajökull Glacier');return false;" class="vlink">Vatnajökull Glacier</a> — guided walk</span></div>
+<div class="srow"><span class="stime">15:00</span><span class="sico">🏨</span><span class="slbl"><span class="sovn">Overnight near Skaftafell</span></span></div>
+</div>
+
+<div class="sday">
+<div class="sday-hdr">Day 6 — Mon May 19 · SE Iceland + Return</div>
+<div class="sday-sub">Depart 07:00 · Overnight: Reykjavík</div>
+<div class="srow"><span class="stime">07:30</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Múlagljúfur Canyon');return false;" class="vlink">Múlagljúfur Canyon</a> <span class="sdrive">29 min</span></span></div>
+<div class="srow"><span class="stime">11:00</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Jökulsárlón Glacier Lagoon');return false;" class="vlink">Jökulsárlón Glacier Lagoon</a> + <a href="#" onclick="openVenueByName('Diamond Beach');return false;" class="vlink">Diamond Beach</a> <span class="sdrive">14 min</span></span></div>
+<div class="srow"><span class="stime">13:30</span><span class="sico">🍽️</span><span class="slbl">Lunch — depart for Reykjavík</span></div>
+<div class="srow"><span class="stime">18:30</span><span class="sico">🏨</span><span class="slbl"><span class="sovn">Arrive Reykjavík</span> <span class="sdrive">~4.5 hr drive</span></span></div>
+</div>
+
+<div class="sday">
+<div class="sday-hdr">Day 7 — Tue May 20 · Departure</div>
+<div class="sday-sub">Depart 08:00 · Airport by 17:00</div>
+<div class="srow"><span class="stime">08:30</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Glymur');return false;" class="vlink">Glymur</a> <span class="sdrive">42 min</span></span></div>
+<div class="srow"><span class="stime">12:00</span><span class="sico">✅</span><span class="slbl">Done Glymur hike</span></div>
+<div class="srow"><span class="stime">13:30</span><span class="sico">🚗</span><span class="slbl"><a href="#" onclick="openVenueByName('Blue Lagoon');return false;" class="vlink">Blue Lagoon</a> <span class="sdrive">38 min from Reykjavík</span></span></div>
+<div class="srow"><span class="stime">16:00</span><span class="sico">✅</span><span class="slbl">Leave Blue Lagoon</span></div>
+<div class="srow"><span class="stime">16:30</span><span class="sico">✈️</span><span class="slbl"><strong>Keflavík Airport</strong> <span class="sdrive">14 min — 30 min buffer ✅</span></span></div>
+</div>
+
+</div>
+
+<script>
+// ── ITINERARY DEEP-LINK SUPPORT ──────────────────────────────────────
+function getItineraryData() {
+  const panel = document.getElementById('schedule-panel');
+  const days = [...panel.querySelectorAll('.sday')].map(day => ({
+    title: day.querySelector('.sday-hdr')?.textContent.trim() || '',
+    subtitle: day.querySelector('.sday-sub')?.textContent.trim() || '',
+    items: [...day.children].filter(el => !el.classList.contains('sday-hdr') && !el.classList.contains('sday-sub')).map(el => {
+      if (el.classList.contains('srow')) {
+        return {
+          type: 'row',
+          time: el.querySelector('.stime')?.textContent.trim() || '',
+          icon: el.querySelector('.sico')?.textContent.trim() || '',
+          labelHtml: el.querySelector('.slbl')?.innerHTML || ''
+        };
+      }
+      if (el.classList.contains('snote')) {
+        return { type: 'note', html: el.innerHTML || '' };
+      }
+      return null;
+    }).filter(Boolean)
+  }));
+  return {
+    title: panel.querySelector('h2')?.textContent.trim() || '',
+    subtitle: document.getElementById('itinerary-subtitle')?.textContent.trim() || '',
+    days
+  };
+}
+
+function exportItinerary() {
+  const itinerary = getItineraryData();
+  if (!itinerary.days.length) { alert('No itinerary days to export.'); return; }
+  const payload = {
+    version: 1,
+    source: 'iceland-south-map',
+    exportedAt: new Date().toISOString(),
+    itinerary
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `iceland-itinerary-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function sanitizeItineraryHtml(html) {
+  const template = document.createElement('template');
+  template.innerHTML = String(html || '');
+  const allowedTags = new Set(['A', 'SPAN', 'STRONG', 'EM', 'B', 'I']);
+  const allowedClasses = new Set(['vlink', 'sdrive', 'sovn']);
+
+  function cleanNode(node) {
+    [...node.childNodes].forEach(child => {
+      if (child.nodeType === Node.ELEMENT_NODE) {
+        if (!allowedTags.has(child.tagName)) {
+          child.replaceWith(document.createTextNode(child.textContent || ''));
+          return;
+        }
+        const incomingClasses = [...child.classList];
+        [...child.attributes].forEach(attr => child.removeAttribute(attr.name));
+        const className = incomingClasses.filter(c => allowedClasses.has(c)).join(' ');
+        if (className) child.className = className;
+        if (child.tagName === 'A') {
+          child.href = '#';
+          if (!child.classList.contains('vlink')) child.classList.add('vlink');
+          const venue = child.textContent.trim().replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+          if (venue) child.setAttribute('onclick', `openVenueByName('${venue}');return false;`);
+        }
+        cleanNode(child);
+      } else if (child.nodeType !== Node.TEXT_NODE) {
+        child.remove();
+      }
+    });
+  }
+
+  cleanNode(template.content);
+  return template.innerHTML;
+}
+
+function renderItinerary(itinerary) {
+  if (!itinerary || !Array.isArray(itinerary.days)) {
+    alert('Invalid itinerary file: expected {"itinerary":{"days":[...]}}');
+    return false;
+  }
+
+  const panel = document.getElementById('schedule-panel');
+  if (typeof itinerary.title === 'string' && itinerary.title.trim()) {
+    panel.querySelector('h2').textContent = itinerary.title.trim();
+  }
+  if (typeof itinerary.subtitle === 'string' && itinerary.subtitle.trim()) {
+    document.getElementById('itinerary-subtitle').textContent = itinerary.subtitle.trim();
+  }
+
+  panel.querySelectorAll('.sday').forEach(day => day.remove());
+
+  itinerary.days.forEach(day => {
+    const dayEl = document.createElement('div');
+    dayEl.className = 'sday';
+
+    const header = document.createElement('div');
+    header.className = 'sday-hdr';
+    header.textContent = typeof day.title === 'string' ? day.title : '';
+    dayEl.appendChild(header);
+
+    const subtitle = document.createElement('div');
+    subtitle.className = 'sday-sub';
+    subtitle.textContent = typeof day.subtitle === 'string' ? day.subtitle : '';
+    dayEl.appendChild(subtitle);
+
+    const items = Array.isArray(day.items) ? day.items : [];
+    items.forEach(item => {
+      if (item.type === 'note') {
+        const note = document.createElement('div');
+        note.className = 'snote';
+        note.innerHTML = sanitizeItineraryHtml(item.html || '');
+        dayEl.appendChild(note);
+        return;
+      }
+      if (item.type !== 'row') return;
+      const row = document.createElement('div');
+      row.className = 'srow';
+
+      const time = document.createElement('span');
+      time.className = 'stime';
+      time.textContent = typeof item.time === 'string' ? item.time : '';
+      row.appendChild(time);
+
+      const icon = document.createElement('span');
+      icon.className = 'sico';
+      icon.textContent = typeof item.icon === 'string' ? item.icon : '';
+      row.appendChild(icon);
+
+      const label = document.createElement('span');
+      label.className = 'slbl';
+      label.innerHTML = sanitizeItineraryHtml(item.labelHtml || '');
+      row.appendChild(label);
+
+      dayEl.appendChild(row);
+    });
+
+    panel.appendChild(dayEl);
+  });
+  return true;
+}
+
+async function importItineraryFromFile(file) {
+  try {
+    const data = JSON.parse(await file.text());
+    const itinerary = data && data.itinerary ? data.itinerary : data;
+    if (renderItinerary(itinerary)) {
+      alert(`Imported ${itinerary.days.length} itinerary day${itinerary.days.length===1?'':'s'}.`);
+    }
+  } catch (e) {
+    alert('Could not read itinerary file: ' + e.message);
+  }
+}
+
+function setupItineraryImportExport() {
+  document.getElementById('export-itinerary').addEventListener('click', exportItinerary);
+  const input = document.getElementById('import-itinerary-file');
+  document.getElementById('import-itinerary').addEventListener('click', () => input.click());
+  input.addEventListener('change', e => {
+    const file = e.target.files && e.target.files[0];
+    if (file) importItineraryFromFile(file);
+    e.target.value = '';
+  });
+}
+
+function openVenueByName(name) {
+  if (typeof markers === 'undefined' || !markers.length) {
+    setTimeout(() => openVenueByName(name), 300); return;
+  }
+  const entry = markers.find(({place}) => place.name === name);
+  if (!entry) { console.warn('Venue not found:', name); return; }
+  openPopup(entry.place, entry.marker);
+  if (entry.marker && entry.marker.map) {
+    entry.marker.map.panTo(entry.marker.position);
+  }
+}
+function handleHash() {
+  const hash = decodeURIComponent(window.location.hash);
+  const match = hash.match(/^#open=(.+)$/);
+  if (match) openVenueByName(match[1]);
+}
+window.addEventListener('hashchange', handleHash);
+window.addEventListener('load', () => setTimeout(handleHash, 1500));
+setupItineraryImportExport();
+</script>
+</body>
+</html>
