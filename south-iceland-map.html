@@ -27,6 +27,9 @@ h1 { font-size: 1.3rem; color: #fff; margin-bottom: 2px; }
 #fav-chip { padding: 4px 12px; border-radius: 20px; border: 1.5px solid #c0406080; background: transparent; color: #e07090; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s; flex-shrink: 0; }
 #fav-chip.fav-active { background: #c04060; color: #fff; border-color: #c04060; }
 #fav-chip.fav-inactive { opacity: 0.55; }
+.io-btn { padding: 4px 10px; border-radius: 20px; border: 1.5px solid #4a7090; background: transparent; color: #7a9bb5; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: color 0.15s, border-color 0.15s; flex-shrink: 0; }
+.io-btn:hover { color: #e8edf2; border-color: #e8edf2; }
+.io-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .badge { font-size: 0.6rem; background: rgba(255,255,255,0.18); padding: 1px 4px; border-radius: 8px; }
 #map { flex: 1; width: 100%; min-height: 0; }
@@ -54,6 +57,9 @@ h1 { font-size: 1.3rem; color: #fff; margin-bottom: 2px; }
 <div class="controls" id="filters">
   <button id="toggle-all">Deselect all</button>
   <button id="fav-chip">❤️ Favorites</button>
+  <button id="export-favs" class="io-btn" title="Download your favorites as a JSON file">📤 Export</button>
+  <button id="import-favs" class="io-btn" title="Import favorites from a JSON file (appends to current)">📥 Import</button>
+  <input type="file" id="import-favs-file" accept="application/json,.json" style="display:none">
 </div>
 <div class="star-row">
   <span class="star-label">Min rating:</span>
@@ -473,6 +479,56 @@ function toggleFav(name) {
   return favs.has(name);
 }
 
+// ── Export / Import favorites ──────────────────────────────────────────────
+function exportFavorites() {
+  const favs = [...getFavorites()];
+  if (!favs.length) { alert('No favorites to export. Click the ❤️ on a marker to add some first.'); return; }
+  const payload = {
+    version: 1,
+    source: 'iceland-south-map',
+    exportedAt: new Date().toISOString(),
+    count: favs.length,
+    favorites: favs
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `iceland-favorites-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function importFavoritesFromFile(file) {
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const incoming = Array.isArray(data) ? data : (data && Array.isArray(data.favorites) ? data.favorites : null);
+    if (!incoming) { alert('Invalid favorites file: expected a JSON array or {"favorites":[...]}'); return; }
+    const validNames = new Set(PLACES.map(p => p.name));
+    const favs = getFavorites();
+    let added = 0, alreadyHad = 0, unknown = 0;
+    for (const name of incoming) {
+      if (typeof name !== 'string') { unknown++; continue; }
+      if (!validNames.has(name)) { unknown++; continue; }
+      if (favs.has(name)) { alreadyHad++; continue; }
+      favs.add(name); added++;
+    }
+    saveFavorites(favs);
+    PLACES.forEach(p => { if (p._marker) p._marker.setIcon(makeIcon(p.cat, favs.has(p.name))); });
+    updateFavChip();
+    updateVisibility();
+    const parts = [`Imported ${added} new favorite${added===1?'':'s'}.`];
+    if (alreadyHad) parts.push(`${alreadyHad} already in your list.`);
+    if (unknown) parts.push(`${unknown} skipped (not on this map).`);
+    alert(parts.join(' '));
+  } catch (e) {
+    alert('Could not read favorites file: ' + e.message);
+  }
+}
+
 // ── Popup builder ──────────────────────────────────────────────────────────
 let _openPlace = null, _openMarker = null;
 
@@ -799,6 +855,15 @@ function buildFilters() {
     updateVisibility();
   });
   updateFavChip();
+
+  document.getElementById('export-favs').addEventListener('click', exportFavorites);
+  const importInput = document.getElementById('import-favs-file');
+  document.getElementById('import-favs').addEventListener('click', () => importInput.click());
+  importInput.addEventListener('change', e => {
+    const file = e.target.files && e.target.files[0];
+    if (file) importFavoritesFromFile(file);
+    e.target.value = '';
+  });
 
   const searchEl = document.getElementById('search');
   const clearBtn = document.getElementById('search-clear');
