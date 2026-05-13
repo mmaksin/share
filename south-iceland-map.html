@@ -18,12 +18,23 @@ h1 { font-size: 1.3rem; color: #fff; margin-bottom: 2px; }
 #search:focus { border-color: #4a9abb; background: #1a2a3d; }
 #search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #4a7090; font-size: 1rem; cursor: pointer; line-height: 1; padding: 2px 4px; display: none; transition: color 0.15s; }
 #search-clear:hover { color: #e8edf2; }
-.controls { padding: 5px 14px 4px; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; flex-shrink: 0; }
-#toggle-all { padding: 4px 12px; border-radius: 20px; border: 1.5px solid #4a7090; background: transparent; color: #7a9bb5; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: color 0.15s, border-color 0.15s; flex-shrink: 0; }
+.controls { padding: 5px 14px 4px; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; align-items: flex-start; flex-shrink: 0; }
+.category-dropdown { position: relative; flex-shrink: 0; }
+#category-menu-toggle { padding: 4px 12px; border-radius: 20px; border: 1.5px solid #4a7090; background: #141f2e; color: #d8e4ee; font-size: 0.68rem; font-weight: 700; cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; display: flex; align-items: center; gap: 6px; min-height: 27px; }
+#category-menu-toggle:hover, #category-menu-toggle[aria-expanded="true"] { color: #fff; border-color: #4a9abb; background: #1a2a3d; }
+#category-summary { color: #7a9bb5; font-weight: 600; }
+.chevron { font-size: 0.6rem; color: #7a9bb5; line-height: 1; }
+.category-menu { position: absolute; top: calc(100% + 6px); left: 0; width: min(310px, calc(100vw - 28px)); max-height: 360px; overflow: auto; padding: 8px; border: 1px solid #2a4a6a; border-radius: 12px; background: #101a27; box-shadow: 0 16px 40px rgba(0,0,0,0.4); z-index: 20; display: none; }
+.category-menu.open { display: block; }
+.category-menu-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 4px 8px; border-bottom: 1px solid #24394f; margin-bottom: 4px; color: #7a9bb5; font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+#toggle-all { padding: 3px 9px; border-radius: 20px; border: 1.5px solid #4a7090; background: transparent; color: #7a9bb5; font-size: 0.65rem; font-weight: 700; cursor: pointer; transition: color 0.15s, border-color 0.15s; flex-shrink: 0; text-transform: none; letter-spacing: 0; }
 #toggle-all:hover { color: #e8edf2; border-color: #e8edf2; }
-.filter-btn { padding: 4px 10px; border-radius: 20px; border: 1.5px solid transparent; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; gap: 4px; background: transparent; }
-.filter-btn.active { opacity: 1; }
-.filter-btn.inactive { opacity: 0.25; }
+.category-options { display: flex; flex-direction: column; gap: 2px; }
+.category-option { display: grid; grid-template-columns: 16px 10px 1fr auto; align-items: center; gap: 7px; padding: 6px 7px; border-radius: 8px; color: #d8e4ee; font-size: 0.74rem; cursor: pointer; user-select: none; }
+.category-option:hover { background: #172538; }
+.category-option input { width: 14px; height: 14px; accent-color: var(--cat-color); cursor: pointer; }
+.category-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.category-count { color: #7a9bb5; font-size: 0.64rem; background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 8px; }
 #fav-chip { padding: 4px 12px; border-radius: 20px; border: 1.5px solid #c0406080; background: transparent; color: #e07090; font-size: 0.68rem; font-weight: 600; cursor: pointer; transition: background 0.15s, color 0.15s; flex-shrink: 0; }
 #fav-chip.fav-active { background: #c04060; color: #fff; border-color: #c04060; }
 #fav-chip.fav-inactive { opacity: 0.55; }
@@ -55,7 +66,16 @@ h1 { font-size: 1.3rem; color: #fff; margin-bottom: 2px; }
   <span id="map-count"></span>
 </div>
 <div class="controls" id="filters">
-  <button id="toggle-all">Deselect all</button>
+  <div class="category-dropdown" id="category-filter">
+    <button id="category-menu-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="category-menu">Categories <span id="category-summary">All</span><span class="chevron">▾</span></button>
+    <div class="category-menu" id="category-menu">
+      <div class="category-menu-head">
+        <span>Show on map</span>
+        <button id="toggle-all" type="button">Deselect all</button>
+      </div>
+      <div class="category-options" id="category-options"></div>
+    </div>
+  </div>
   <button id="fav-chip">❤️ Favorites</button>
   <button id="export-favs" class="io-btn" title="Download your favorites as a JSON file">📤 Export</button>
   <button id="import-favs" class="io-btn" title="Import favorites from a JSON file (appends to current)">📥 Import</button>
@@ -811,42 +831,67 @@ function buildStarFilter() {
 }
 
 function buildFilters() {
-  const el = document.getElementById('filters');
+  const menuToggle = document.getElementById('category-menu-toggle');
+  const menu = document.getElementById('category-menu');
+  const options = document.getElementById('category-options');
+  const summary = document.getElementById('category-summary');
+  const toggleAllBtn = document.getElementById('toggle-all');
+  const availableCats = CATS.filter(cat => PLACES.some(p => p.cat === cat.id));
+
+  function allActive() { return availableCats.every(c => activeFilters.has(c.id)); }
+  function syncCategoryControls() {
+    const selected = availableCats.filter(c => activeFilters.has(c.id)).length;
+    summary.textContent = selected === availableCats.length ? `All ${availableCats.length}` : (selected ? `${selected} selected` : 'None');
+    toggleAllBtn.textContent = allActive() ? 'Deselect all' : 'Select all';
+    options.querySelectorAll('input[type="checkbox"]').forEach(input => {
+      input.checked = activeFilters.has(input.dataset.cat);
+    });
+  }
+
   CATS.forEach(cat => {
     const count = PLACES.filter(p => p.cat === cat.id).length;
     if (!count) return;
-    const btn = document.createElement('button');
-    btn.className = 'filter-btn active';
-    btn.style.color = cat.color;
-    btn.style.borderColor = cat.color + '60';
-    btn.style.background = cat.color + '18';
-    btn.innerHTML = `<span class="dot" style="background:${cat.color}"></span>${cat.label}<span class="badge">${count}</span>`;
-    btn.addEventListener('click', () => {
-      if (activeFilters.has(cat.id)) { activeFilters.delete(cat.id); btn.classList.replace('active','inactive'); }
-      else { activeFilters.add(cat.id); btn.classList.replace('inactive','active'); }
+    const row = document.createElement('label');
+    row.className = 'category-option';
+    row.style.setProperty('--cat-color', cat.color);
+    row.innerHTML = `<input type="checkbox" data-cat="${cat.id}" checked><span class="dot" style="background:${cat.color}"></span><span class="category-label">${cat.label}</span><span class="category-count">${count}</span>`;
+    row.querySelector('input').addEventListener('change', event => {
+      if (event.target.checked) activeFilters.add(cat.id);
+      else activeFilters.delete(cat.id);
+      syncCategoryControls();
       updateVisibility();
     });
-    el.appendChild(btn);
+    options.appendChild(row);
   });
 
-  const toggleAllBtn = document.getElementById('toggle-all');
-  function allActive() { return CATS.every(c => activeFilters.has(c.id)); }
-  function syncToggleLabel() { toggleAllBtn.textContent = allActive() ? 'Deselect all' : 'Select all'; }
   toggleAllBtn.addEventListener('click', () => {
-    const chipBtns = el.querySelectorAll('.filter-btn');
     if (allActive()) {
-      CATS.forEach(c => activeFilters.delete(c.id));
-      chipBtns.forEach(b => b.classList.replace('active', 'inactive'));
+      availableCats.forEach(c => activeFilters.delete(c.id));
     } else {
-      CATS.forEach(c => activeFilters.add(c.id));
-      chipBtns.forEach(b => b.classList.replace('inactive', 'active'));
+      availableCats.forEach(c => activeFilters.add(c.id));
     }
-    syncToggleLabel();
+    syncCategoryControls();
     updateVisibility();
   });
-  el.querySelectorAll('.filter-btn').forEach(b => {
-    b.addEventListener('click', syncToggleLabel, true);
+
+  menuToggle.addEventListener('click', () => {
+    const isOpen = menu.classList.toggle('open');
+    menuToggle.setAttribute('aria-expanded', String(isOpen));
   });
+  document.addEventListener('click', event => {
+    if (!document.getElementById('category-filter').contains(event.target)) {
+      menu.classList.remove('open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      menu.classList.remove('open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+      menuToggle.focus();
+    }
+  });
+  syncCategoryControls();
 
   const favChip = document.getElementById('fav-chip');
   favChip.addEventListener('click', () => {
