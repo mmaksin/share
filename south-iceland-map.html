@@ -84,6 +84,7 @@ const CATS = [
   { id:'museum',     label:'Museums & Centres',     color:'#9060c8', emoji:'📚' },
   { id:'hotspring',  label:'Geothermal Baths',      color:'#f078c8', emoji:'🛁' },
   { id:'pool',       label:'Swimming Pools',        color:'#50d8c8', emoji:'🏊' },
+  { id:'town',       label:'Towns & Villages',      color:'#7090c0', emoji:'🏘️' },
 ];
 
 const PLACES = [
@@ -109,6 +110,7 @@ const PLACES = [
   {name:'Brúará',              cat:'waterfall', lat:64.2920, lng:-20.4860, url:'/en/destinations/nature/waterfalls/bruara',                              desc:'Scenic waterfall on the Brúará river near Gullfoss — a quieter Golden Circle gem.'},
   {name:'Ægissíðufoss',        cat:'waterfall', lat:63.7400, lng:-17.9000, url:'/en/destinations/nature/waterfalls/aegissidufoss-waterfall',             desc:'A beautiful waterfall in the Síða region of southeast Iceland.'},
   {name:'Gjáin Valley',        cat:'waterfall', lat:64.1040, lng:-19.8700, url:'/en/destinations/nature/waterfalls/gjain-in-thjorsardalur-valley',       desc:'A hidden fairytale valley in Þjórsárdalur with twisting lava, pools and cascading waterfalls — magical.'},
+  {name:'Faxi (Faxafoss)',     cat:'waterfall', lat:64.2186, lng:-20.3242, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'A wide 7m waterfall on the Tungufljót river — a quieter Golden Circle stop between Geysir and Gullfoss with a salmon ladder.'},
 
   // ── GLACIERS & ICE ──────────────────────────────────────────────────────────
   {name:'Jökulsárlón Glacier Lagoon', searchName:'Jokulsarlon', cat:'glacier', lat:64.0784, lng:-16.2306, url:'/en/destinations/nature/glaciers/jokulsarlon-glacier-lagoon',        desc:'Stunning glacial lake filled with floating icebergs calved from Breiðamerkurjökull. Boat tours available.'},
@@ -403,6 +405,30 @@ const PLACES = [
   // ── REYKJAVÍK — CHURCHES ──────────────────────────────────────────────────────
   {name:'Hallgrímskirkja',       cat:'church', lat:64.1419, lng:-21.9262, url:'https://visitreykjavik.is/service/hallgrimskirkja-church',        desc:'Iceland\'s largest and most iconic church — 74m tower with panoramic views over Reykjavík, modelled on basalt columns.'},
   {name:'Kópavogskirkja',        cat:'church', lat:64.1072, lng:-21.9020, url:'https://visitreykjavik.is/service/kopavogskirkja-church',         desc:'The striking geometric church in Kópavogur — a distinctive landmark with a sculptural concrete tower.'},
+
+  // ── TOWNS & VILLAGES (from guidetoiceland.is/travel-iceland/drive) ──────────
+  {name:'Reykjavík',              cat:'town', lat:64.1466, lng:-21.9426, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'The world\'s northernmost capital — population ~143,000 — and the cultural, political and culinary heart of Iceland.'},
+  {name:'Kópavogur',              cat:'town', lat:64.1108, lng:-21.9094, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Iceland\'s second-largest town, just south of Reykjavík — home to Smáralind mall and Gerðarsafn art museum.'},
+  {name:'Hafnarfjörður',          cat:'town', lat:64.0671, lng:-21.9519, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Picturesque lava-town south of Reykjavík — colourful harbour, Viking heritage and the famed hidden-folk (huldufólk) trails.'},
+  {name:'Garðabær',               cat:'town', lat:64.0833, lng:-21.9333, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Capital-region town between Reykjavík and Hafnarfjörður — leafy suburbs, design museum and Vífilsstaðavatn lake.'},
+  {name:'Mosfellsbær',            cat:'town', lat:64.1697, lng:-21.6967, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Capital-region town in a green valley — home of Nobel laureate Halldór Laxness and gateway to Mosfellsdalur.'},
+  {name:'Seltjarnarnes',          cat:'town', lat:64.1547, lng:-22.0094, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Small coastal town at the very tip of the Reykjavík peninsula — Grótta lighthouse and great northern lights views.'},
+  {name:'Keflavík',               cat:'town', lat:64.0049, lng:-22.5644, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Largest town on the Reykjanes Peninsula and home to Iceland\'s main international airport — part of Reykjanesbær.'},
+  {name:'Njarðvík',               cat:'town', lat:64.0033, lng:-22.5417, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Reykjanes town merged with Keflavík to form Reykjanesbær — Viking World museum and a Viking-ship replica.'},
+  {name:'Hafnir',                 cat:'town', lat:63.9333, lng:-22.6833, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Tiny fishing village on the Reykjanes Peninsula — fishing heritage and the nearby Hafnaberg sea cliffs.'},
+  {name:'Hveragerði',             cat:'town', lat:64.0064, lng:-21.1858, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'"Town of flowers and hot springs" — geothermal greenhouses, the Geothermal Park and the Reykjadalur hot-river hike.'},
+  {name:'Þorlákshöfn',            cat:'town', lat:63.8567, lng:-21.3919, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'South Coast harbour town — ferry port to the Westman Islands and surfing beaches on the open Atlantic.'},
+  {name:'Eyrarbakki',             cat:'town', lat:63.8636, lng:-21.1481, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Historic fishing village with colourful timber houses — the 1765 Húsið heritage centre and a maritime museum.'},
+  {name:'Stokkseyri',             cat:'town', lat:63.8333, lng:-21.0667, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Coastal village just east of Eyrarbakki — famous for lobster restaurants, the Ghost Centre and folklore museums.'},
+  {name:'Selfoss',                cat:'town', lat:63.9333, lng:-20.9978, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Largest town in South Iceland — a hub on the Ring Road set on the powerful Ölfusá river, with Bobby Fischer\'s grave.'},
+  {name:'Hella',                  cat:'town', lat:63.8333, lng:-20.4000, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'South Iceland town on the Rangá river — gateway to Landmannalaugar, with man-made caves and horse-riding country.'},
+  {name:'Hvolsvöllur',            cat:'town', lat:63.7531, lng:-20.2342, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'South Coast town in the heart of Njál\'s-Saga country — home to the LAVA Centre interactive volcano exhibition.'},
+  {name:'Flúðir',                 cat:'town', lat:64.1378, lng:-20.3147, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Small geothermal village in South Iceland — home to the Secret Lagoon (Gamla Laugin) and rows of greenhouses.'},
+  {name:'Laugarvatn',             cat:'town', lat:64.2117, lng:-20.7297, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Lakeside village between Þingvellir and Geysir — geothermal Fontana baths, steam saunas and rye-bread baked in the ground.'},
+  {name:'Reykholt (Biskupstungur)', cat:'town', lat:64.2667, lng:-20.4000, url:'https://guidetoiceland.is/travel-iceland/drive',                        desc:'Small geothermal Golden-Circle village — greenhouses, swimming pool and the Sólheimar eco-village nearby.'},
+  {name:'Vík í Mýrdal',           cat:'town', lat:63.4194, lng:-19.0064, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'Iceland\'s southernmost village — Reyniskirkja church on the hill, black-sand beaches and the Reynisdrangar sea stacks.'},
+  {name:'Kirkjubæjarklaustur',    cat:'town', lat:63.7894, lng:-18.0644, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'South-east village at the edge of the Lakagígar lava fields — historic medieval convent site and a stop on the Ring Road.'},
+  {name:'Höfn í Hornafirði',      cat:'town', lat:64.2526, lng:-15.2092, url:'https://guidetoiceland.is/travel-iceland/drive',                          desc:'South-east fishing town at the foot of Vatnajökull — famed for langoustine and the annual Lobster Festival.'},
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
