@@ -903,11 +903,27 @@ function updateStats() { updateVisibility(); }
 #schedule-panel h2 { font-size: 14px; font-weight: 800; color: #fff;
   padding: 14px 16px 4px; border-bottom: 1px solid #243548; margin: 0; }
 #schedule-panel .sub { color: #7a90a8; font-size: 11px; padding: 4px 16px 10px; border-bottom: 1px solid #1e2e3e; }
-.itinerary-actions { display: flex; gap: 6px; padding: 8px 16px; border-bottom: 1px solid #1e2e3e; }
+.itinerary-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 16px; border-bottom: 1px solid #1e2e3e; }
 .sched-io-btn { padding: 4px 10px; border-radius: 16px; border: 1px solid #35516a;
   background: transparent; color: #8fb4cf; font-size: 11px; font-weight: 700;
   cursor: pointer; transition: color .15s, border-color .15s, background .15s; }
 .sched-io-btn:hover { color: #e8edf2; border-color: #5bc4f5; background: rgba(91,196,245,.08); }
+.sched-io-btn.is-editing { color: #fff; border-color: #5bc4f5; background: rgba(91,196,245,.18); }
+.sched-save-status { color: #6f8aa3; font-size: 10.5px; margin-left: 2px; min-width: 64px; }
+#schedule-panel.itinerary-editing h2,
+#schedule-panel.itinerary-editing #itinerary-subtitle,
+#schedule-panel.itinerary-editing .sday-hdr,
+#schedule-panel.itinerary-editing .sday-sub,
+#schedule-panel.itinerary-editing .stime,
+#schedule-panel.itinerary-editing .sico,
+#schedule-panel.itinerary-editing .slbl,
+#schedule-panel.itinerary-editing .snote {
+  outline: 1px dashed rgba(91,196,245,.38);
+  outline-offset: 2px;
+  background: rgba(91,196,245,.06);
+  cursor: text;
+}
+#schedule-panel.itinerary-editing a.vlink { pointer-events: none; text-decoration: underline; }
 .sday { padding: 10px 16px 4px; }
 .sday-hdr { font-weight: 700; color: #fff; font-size: 12.5px; margin-bottom: 1px; }
 .sday-sub { color: #7a90a8; font-size: 10.5px; margin-bottom: 6px; }
@@ -930,9 +946,13 @@ a.vlink:hover { text-decoration: underline; color: #82d8ff; }
 <h2>🗓 Iceland — May 14–20, 2026</h2>
 <div class="sub" id="itinerary-subtitle">Click any venue to open on map</div>
 <div class="itinerary-actions">
+  <button id="edit-itinerary" class="sched-io-btn" title="Edit itinerary inline">✏️ Edit</button>
+  <button id="save-itinerary" class="sched-io-btn" title="Save itinerary in this browser">💾 Save</button>
+  <button id="reset-itinerary" class="sched-io-btn" title="Restore the itinerary bundled in this file">↺ Reset</button>
   <button id="export-itinerary" class="sched-io-btn" title="Download itinerary as a JSON file">📤 Export</button>
   <button id="import-itinerary" class="sched-io-btn" title="Import itinerary from a JSON file">📥 Import</button>
   <input type="file" id="import-itinerary-file" accept="application/json,.json" style="display:none">
+  <span id="itinerary-save-status" class="sched-save-status"></span>
 </div>
 
 <div class="sday">
@@ -1015,6 +1035,12 @@ a.vlink:hover { text-decoration: underline; color: #82d8ff; }
 
 <script>
 // ── ITINERARY DEEP-LINK SUPPORT ──────────────────────────────────────
+const ITINERARY_STORAGE_KEY = 'iceland_itinerary_v1';
+const ITINERARY_EDITABLE_SELECTOR = 'h2, #itinerary-subtitle, .sday-hdr, .sday-sub, .stime, .sico, .slbl, .snote';
+let itinerarySaveTimer = null;
+let itineraryEditMode = false;
+let defaultItineraryData = null;
+
 function getItineraryData() {
   const panel = document.getElementById('schedule-panel');
   const days = [...panel.querySelectorAll('.sday')].map(day => ({
@@ -1026,11 +1052,11 @@ function getItineraryData() {
           type: 'row',
           time: el.querySelector('.stime')?.textContent.trim() || '',
           icon: el.querySelector('.sico')?.textContent.trim() || '',
-          labelHtml: el.querySelector('.slbl')?.innerHTML || ''
+          labelHtml: sanitizeItineraryHtml(el.querySelector('.slbl')?.innerHTML || '')
         };
       }
       if (el.classList.contains('snote')) {
-        return { type: 'note', html: el.innerHTML || '' };
+        return { type: 'note', html: sanitizeItineraryHtml(el.innerHTML || '') };
       }
       return null;
     }).filter(Boolean)
@@ -1096,9 +1122,10 @@ function sanitizeItineraryHtml(html) {
   return template.innerHTML;
 }
 
-function renderItinerary(itinerary) {
+function renderItinerary(itinerary, options = {}) {
+  const { persist = false, alertOnError = true } = options;
   if (!itinerary || !Array.isArray(itinerary.days)) {
-    alert('Invalid itinerary file: expected {"itinerary":{"days":[...]}}');
+    if (alertOnError) alert('Invalid itinerary data: expected {"days":[...]} or {"itinerary":{"days":[...]}}');
     return false;
   }
 
@@ -1159,14 +1186,103 @@ function renderItinerary(itinerary) {
 
     panel.appendChild(dayEl);
   });
+  applyItineraryEditMode();
+  if (persist) saveItinerary(false);
   return true;
+}
+
+function setItineraryStatus(text) {
+  const el = document.getElementById('itinerary-save-status');
+  if (!el) return;
+  el.textContent = text || '';
+  if (text) {
+    clearTimeout(setItineraryStatus._timer);
+    setItineraryStatus._timer = setTimeout(() => { el.textContent = ''; }, 2600);
+  }
+}
+
+function saveItinerary(showStatus = true) {
+  try {
+    localStorage.setItem(ITINERARY_STORAGE_KEY, JSON.stringify(getItineraryData()));
+    if (showStatus) setItineraryStatus('Saved');
+    return true;
+  } catch (e) {
+    if (showStatus) setItineraryStatus('Save failed');
+    console.warn('Could not save itinerary:', e);
+    return false;
+  }
+}
+
+function queueItinerarySave() {
+  setItineraryStatus('Editing...');
+  clearTimeout(itinerarySaveTimer);
+  itinerarySaveTimer = setTimeout(() => saveItinerary(), 600);
+}
+
+function loadStoredItinerary() {
+  try {
+    const raw = localStorage.getItem(ITINERARY_STORAGE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    const itinerary = data && data.itinerary ? data.itinerary : data;
+    const loaded = renderItinerary(itinerary, { alertOnError: false });
+    if (loaded) setItineraryStatus('Saved itinerary loaded');
+    return loaded;
+  } catch (e) {
+    console.warn('Could not load saved itinerary:', e);
+    return false;
+  }
+}
+
+function applyItineraryEditMode() {
+  const panel = document.getElementById('schedule-panel');
+  if (!panel) return;
+  panel.classList.toggle('itinerary-editing', itineraryEditMode);
+  panel.querySelectorAll(ITINERARY_EDITABLE_SELECTOR).forEach(el => {
+    el.contentEditable = itineraryEditMode ? 'true' : 'false';
+    el.spellcheck = false;
+  });
+  const editBtn = document.getElementById('edit-itinerary');
+  if (editBtn) {
+    editBtn.textContent = itineraryEditMode ? '✓ Done' : '✏️ Edit';
+    editBtn.classList.toggle('is-editing', itineraryEditMode);
+  }
+}
+
+function setItineraryEditMode(enabled) {
+  if (itineraryEditMode && !enabled) {
+    const current = getItineraryData();
+    renderItinerary(current, { persist: true });
+  }
+  itineraryEditMode = enabled;
+  applyItineraryEditMode();
+}
+
+function resetItinerary() {
+  if (!defaultItineraryData) return;
+  if (!confirm('Restore the original itinerary bundled in this file?')) return;
+  localStorage.removeItem(ITINERARY_STORAGE_KEY);
+  itineraryEditMode = false;
+  renderItinerary(defaultItineraryData);
+  applyItineraryEditMode();
+  setItineraryStatus('Restored');
+}
+
+function setItineraryData(itinerary, options = {}) {
+  const data = itinerary && itinerary.itinerary ? itinerary.itinerary : itinerary;
+  const ok = renderItinerary(data, {
+    persist: options.persist !== false,
+    alertOnError: options.alertOnError !== false
+  });
+  if (ok) setItineraryStatus(options.persist === false ? 'Updated' : 'Saved');
+  return ok;
 }
 
 async function importItineraryFromFile(file) {
   try {
     const data = JSON.parse(await file.text());
     const itinerary = data && data.itinerary ? data.itinerary : data;
-    if (renderItinerary(itinerary)) {
+    if (renderItinerary(itinerary, { persist: true })) {
       alert(`Imported ${itinerary.days.length} itinerary day${itinerary.days.length===1?'':'s'}.`);
     }
   } catch (e) {
@@ -1175,6 +1291,15 @@ async function importItineraryFromFile(file) {
 }
 
 function setupItineraryImportExport() {
+  defaultItineraryData = getItineraryData();
+  loadStoredItinerary();
+
+  document.getElementById('edit-itinerary').addEventListener('click', () => {
+    setItineraryEditMode(!itineraryEditMode);
+  });
+  document.getElementById('save-itinerary').addEventListener('click', () => saveItinerary());
+  document.getElementById('reset-itinerary').addEventListener('click', resetItinerary);
+
   document.getElementById('export-itinerary').addEventListener('click', exportItinerary);
   const input = document.getElementById('import-itinerary-file');
   document.getElementById('import-itinerary').addEventListener('click', () => input.click());
@@ -1183,6 +1308,13 @@ function setupItineraryImportExport() {
     if (file) importItineraryFromFile(file);
     e.target.value = '';
   });
+
+  const panel = document.getElementById('schedule-panel');
+  panel.addEventListener('input', e => {
+    if (!itineraryEditMode || !e.target.closest(ITINERARY_EDITABLE_SELECTOR)) return;
+    queueItinerarySave();
+  });
+  applyItineraryEditMode();
 }
 
 function openVenueByName(name) {
@@ -1203,6 +1335,10 @@ function handleHash() {
 }
 window.addEventListener('hashchange', handleHash);
 window.addEventListener('load', () => setTimeout(handleHash, 1500));
+window.getItineraryData = getItineraryData;
+window.setItineraryData = setItineraryData;
+window.saveItinerary = saveItinerary;
+window.resetItinerary = resetItinerary;
 setupItineraryImportExport();
 </script>
 </body>
