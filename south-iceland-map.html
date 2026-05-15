@@ -553,7 +553,7 @@ async function importFavoritesFromFile(file) {
 let _openPlace = null, _openMarker = null;
 
 function ratingLineHtml(place) {
-  if (place.rating) return starsHtml(place.rating, place.ratingCount, place.placeId);
+  if (place.rating) return starsHtml(place);
   return `<div id="rating-placeholder" style="font-size:.72rem;color:#4a7090;margin-bottom:6px;">⭐ fetching rating…</div>`;
 }
 
@@ -597,7 +597,7 @@ function openPopup(place, marker) {
 function refreshOpenPopupRating() {
   if (!_openPlace || !_openPlace.rating) return;
   const el = document.getElementById('rating-placeholder');
-  if (el) el.outerHTML = starsHtml(_openPlace.rating, _openPlace.ratingCount, _openPlace.placeId);
+  if (el) el.outerHTML = starsHtml(_openPlace);
 }
 
 function catFor(id) { return CATS.find(c => c.id === id); }
@@ -698,15 +698,20 @@ let minRating = 0;
 const RATINGS_KEY = 'iceland_map_ratings_v2';
 const CACHE_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days
 
-function starsHtml(rating, count, placeId) {
+function starsHtml(place) {
+  const rating = place.rating;
   if (!rating) return '';
+  const count = place.ratingCount;
   const full = Math.floor(rating);
   const half = (rating - full) >= 0.3 ? 1 : 0;
   const empty = 5 - full - half;
   const stars = '★'.repeat(full) + (half ? '⯨' : '') + '☆'.repeat(empty);
   const cnt = count ? ` <span style="opacity:.55">(${count >= 1000 ? (count/1000).toFixed(1)+'k' : count})</span>` : '';
-  const href = placeId ? `https://www.google.com/maps/place/?q=place_id:${placeId}` : `https://www.google.com/maps/search/${encodeURIComponent(stars)}`;
-  return `<a href="${href}" target="_blank" style="display:block;color:#f5c842;font-size:.8rem;margin-bottom:6px;text-decoration:none;cursor:pointer;" title="View on Google Maps">${stars} <span style="color:#c8a820">${rating.toFixed(1)}</span>${cnt} <span style="font-size:.6rem;color:#4a9abb">↗</span></a>`;
+  const query = encodeURIComponent(`${place.name}, Iceland`);
+  const href = place.placeId
+    ? `https://www.google.com/maps/search/?api=1&query=${query}&query_place_id=${place.placeId}`
+    : `https://www.google.com/maps/search/?api=1&query=${query}`;
+  return `<a href="${href}" target="_blank" rel="noopener" style="display:block;color:#f5c842;font-size:.8rem;margin-bottom:6px;text-decoration:none;cursor:pointer;" title="View on Google Maps">${stars} <span style="color:#c8a820">${rating.toFixed(1)}</span>${cnt} <span style="font-size:.6rem;color:#4a9abb">↗</span></a>`;
 }
 
 function loadRatingsCache() {
