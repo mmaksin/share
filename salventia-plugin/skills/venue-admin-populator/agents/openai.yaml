@@ -1,0 +1,4 @@
+interface:
+  display_name: "Venue Admin Populator"
+  short_description: "Populate Salventia venue admin records from URLs or files."
+  default_prompt: "Use this skill to create or update a venue in admin.salventia.com from source URLs or provided files."

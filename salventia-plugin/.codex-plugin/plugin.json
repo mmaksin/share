@@ -1,0 +1,7 @@
+{
+  "name": "venue-admin-populator",
+  "version": "1.0.0",
+  "description": "Populate Salventia venue admin records from URLs or files.",
+  "skills": "./skills/"
+}
+
