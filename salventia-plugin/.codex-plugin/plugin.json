@@ -2,6 +2,26 @@
   "name": "venue-admin-populator",
   "version": "1.1.0",
   "description": "Populate Salventia venue admin records from URLs or files.",
-  "skills": "./skills/"
+  "author": {
+    "name": "M Maksin",
+    "url": "https://github.com/mmaksin"
+  },
+  "homepage": "https://mmaksin.github.io/share/salventia-plugin/",
+  "repository": "https://github.com/mmaksin/share",
+  "keywords": ["salventia", "venue-admin", "data-entry"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Salventia Venue Admin Populator",
+    "shortDescription": "Populate Salventia venue records from source material.",
+    "longDescription": "Use Salventia venue source material to create or update admin venue records, including descriptions, mappings, rooms, seasons, rates, packages, services, and discounts.",
+    "developerName": "M Maksin",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "websiteURL": "https://mmaksin.github.io/share/salventia-plugin/",
+    "defaultPrompt": [
+      "Populate a Salventia venue from these sources.",
+      "Update this Salventia venue admin record."
+    ],
+    "brandColor": "#0B65C2"
+  }
 }
-
